@@ -1,73 +1,86 @@
-# Welcome to your Lovable project
+# 🕌 Prayer Debt Tracker - Трекер пропущенных намазов (Каза)
 
-## Project info
+Telegram Mini App для расчета и отслеживания восполнения пропущенных обязательных намазов по ханафитскому мазхабу.
 
-**URL**: https://lovable.dev/projects/46d0cebe-8ebf-43c5-bb23-7131a1927e8f
+## ✨ Основные функции
 
-## How can I edit this code?
+### 📊 Пропущенные намазы (Каза)
+- **Расчёт долга** - автоматический расчет пропущенных намазов с момента булюга
+- **Прогресс** - отслеживание восполнения по каждому намазу
+- **AI-план** - персональные рекомендации для эффективного восполнения
+- **Сафар-намазы** - отдельный трекинг сокращенных намазов в путешествиях
+- **Отчёты** - детальная статистика и PDF отчеты
+- **Цели** - система целей и привычек с автоматическим созданием
+- **Календарь** - визуальный календарь с отслеживанием по дням
 
-There are several ways of editing your application.
+### 📿 Зикры
+- **Дуа** - 9 категорий, 26 мольб (перед сном, после намаза, в хадже и т.д.)
+- **Азкары** - 5 категорий, 13 поминаний с счетчиками
+- **Салаваты** - благословения на Пророка Мухаммада ﷺ
+- **Калимы** - все 6 основополагающих формул веры
 
-**Use Lovable**
+## 🚀 Технологии
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/46d0cebe-8ebf-43c5-bb23-7131a1927e8f) and start prompting.
+- **Frontend**: React 18 + TypeScript
+- **UI**: shadcn/ui + Tailwind CSS
+- **Роутинг**: React Router
+- **State**: React Query
+- **Сборка**: Vite
+- **Интеграции**: Telegram WebApp API, e-Replika API
 
-Changes made via Lovable will be committed automatically to this repo.
+## 📦 Установка
 
-**Use your preferred IDE**
+```bash
+# Клонировать репозиторий
+git clone https://github.com/ahmed11551/prayer-debt-tracker.git
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+# Установить зависимости
+npm install
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Запустить dev сервер
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## ⚙️ Настройка
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Создайте файл `.env` в корне проекта:
 
-**Use GitHub Codespaces**
+```env
+VITE_API_BASE_URL=https://bot.e-replika.ru/api
+VITE_INTERNAL_API_URL=/api
+VITE_API_TOKEN=your_api_token_here
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🏗️ Сборка
 
-## What technologies are used for this project?
+```bash
+# Production сборка
+npm run build
 
-This project is built with:
+# Preview сборки
+npm run preview
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 📱 Telegram Mini App
 
-## How can I deploy this project?
+Приложение готово для использования в Telegram Mini App. Telegram WebApp API автоматически инициализируется при загрузке.
 
-Simply open [Lovable](https://lovable.dev/projects/46d0cebe-8ebf-43c5-bb23-7131a1927e8f) and click on Share -> Publish.
+## 📋 Особенности
 
-## Can I connect a custom domain to my Lovable project?
+- ✅ Полная реализация ТЗ
+- ✅ Поддержка мазхабов (Ханафитский, Шафиитский)
+- ✅ AI-функции (мотиватор, трекер, оптимизатор)
+- ✅ Интеграция с e-Replika API
+- ✅ AuditLog для безопасности
+- ✅ Согласие на обработку данных
+- ✅ Соревновательный эффект с друзьями
+- ✅ Категоризированные дуа и азкары
 
-Yes, you can!
+## 📄 Лицензия
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Проект создан для использования в Telegram Mini App MubarakWay.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 🔗 Ссылки
+
+- [e-Replika API Documentation](https://bot.e-replika.ru/docs#/)
+- [Telegram WebApp API](https://core.telegram.org/bots/webapps)

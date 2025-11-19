@@ -1,61 +1,60 @@
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalculatorSection } from "@/components/qaza/CalculatorSection";
-import { ProgressSection } from "@/components/qaza/ProgressSection";
-import { TravelPrayersSection } from "@/components/qaza/TravelPrayersSection";
-import { ReportsSection } from "@/components/qaza/ReportsSection";
 import { MainHeader } from "@/components/layout/MainHeader";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DuaSection } from "@/components/dhikr/DuaSection";
+import { AdhkarSection } from "@/components/dhikr/AdhkarSection";
+import { SalawatSection } from "@/components/dhikr/SalawatSection";
+import { KalimaSection } from "@/components/dhikr/KalimaSection";
 
-const Index = () => {
+const Dhikr = () => {
   return (
     <div className="min-h-screen bg-gradient-hero pb-20">
       <MainHeader />
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-6 max-w-5xl">
-        <Tabs defaultValue="calculator" className="w-full">
+        <Tabs defaultValue="dua" className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-6 glass shadow-medium h-auto p-1">
             <TabsTrigger 
-              value="calculator" 
+              value="dua"
               className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300"
             >
-              Расчёт
+              Дуа
             </TabsTrigger>
             <TabsTrigger 
-              value="progress"
+              value="adhkar"
               className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300"
             >
-              Прогресс
+              Азкары
             </TabsTrigger>
             <TabsTrigger 
-              value="travel"
+              value="salawat"
               className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300"
             >
-              Сафар
+              Салаваты
             </TabsTrigger>
             <TabsTrigger 
-              value="reports"
+              value="kalima"
               className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300"
             >
-              Отчёты
+              Калимы
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="calculator">
-            <CalculatorSection />
+          <TabsContent value="dua">
+            <DuaSection />
           </TabsContent>
 
-          <TabsContent value="progress">
-            <ProgressSection />
+          <TabsContent value="adhkar">
+            <AdhkarSection />
           </TabsContent>
 
-          <TabsContent value="travel">
-            <TravelPrayersSection />
+          <TabsContent value="salawat">
+            <SalawatSection />
           </TabsContent>
 
-          <TabsContent value="reports">
-            <ReportsSection />
+          <TabsContent value="kalima">
+            <KalimaSection />
           </TabsContent>
         </Tabs>
       </main>
@@ -65,4 +64,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Dhikr;

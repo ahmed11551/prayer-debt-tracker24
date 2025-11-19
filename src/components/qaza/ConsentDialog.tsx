@@ -122,7 +122,7 @@ export function ConsentDialog() {
           <Button
             onClick={handleAccept}
             disabled={!readTerms}
-            className="flex-1 bg-gradient-primary"
+            className="flex-1 bg-primary"
           >
             Принять
           </Button>

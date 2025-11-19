@@ -216,7 +216,7 @@ export const TravelPeriodsDialog = ({
           >
             Отмена
           </Button>
-          <Button onClick={handleSave} className="flex-1 bg-gradient-primary">
+          <Button onClick={handleSave} className="flex-1 bg-primary">
             Сохранить
           </Button>
         </div>

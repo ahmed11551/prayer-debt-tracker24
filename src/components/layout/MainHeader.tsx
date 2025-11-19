@@ -19,8 +19,8 @@ export const MainHeader = () => {
       <div className="container mx-auto px-4 py-4 max-w-5xl">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-primary opacity-20 blur-xl rounded-full animate-pulse" />
-            <div className="relative w-14 h-14 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-glow">
+            <div className="absolute inset-0 bg-primary opacity-20 blur-xl rounded-full animate-pulse" />
+            <div className="relative w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-glow">
               <Sparkles className="w-7 h-7 text-primary-foreground" />
             </div>
           </div>

@@ -41,7 +41,7 @@ export const BottomNav = () => {
                   {label}
                 </span>
                 {isActive && (
-                  <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-primary rounded-full shadow-glow" />
+                  <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-full shadow-glow" />
                 )}
               </Link>
             );

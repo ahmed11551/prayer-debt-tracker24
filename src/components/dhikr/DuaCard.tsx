@@ -101,7 +101,7 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
             )}
           </Button>
           <div className="flex-1 h-2 bg-border/30 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-primary w-0 transition-all duration-300" />
+            <div className="h-full bg-primary w-0 transition-all duration-300" />
           </div>
           <Volume2 className="w-5 h-5 text-muted-foreground" />
         </div>

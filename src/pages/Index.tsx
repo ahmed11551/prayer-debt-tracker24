@@ -20,46 +20,46 @@ const Index = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6 max-w-5xl">
         <Tabs defaultValue="calculator" className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-6 glass shadow-medium h-auto p-1 overflow-x-auto">
+          <TabsList className="grid w-full grid-cols-7 mb-6 glass shadow-medium h-auto p-1.5 gap-1 overflow-x-auto">
             <TabsTrigger 
               value="calculator" 
-              className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium"
             >
               Расчёт
             </TabsTrigger>
             <TabsTrigger 
               value="progress"
-              className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium"
             >
               Прогресс
             </TabsTrigger>
             <TabsTrigger 
               value="plan"
-              className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium"
             >
               План
             </TabsTrigger>
             <TabsTrigger 
               value="travel"
-              className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium"
             >
               Сафар
             </TabsTrigger>
             <TabsTrigger 
               value="reports"
-              className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium"
             >
               Отчёты
             </TabsTrigger>
             <TabsTrigger 
               value="goals"
-              className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium"
             >
               Цели
             </TabsTrigger>
             <TabsTrigger 
               value="calendar"
-              className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium"
             >
               Календарь
             </TabsTrigger>

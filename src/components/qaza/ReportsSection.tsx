@@ -181,7 +181,7 @@ export const ReportsSection = () => {
                   <stat.icon className="w-4 h-4" />
                   <span className="text-sm">{stat.label}</span>
                 </div>
-                <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                <div className="text-3xl font-bold gradient-text">
                   {stat.value}
                 </div>
                 <p className="text-sm text-muted-foreground">{stat.description}</p>
@@ -227,7 +227,7 @@ export const ReportsSection = () => {
             {[10, 12, 8, 15, 11, 13, 14].map((value, index) => (
               <div key={index} className="flex-1 flex flex-col items-center gap-2">
                 <div
-                  className="w-full bg-gradient-primary rounded-t-lg transition-all duration-500 hover:opacity-80"
+                  className="w-full bg-primary rounded-t-lg transition-all duration-500 hover:opacity-80"
                   style={{ height: `${(value / 15) * 100}%` }}
                 />
                 <span className="text-xs text-muted-foreground">
@@ -245,7 +245,7 @@ export const ReportsSection = () => {
           onClick={handleDownloadPDF}
           disabled={loading}
           size="lg"
-          className="bg-gradient-primary hover:opacity-90 transition-opacity shadow-glow"
+          className="bg-primary hover:opacity-90 transition-opacity shadow-glow"
         >
           <Download className="w-5 h-5 mr-2" />
           {loading ? "Формирование..." : "Скачать PDF отчёт"}

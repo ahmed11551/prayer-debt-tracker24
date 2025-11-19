@@ -187,7 +187,7 @@ export const AddPrayerDialog = ({ open, onOpenChange, onUpdate }: AddPrayerDialo
           </Button>
           <Button
             onClick={handleSave}
-            className="flex-1 bg-gradient-primary hover:opacity-90"
+            className="flex-1 bg-primary hover:opacity-90"
           >
             Сохранить
           </Button>

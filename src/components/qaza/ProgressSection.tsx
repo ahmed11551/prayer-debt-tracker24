@@ -62,7 +62,7 @@ export const ProgressSection = () => {
                   const calculatorTab = document.querySelector('[value="calculator"]') as HTMLElement;
                   if (calculatorTab) calculatorTab.click();
                 }}
-                className="bg-gradient-primary"
+                className="bg-primary"
               >
                 Перейти к расчёту
               </Button>
@@ -150,7 +150,7 @@ export const ProgressSection = () => {
               </CardDescription>
             </div>
             <div className="text-right">
-              <div className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              <div className="text-4xl font-bold gradient-text">
                 {overallProgress}%
               </div>
               <div className="text-sm text-muted-foreground flex items-center gap-1">
@@ -173,7 +173,7 @@ export const ProgressSection = () => {
       <Button
         onClick={() => setDialogOpen(true)}
         size="lg"
-        className="w-full bg-gradient-primary hover:opacity-90 transition-opacity shadow-glow"
+        className="w-full bg-primary hover:opacity-90 transition-opacity shadow-glow"
       >
         <Plus className="w-5 h-5 mr-2" />
         Отметить восполненные намазы

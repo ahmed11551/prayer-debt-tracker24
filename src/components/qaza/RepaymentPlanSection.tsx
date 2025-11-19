@@ -226,7 +226,7 @@ export const RepaymentPlanSection = () => {
                 <TrendingUp className="w-4 h-4" />
                 <span className="text-sm">Текущий темп</span>
               </div>
-              <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              <div className="text-3xl font-bold gradient-text">
                 {plan.currentPace}
               </div>
               <p className="text-sm text-muted-foreground">намазов/день</p>
@@ -241,7 +241,7 @@ export const RepaymentPlanSection = () => {
                 <Target className="w-4 h-4" />
                 <span className="text-sm">Еженедельная цель</span>
               </div>
-              <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              <div className="text-3xl font-bold gradient-text">
                 {plan.weeklyGoal}
               </div>
               <p className="text-sm text-muted-foreground">намазов/неделя</p>
@@ -256,7 +256,7 @@ export const RepaymentPlanSection = () => {
                 <Clock className="w-4 h-4" />
                 <span className="text-sm">До завершения</span>
               </div>
-              <div className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              <div className="text-2xl font-bold gradient-text">
                 {plan.estimatedCompletion.months} мес. {plan.estimatedCompletion.days} дн.
               </div>
               <p className="text-sm text-muted-foreground">при текущем темпе</p>

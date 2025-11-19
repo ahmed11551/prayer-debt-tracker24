@@ -14,28 +14,28 @@ const Dhikr = () => {
 
       <main className="container mx-auto px-4 py-6 max-w-5xl">
         <Tabs defaultValue="dua" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6 glass shadow-medium h-auto p-1">
+          <TabsList className="grid w-full grid-cols-4 mb-6 glass shadow-medium h-auto p-1.5 gap-1">
             <TabsTrigger 
               value="dua"
-              className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 px-3 py-2 text-sm font-medium"
             >
               Дуа
             </TabsTrigger>
             <TabsTrigger 
               value="adhkar"
-              className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 px-3 py-2 text-sm font-medium"
             >
               Азкары
             </TabsTrigger>
             <TabsTrigger 
               value="salawat"
-              className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 px-3 py-2 text-sm font-medium"
             >
               Салаваты
             </TabsTrigger>
             <TabsTrigger 
               value="kalima"
-              className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 px-3 py-2 text-sm font-medium"
             >
               Калимы
             </TabsTrigger>

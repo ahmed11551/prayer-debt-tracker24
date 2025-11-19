@@ -222,7 +222,7 @@ export const GoalsAndHabits = () => {
               />
             </div>
           </div>
-          <Button onClick={handleCreateGoal} className="w-full bg-gradient-primary">
+          <Button onClick={handleCreateGoal} className="w-full bg-primary">
             <Target className="w-4 h-4 mr-2" />
             Создать цель
           </Button>

@@ -27,7 +27,7 @@ export const PrayerProgressCard = ({
               <span className="text-2xl">{emoji}</span>
               <h3 className="font-semibold text-foreground">{name}</h3>
             </div>
-            <div className="text-sm font-bold bg-gradient-primary bg-clip-text text-transparent">
+            <div className="text-sm font-bold gradient-text">
               {percentage}%
             </div>
           </div>

@@ -196,7 +196,7 @@ export const ShareAndFriends = () => {
                 key={achievement.id}
                 className={`text-center p-4 rounded-lg border transition-all ${
                   achievement.unlocked
-                    ? "bg-gradient-primary/10 border-primary/50 shadow-glow"
+                    ? "bg-primary/10 border-primary/50 shadow-glow"
                     : "bg-card opacity-50 border-border"
                 }`}
               >
@@ -256,7 +256,7 @@ export const ShareAndFriends = () => {
                     >
                       Отмена
                     </Button>
-                    <Button onClick={handleAddFriend} className="flex-1 bg-gradient-primary">
+                    <Button onClick={handleAddFriend} className="flex-1 bg-primary">
                       Добавить
                     </Button>
                   </div>
@@ -269,9 +269,9 @@ export const ShareAndFriends = () => {
         <CardContent>
           <div className="space-y-3">
             {/* Your Progress */}
-            <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-primary/10 border border-primary/50">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-primary/10 border border-primary/50">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold">
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
                   Вы
                 </div>
                 <div>
@@ -279,7 +279,7 @@ export const ShareAndFriends = () => {
                   <div className="text-sm text-muted-foreground">{overallProgress}% выполнено</div>
                 </div>
               </div>
-              <Badge variant="default" className="bg-gradient-primary">
+              <Badge variant="default" className="bg-primary">
                 {overallProgress}%
               </Badge>
             </div>
@@ -291,7 +291,7 @@ export const ShareAndFriends = () => {
                 className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 border border-border/50 hover:bg-secondary transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-primary/20 flex items-center justify-center text-primary font-bold">
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
                     {friend.name[0]}
                   </div>
                   <div>

@@ -98,7 +98,7 @@ export const TravelPrayersSection = () => {
                   <div>
                     <div className="flex justify-between text-sm mb-2">
                       <span className="text-muted-foreground">Прогресс</span>
-                      <span className="font-bold bg-gradient-primary bg-clip-text text-transparent">
+                      <span className="font-bold gradient-text">
                         {percentage}%
                       </span>
                     </div>
@@ -123,7 +123,7 @@ export const TravelPrayersSection = () => {
       </div>
 
       {/* Summary Card */}
-      <Card className="bg-gradient-primary text-primary-foreground shadow-glow">
+      <Card className="bg-primary text-primary-foreground shadow-glow">
         <CardContent className="pt-6">
           <div className="text-center space-y-2">
             <div className="text-sm opacity-90">Общий прогресс сафар-намазов</div>

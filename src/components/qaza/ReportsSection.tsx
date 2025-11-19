@@ -61,7 +61,7 @@ export const ReportsSection = () => {
       } catch (apiError) {
         // Fallback: генерация через e-Replika API
         try {
-          const blob = await eReplikaAPI.generatePDFReport(userData.user_id);
+          const blob = await eReplikaAPI.generatePDFReport(userData.user_id, userData);
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
@@ -72,12 +72,14 @@ export const ReportsSection = () => {
           window.URL.revokeObjectURL(url);
           toast({
             title: "PDF отчёт скачан",
-            description: "Отчёт успешно сохранён",
+            description: "Отчёт сгенерирован через e-Replika API",
           });
         } catch (error) {
+          console.error("e-Replika API error:", error);
           toast({
-            title: "PDF отчёт формируется",
-            description: "Ваш отчёт будет готов через несколько секунд",
+            title: "Ошибка генерации PDF",
+            description: error instanceof Error ? error.message : "Не удалось сгенерировать PDF через e-Replika API",
+            variant: "destructive",
           });
         }
       }

@@ -13,6 +13,26 @@ function getAuthToken(): string | null {
   return import.meta.env.VITE_API_TOKEN || null;
 }
 
+// Получение заголовков для запросов к e-Replika API
+function getAuthHeaders(): HeadersInit {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+  
+  const token = getAuthToken();
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  
+  // Добавляем API ключ, если он указан в env
+  const apiKey = import.meta.env.VITE_E_REPLIKA_API_KEY;
+  if (apiKey) {
+    headers["X-API-Key"] = apiKey;
+  }
+  
+  return headers;
+}
+
 import type {
   CalculationRequest,
   DebtSnapshot,
@@ -28,25 +48,32 @@ export const eReplikaAPI = {
   // Эндпоинт согласно документации e-Replika API
   async getTerms(): Promise<Term[]> {
     try {
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
-      
-      const token = getAuthToken();
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
       const response = await fetch(`${API_BASE_URL}/terms`, {
         method: "GET",
-        headers,
+        headers: getAuthHeaders(),
       });
 
       if (!response.ok) {
+        // Если 404 или другой ошибка, возвращаем дефолтные термины
+        if (response.status === 404) {
+          console.warn("Terms endpoint not found, using default terms");
+          return getDefaultTerms();
+        }
         throw new Error(`Failed to fetch terms: ${response.statusText}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      // Проверяем формат ответа
+      if (Array.isArray(data)) {
+        return data;
+      }
+      // Если ответ в другом формате, пытаемся извлечь массив
+      if (data.terms && Array.isArray(data.terms)) {
+        return data.terms;
+      }
+      // Если формат неизвестен, возвращаем дефолтные термины
+      console.warn("Unexpected response format, using default terms");
+      return getDefaultTerms();
     } catch (error) {
       console.error("Error fetching terms:", error);
       // Возвращаем базовый набор терминов, если API недоступен
@@ -58,32 +85,31 @@ export const eReplikaAPI = {
   // Эндпоинт согласно документации e-Replika API
   async convertToHijri(gregorianDate: Date): Promise<{ year: number; month: number; day: number }> {
     try {
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
-      
-      const token = getAuthToken();
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
       const response = await fetch(`${API_BASE_URL}/calendar/convert-to-hijri`, {
         method: "POST",
-        headers,
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           date: gregorianDate.toISOString().split("T")[0],
         }),
       });
 
       if (!response.ok) {
+        // Если API недоступен, пробрасываем ошибку для fallback
         throw new Error(`Failed to convert date: ${response.statusText}`);
       }
 
       const data = await response.json();
-      return { year: data.year, month: data.month, day: data.day };
+      // Поддерживаем разные форматы ответа
+      if (data.year && data.month && data.day) {
+        return { year: data.year, month: data.month, day: data.day };
+      }
+      if (data.hijri) {
+        return { year: data.hijri.year, month: data.hijri.month, day: data.hijri.day };
+      }
+      throw new Error("Unexpected response format from convert-to-hijri");
     } catch (error) {
       console.error("Error converting to Hijri:", error);
-      // Fallback на упрощенную конвертацию
+      // Fallback на упрощенную конвертацию будет обработан в prayer-calculator
       throw error;
     }
   },
@@ -91,18 +117,9 @@ export const eReplikaAPI = {
   // Конвертация даты из хиджры в григорианский календарь
   async convertFromHijri(hijriDate: { year: number; month: number; day: number }): Promise<Date> {
     try {
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
-      
-      const token = getAuthToken();
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
       const response = await fetch(`${API_BASE_URL}/calendar/convert-from-hijri`, {
         method: "POST",
-        headers,
+        headers: getAuthHeaders(),
         body: JSON.stringify(hijriDate),
       });
 
@@ -111,7 +128,14 @@ export const eReplikaAPI = {
       }
 
       const data = await response.json();
-      return new Date(data.date);
+      // Поддерживаем разные форматы ответа
+      if (data.date) {
+        return new Date(data.date);
+      }
+      if (data.gregorian) {
+        return new Date(data.gregorian);
+      }
+      throw new Error("Unexpected response format from convert-from-hijri");
     } catch (error) {
       console.error("Error converting from Hijri:", error);
       throw error;
@@ -120,27 +144,46 @@ export const eReplikaAPI = {
 
   // Генерация PDF отчета через e-Replika API
   // Эндпоинт согласно документации: /reports/pdf
-  async generatePDFReport(userId: string): Promise<Blob> {
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
-    };
-    
-    const token = getAuthToken();
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
+  async generatePDFReport(userId: string, userData?: any): Promise<Blob> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/reports/pdf`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ 
+          user_id: userId,
+          ...(userData && { data: userData })
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to generate PDF: ${response.statusText} - ${errorText}`);
+      }
+
+      // Проверяем, что ответ действительно PDF
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/pdf")) {
+        return await response.blob();
+      }
+      
+      // Если не PDF, возможно это JSON с ошибкой или URL
+      const blob = await response.blob();
+      const text = await blob.text();
+      try {
+        const json = JSON.parse(text);
+        if (json.url) {
+          // Если API вернул URL, загружаем PDF по этому URL
+          const pdfResponse = await fetch(json.url);
+          return await pdfResponse.blob();
+        }
+        throw new Error(json.message || "Unexpected response format");
+      } catch {
+        throw new Error("Response is not a PDF file");
+      }
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      throw error;
     }
-
-    const response = await fetch(`${API_BASE_URL}/reports/pdf`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ user_id: userId }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to generate PDF: ${response.statusText}`);
-    }
-
-    return await response.blob();
   },
 };
 

@@ -1,0 +1,53 @@
+import { Home, BookOpen } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
+
+export const BottomNav = () => {
+  const location = useLocation();
+
+  const navItems = [
+    { path: "/", icon: Home, label: "Каза" },
+    { path: "/dhikr", icon: BookOpen, label: "Зикры" },
+  ];
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border/50 backdrop-blur-xl z-50">
+      <div className="container mx-auto px-4 max-w-5xl">
+        <div className="flex justify-around items-center h-16">
+          {navItems.map(({ path, icon: Icon, label }) => {
+            const isActive = location.pathname === path;
+            return (
+              <Link
+                key={path}
+                to={path}
+                className={cn(
+                  "flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-all duration-300 group relative",
+                  isActive
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {isActive && (
+                  <div className="absolute inset-0 bg-primary/10 rounded-xl shadow-inner" />
+                )}
+                <Icon className={cn(
+                  "w-6 h-6 transition-transform duration-300 relative z-10",
+                  isActive ? "scale-110" : "group-hover:scale-105"
+                )} />
+                <span className={cn(
+                  "text-xs font-medium relative z-10",
+                  isActive && "gradient-text"
+                )}>
+                  {label}
+                </span>
+                {isActive && (
+                  <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-12 h-1 bg-gradient-primary rounded-full shadow-glow" />
+                )}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </nav>
+  );
+};

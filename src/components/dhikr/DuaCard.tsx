@@ -57,16 +57,35 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
     if ("speechSynthesis" in window) {
       try {
         const synth = window.speechSynthesis;
-        // Проверяем, есть ли доступные голоса
-        const voices = synth.getVoices();
-        setIsTTSAvailable(voices.length > 0);
         synthRef.current = synth;
         
+        // Функция для проверки доступности голосов
+        const checkVoices = () => {
+          try {
+            const voices = synth.getVoices();
+            const hasArabicVoice = voices.some(voice => 
+              voice.lang.startsWith('ar') || voice.lang.includes('Arabic')
+            );
+            setIsTTSAvailable(voices.length > 0);
+            
+            // Если есть арабские голоса, это лучше
+            if (hasArabicVoice) {
+              console.log("Arabic TTS voices available");
+            }
+          } catch (error) {
+            console.warn("Error checking voices:", error);
+            setIsTTSAvailable(false);
+          }
+        };
+        
+        // Проверяем сразу
+        checkVoices();
+        
         // Если голоса еще не загружены, ждем события voiceschanged
+        const voices = synth.getVoices();
         if (voices.length === 0) {
           const onVoicesChanged = () => {
-            const updatedVoices = synth.getVoices();
-            setIsTTSAvailable(updatedVoices.length > 0);
+            checkVoices();
             synth.removeEventListener("voiceschanged", onVoicesChanged);
           };
           synth.addEventListener("voiceschanged", onVoicesChanged);
@@ -192,7 +211,21 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
 
   // Загрузка аудио из API, если не указано
   useEffect(() => {
-    if (!dua.audioUrl && dua.id && !audioUrl) {
+    // Если audioUrl уже есть в пропсах, используем его
+    if (dua.audioUrl) {
+      setAudioUrl(dua.audioUrl);
+      setIsLoadingAudio(false);
+      return;
+    }
+
+    // Если audioUrl уже загружен, не загружаем снова
+    if (audioUrl) {
+      setIsLoadingAudio(false);
+      return;
+    }
+
+    // Загружаем из API только если нет audioUrl и есть id
+    if (!dua.audioUrl && dua.id) {
       setIsLoadingAudio(true);
       
       // Используем AbortController для отмены предыдущих запросов
@@ -222,29 +255,37 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
         isMounted = false;
         abortController.abort();
       };
-    } else if (dua.audioUrl) {
-      // Если audioUrl указан в пропсах, используем его
-      setAudioUrl(dua.audioUrl);
+    } else {
       setIsLoadingAudio(false);
     }
-  }, [dua.id, dua.audioUrl, audioUrl]);
+  }, [dua.id, dua.audioUrl]);
 
   // Инициализация аудио
   useEffect(() => {
     // Если есть audioUrl, создаем HTML5 Audio элемент
     if (audioUrl) {
+      // Очищаем предыдущий audio элемент
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current = null;
+      }
+
       const audio = new Audio(audioUrl);
       audioRef.current = audio;
 
+      // Предзагрузка аудио
+      audio.preload = "auto";
+
       // Обработчики событий
       const handleLoadedMetadata = () => {
-        if (audio.duration && !isNaN(audio.duration)) {
+        if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
           setDuration(audio.duration);
         }
       };
 
       const handleTimeUpdate = () => {
-        if (audio.duration && !isNaN(audio.duration)) {
+        if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
           setProgress((audio.currentTime / audio.duration) * 100);
         }
       };
@@ -256,11 +297,14 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
 
       const handleError = (e: Event) => {
         console.error("Audio error:", e);
-        toast({
-          title: "Ошибка воспроизведения",
-          description: "Не удалось загрузить аудио. Используется синтез речи.",
-          variant: "destructive",
-        });
+        // Не показываем ошибку сразу, пробуем TTS
+        setAudioUrl(null);
+        audioRef.current = null;
+      };
+
+      const handleCanPlay = () => {
+        // Аудио готово к воспроизведению
+        console.log("Audio ready to play");
       };
 
       // Добавляем обработчики
@@ -268,6 +312,10 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
       audio.addEventListener("timeupdate", handleTimeUpdate);
       audio.addEventListener("ended", handleEnded);
       audio.addEventListener("error", handleError);
+      audio.addEventListener("canplay", handleCanPlay);
+
+      // Пытаемся загрузить метаданные
+      audio.load();
 
       // Cleanup: удаляем все обработчики и освобождаем ресурсы
       return () => {
@@ -275,14 +323,19 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
         audio.removeEventListener("timeupdate", handleTimeUpdate);
         audio.removeEventListener("ended", handleEnded);
         audio.removeEventListener("error", handleError);
+        audio.removeEventListener("canplay", handleCanPlay);
         audio.pause();
         audio.src = "";
         audioRef.current = null;
       };
     } else {
-      audioRef.current = null;
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current = null;
+      }
     }
-  }, [audioUrl, toast]);
+  }, [audioUrl]);
 
   // Воспроизведение через синтез речи (fallback)
   const playWithTTS = useCallback(() => {
@@ -298,7 +351,20 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
 
     // Создаем utterance для арабского текста
     const arabicUtterance = new SpeechSynthesisUtterance(dua.arabic);
-    arabicUtterance.lang = "ar-SA";
+    
+    // Пытаемся найти арабский голос
+    const voices = synthRef.current.getVoices();
+    const arabicVoice = voices.find(voice => 
+      voice.lang.startsWith('ar') || voice.lang.includes('Arabic')
+    );
+    
+    if (arabicVoice) {
+      arabicUtterance.voice = arabicVoice;
+      arabicUtterance.lang = arabicVoice.lang;
+    } else {
+      arabicUtterance.lang = "ar-SA";
+    }
+    
     arabicUtterance.rate = 0.75;
     arabicUtterance.volume = isMuted ? 0 : volume;
     arabicUtterance.pitch = 1;
@@ -402,32 +468,46 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
 
       if (audioUrl && audioRef.current) {
         // Используем аудио файл
-        audioRef.current.volume = isMuted ? 0 : volume;
-        audioRef.current.play().catch((error) => {
-          console.error("Play error:", error);
-          // Fallback на TTS только если доступен
+        try {
+          audioRef.current.volume = isMuted ? 0 : volume;
+          const playPromise = audioRef.current.play();
+          
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                setIsPlaying(true);
+              })
+              .catch((error) => {
+                console.error("Play error:", error);
+                setIsPlaying(false);
+                // Fallback на TTS только если доступен
+                if (isTTSAvailable) {
+                  playWithTTS();
+                } else {
+                  toast({
+                    title: "Воспроизведение недоступно",
+                    description: "Аудио файл не загружен, а синтез речи не поддерживается браузером",
+                    variant: "destructive",
+                  });
+                }
+              });
+          } else {
+            setIsPlaying(true);
+          }
+        } catch (error) {
+          console.error("Error starting playback:", error);
+          setIsPlaying(false);
+          // Fallback на TTS
           if (isTTSAvailable) {
             playWithTTS();
-          } else {
-            setIsPlaying(false);
-            toast({
-              title: "Воспроизведение недоступно",
-              description: "Аудио файл не загружен, а синтез речи не поддерживается браузером",
-              variant: "destructive",
-            });
           }
-        });
-        setIsPlaying(true);
+        }
       } else if (isTTSAvailable) {
         // Используем синтез речи только если доступен
         playWithTTS();
       } else {
-        // Нет способа воспроизведения
-        toast({
-          title: "Воспроизведение недоступно",
-          description: "Аудио файл не найден, а синтез речи не поддерживается вашим браузером",
-          variant: "destructive",
-        });
+        // Нет способа воспроизведения - не показываем ошибку, просто не воспроизводим
+        console.warn("No audio source available");
         setIsPlaying(false);
       }
     }
@@ -521,7 +601,7 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
               size="icon"
               variant="ghost"
               onClick={togglePlay}
-              disabled={!audioUrl && !isTTSAvailable && !isLoadingAudio}
+              disabled={!audioUrl && !isTTSAvailable}
               className="shrink-0 hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isPlaying ? (

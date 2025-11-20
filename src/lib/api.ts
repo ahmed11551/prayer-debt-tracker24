@@ -152,31 +152,24 @@ export const eReplikaAPI = {
   // Эндпоинт согласно документации e-Replika API
   async getDuaAudio(duaId: string): Promise<string | null> {
     try {
-      // Сначала пытаемся получить список всех дуа, чтобы найти правильный ID
-      // Локальные ID могут не совпадать с ID в API
-      let apiDuaId: string | null = null;
-      
-      try {
-        const duasList = await this.getDuas();
-        // Ищем дуа по арабскому тексту или пытаемся сопоставить ID
-        // Если не найдем, используем исходный duaId
-        apiDuaId = duaId; // Пока используем исходный ID
-      } catch (err) {
-        console.warn("Could not fetch duas list, using provided ID:", err);
-        apiDuaId = duaId;
-      }
+      // Локальные ID (например, "sleep-1", "kalima-1") могут не совпадать с ID в API
+      // API может использовать числовые ID или другие форматы
+      // Пробуем несколько вариантов ID
+      const possibleIds = [
+        duaId, // Оригинальный ID
+        duaId.replace(/^[a-z]+-/, ""), // Убираем префикс (например, "sleep-1" -> "1")
+        duaId.split("-").pop() || duaId, // Последняя часть после дефиса
+      ].filter((id, index, arr) => arr.indexOf(id) === index); // Убираем дубликаты
 
-      // Пробуем разные варианты эндпоинтов
-      const endpoints = [
-        `${API_BASE_URL}/duas/${apiDuaId}/audio`,
-        `${API_BASE_URL}/audio/dua/${apiDuaId}`,
-        `${API_BASE_URL}/dua/${apiDuaId}/audio`,
-        // Также пробуем числовой ID, если duaId содержит число
-        ...(apiDuaId.match(/\d+/) ? [
-          `${API_BASE_URL}/duas/${apiDuaId.match(/\d+/)?.[0]}/audio`,
-          `${API_BASE_URL}/audio/dua/${apiDuaId.match(/\d+/)?.[0]}`,
-        ] : []),
-      ];
+      // Пробуем разные варианты эндпоинтов для каждого возможного ID
+      const endpoints: string[] = [];
+      for (const id of possibleIds) {
+        endpoints.push(
+          `${API_BASE_URL}/duas/${id}/audio`,
+          `${API_BASE_URL}/audio/dua/${id}`,
+          `${API_BASE_URL}/dua/${id}/audio`,
+        );
+      }
 
       for (const endpoint of endpoints) {
         try {

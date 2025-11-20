@@ -24,7 +24,6 @@ export const InteractivePlanCalculator = ({
   currentEstimatedCompletion,
 }: InteractivePlanCalculatorProps) => {
   const [customDailyGoal, setCustomDailyGoal] = useState<number>(currentPace || 10);
-  const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Расчет оставшихся намазов
   const totalRemaining = useMemo(() => {

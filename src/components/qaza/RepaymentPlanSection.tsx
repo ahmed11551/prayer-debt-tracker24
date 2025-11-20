@@ -1,8 +1,8 @@
 // Компонент AI-плана восполнения
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bot, TrendingUp, Calendar, Target, Clock } from "lucide-react";
+import { Bot, TrendingUp, Calendar, Target, Clock, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -12,6 +12,7 @@ import {
   generateMotivationalMessage,
   detectMissedPrayerPatterns,
 } from "@/lib/ai-functions";
+import { useUserData } from "@/hooks/useUserData";
 
 interface RepaymentPlan {
   recommendations: Array<{
@@ -40,11 +41,11 @@ function optimizeRepaymentSchedule(snapshot: DebtSnapshot | null): RepaymentPlan
 
   const totalRemaining =
     Object.values(snapshot.remaining_prayers).reduce((sum, val) => sum + val, 0) +
-    Object.values(snapshot.debt_calculation.travel_prayers).reduce((sum, val) => sum + val, 0);
+    Object.values(snapshot.debt_calculation.travel_prayers || {}).reduce((sum, val) => sum + val, 0);
 
   // Расчет текущего темпа (на основе прогресса)
-  const totalCompleted = Object.values(snapshot.repayment_progress.completed_prayers).reduce(
-    (sum, val) => sum + val,
+  const totalCompleted = Object.values(snapshot.repayment_progress.completed_prayers || {}).reduce(
+    (sum, val) => sum + (val || 0),
     0
   );
   const daysSinceStart = Math.max(
@@ -76,74 +77,46 @@ function optimizeRepaymentSchedule(snapshot: DebtSnapshot | null): RepaymentPlan
 }
 
 export const RepaymentPlanSection = () => {
+  const { userData, loading: userDataLoading } = useUserData();
   const [plan, setPlan] = useState<RepaymentPlan | null>(null);
   const [loading, setLoading] = useState(true);
   const [motivationalMessage, setMotivationalMessage] = useState<string | null>(null);
   const [patternWarning, setPatternWarning] = useState<string | null>(null);
 
+  // Создаем snapshot из userData
+  const snapshot = useMemo((): DebtSnapshot | null => {
+    if (!userData || !userData.debt_calculation || !userData.repayment_progress) {
+      return null;
+    }
+
+    try {
+      return {
+        user_id: userData.user_id || `user_${Date.now()}`,
+        debt_calculation: userData.debt_calculation,
+        repayment_progress: userData.repayment_progress,
+        overall_progress_percent: 0,
+        remaining_prayers: {
+          fajr: (userData.debt_calculation.missed_prayers?.fajr || 0) - (userData.repayment_progress.completed_prayers?.fajr || 0),
+          dhuhr: (userData.debt_calculation.missed_prayers?.dhuhr || 0) - (userData.repayment_progress.completed_prayers?.dhuhr || 0),
+          asr: (userData.debt_calculation.missed_prayers?.asr || 0) - (userData.repayment_progress.completed_prayers?.asr || 0),
+          maghrib: (userData.debt_calculation.missed_prayers?.maghrib || 0) - (userData.repayment_progress.completed_prayers?.maghrib || 0),
+          isha: (userData.debt_calculation.missed_prayers?.isha || 0) - (userData.repayment_progress.completed_prayers?.isha || 0),
+          witr: (userData.debt_calculation.missed_prayers?.witr || 0) - (userData.repayment_progress.completed_prayers?.witr || 0),
+        },
+      };
+    } catch (error) {
+      console.error("Error creating snapshot:", error);
+      return null;
+    }
+  }, [userData]);
+
   useEffect(() => {
-    // Загрузка данных из localStorage или API
+    // Загрузка плана на основе userData
     const loadPlan = async () => {
       try {
-        // В реальном приложении здесь будет запрос к API
-        // Для демо используем localStorage
-        const savedData = localStorage.getItem("userPrayerDebt");
-        if (savedData) {
-          let userData: any;
-          try {
-            userData = JSON.parse(savedData);
-            // Валидация структуры данных
-            if (!userData || !userData.debt_calculation || !userData.repayment_progress) {
-              throw new Error("Invalid user data structure");
-            }
-          } catch (parseError) {
-            console.error("Failed to parse user data from localStorage:", parseError);
-            setLoading(false);
-            return;
-          }
-          
-          const snapshot: DebtSnapshot = {
-            user_id: userData.user_id,
-            debt_calculation: userData.debt_calculation,
-            repayment_progress: userData.repayment_progress,
-            overall_progress_percent: 0,
-            remaining_prayers: {
-              fajr: (userData.debt_calculation.missed_prayers?.fajr || 0) - (userData.repayment_progress.completed_prayers?.fajr || 0),
-              dhuhr: (userData.debt_calculation.missed_prayers?.dhuhr || 0) - (userData.repayment_progress.completed_prayers?.dhuhr || 0),
-              asr: (userData.debt_calculation.missed_prayers?.asr || 0) - (userData.repayment_progress.completed_prayers?.asr || 0),
-              maghrib: (userData.debt_calculation.missed_prayers?.maghrib || 0) - (userData.repayment_progress.completed_prayers?.maghrib || 0),
-              isha: (userData.debt_calculation.missed_prayers?.isha || 0) - (userData.repayment_progress.completed_prayers?.isha || 0),
-              witr: (userData.debt_calculation.missed_prayers?.witr || 0) - (userData.repayment_progress.completed_prayers?.witr || 0),
-            },
-          };
+        setLoading(true);
 
-          const calculatedPlan = optimizeRepaymentSchedule(snapshot);
-          setPlan(calculatedPlan);
-
-          // AI-мотиватор
-          const completedPrayers = snapshot.repayment_progress?.completed_prayers || {};
-          const missedPrayers = snapshot.debt_calculation?.missed_prayers || {};
-          const totalCompleted = Object.values(completedPrayers).reduce(
-            (sum, val) => sum + (val || 0),
-            0
-          );
-          const totalMissed = Object.values(missedPrayers).reduce(
-            (sum, val) => sum + (val || 0),
-            0
-          );
-          const progressPercent = totalMissed > 0 ? Math.round((totalCompleted / totalMissed) * 100) : 0;
-          const message = generateMotivationalMessage(progressPercent, totalCompleted);
-          setMotivationalMessage(message);
-
-          // Умный трекер пропусков
-          if (snapshot.repayment_progress && snapshot.debt_calculation) {
-            const warning = detectMissedPrayerPatterns(
-              snapshot.repayment_progress,
-              snapshot.debt_calculation.missed_prayers
-            );
-            setPatternWarning(warning);
-          }
-        } else {
+        if (!userData || !snapshot) {
           // Дефолтный план, если данных нет
           setPlan({
             recommendations: [
@@ -155,6 +128,35 @@ export const RepaymentPlanSection = () => {
             estimatedCompletion: { months: 8, days: 12 },
             weeklyGoal: 70,
           });
+          setLoading(false);
+          return;
+        }
+
+        const calculatedPlan = optimizeRepaymentSchedule(snapshot);
+        setPlan(calculatedPlan);
+
+        // AI-мотиватор
+        const completedPrayers = snapshot.repayment_progress?.completed_prayers || {};
+        const missedPrayers = snapshot.debt_calculation?.missed_prayers || {};
+        const totalCompleted = Object.values(completedPrayers).reduce(
+          (sum, val) => sum + (val || 0),
+          0
+        );
+        const totalMissed = Object.values(missedPrayers).reduce(
+          (sum, val) => sum + (val || 0),
+          0
+        );
+        const progressPercent = totalMissed > 0 ? Math.round((totalCompleted / totalMissed) * 100) : 0;
+        const message = generateMotivationalMessage(progressPercent, totalCompleted);
+        setMotivationalMessage(message);
+
+        // Умный трекер пропусков
+        if (snapshot.repayment_progress && snapshot.debt_calculation) {
+          const warning = detectMissedPrayerPatterns(
+            snapshot.repayment_progress,
+            snapshot.debt_calculation.missed_prayers
+          );
+          setPatternWarning(warning);
         }
       } catch (error) {
         console.error("Failed to load plan:", error);
@@ -163,21 +165,38 @@ export const RepaymentPlanSection = () => {
       }
     };
 
-    loadPlan();
-  }, []);
+    // Загружаем план только когда userData загружен
+    if (!userDataLoading) {
+      loadPlan();
+    }
+  }, [userData, snapshot, userDataLoading]);
 
-  if (loading) {
+  // Показываем загрузку, если данные еще не загружены
+  if (userDataLoading || loading) {
     return (
       <Card className="bg-gradient-card shadow-medium border-border/50">
         <CardContent className="pt-6">
-          <div className="text-center py-8 text-muted-foreground">Загрузка плана...</div>
+          <div className="text-center py-8 space-y-4">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
+            <p className="text-muted-foreground">Загрузка плана...</p>
+          </div>
         </CardContent>
       </Card>
     );
   }
 
   if (!plan) {
-    return null;
+    return (
+      <Card className="bg-gradient-card shadow-medium border-border/50">
+        <CardContent className="pt-6">
+          <div className="text-center py-8 space-y-4">
+            <p className="text-muted-foreground">
+              Для отображения плана необходимо сначала рассчитать долг намазов
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
@@ -294,4 +313,3 @@ export const RepaymentPlanSection = () => {
     </div>
   );
 };
-

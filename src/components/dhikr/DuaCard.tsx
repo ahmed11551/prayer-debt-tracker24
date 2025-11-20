@@ -334,11 +334,19 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
       if (progressInterval) {
         clearInterval(progressInterval);
       }
-      toast({
-        title: "Ошибка синтеза речи",
-        description: "Не удалось воспроизвести текст",
-        variant: "destructive",
-      });
+      
+      // Не показываем ошибку пользователю, если это просто отсутствие поддержки
+      // или если пользователь не пытался воспроизвести
+      const errorEvent = e as SpeechSynthesisErrorEvent;
+      if (errorEvent.error === 'not-allowed' || errorEvent.error === 'synthesis-failed') {
+        // Только для критических ошибок показываем уведомление
+        // Для остальных просто логируем
+        console.warn("TTS playback failed:", errorEvent.error);
+      } else {
+        // Для других ошибок (например, network) не показываем toast
+        // так как это может быть временная проблема
+        console.warn("TTS error (silent):", errorEvent.error);
+      }
     };
 
     synthRef.current.speak(arabicUtterance);
@@ -574,8 +582,8 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
             </p>
           )}
           {!audioUrl && !isLoadingAudio && !isTTSAvailable && (
-            <p className="text-xs text-muted-foreground text-center">
-              Аудио файл не найден. Доступен синтез речи.
+            <p className="text-xs text-muted-foreground text-center opacity-60">
+              Аудио воспроизведение недоступно
             </p>
           )}
         </div>

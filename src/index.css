@@ -257,4 +257,25 @@ All colors MUST be HSL.
   .pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite;
   }
+
+  /* Tab slide animation */
+  @keyframes tab-slide {
+    0% {
+      transform: translateX(-10px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .tab-slide {
+    animation: tab-slide 0.3s ease-out;
+  }
+
+  /* Smooth tab transition */
+  .tab-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }

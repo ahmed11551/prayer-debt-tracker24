@@ -153,6 +153,24 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 
+  /* Custom scrollbar for horizontal scrolling */
+  .overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .overflow-x-auto::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.3);
+    border-radius: 3px;
+  }
+  
+  .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;

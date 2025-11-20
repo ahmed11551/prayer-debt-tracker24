@@ -13,6 +13,7 @@ import {
   detectMissedPrayerPatterns,
 } from "@/lib/ai-functions";
 import { useUserData } from "@/hooks/useUserData";
+import { InteractivePlanCalculator } from "./InteractivePlanCalculator";
 
 interface RepaymentPlan {
   recommendations: Array<{
@@ -222,10 +223,10 @@ export const RepaymentPlanSection = () => {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-primary" />
-            <CardTitle>AI-план восполнения</CardTitle>
+            <CardTitle>План восполнения</CardTitle>
           </div>
           <CardDescription>
-            Персональные рекомендации для эффективного восполнения пропущенных намазов
+            Умные рекомендации для эффективного восполнения пропущенных намазов на основе вашего прогресса
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -300,13 +301,21 @@ export const RepaymentPlanSection = () => {
         </Card>
       </div>
 
+      {/* Интерактивный планировщик */}
+      <InteractivePlanCalculator
+        snapshot={snapshot}
+        currentPace={plan.currentPace}
+        currentEstimatedCompletion={plan.estimatedCompletion}
+      />
+
       {/* Info Card */}
       <Card className="border-accent/30 bg-accent/5">
         <CardContent className="pt-6">
           <p className="text-sm text-muted-foreground">
-            <strong className="text-accent">Примечание:</strong> План автоматически обновляется на
-            основе вашего текущего прогресса. Рекомендации оптимизированы для равномерного
-            распределения нагрузки и учитывают ваши привычки в молитве.
+            <strong className="text-accent">Примечание:</strong> План основан на умной методологии расчета, 
+            которая анализирует ваш текущий прогресс и оставшееся количество намазов. Рекомендации 
+            оптимизированы для равномерного распределения нагрузки. Вы можете изменить цель выше и 
+            посмотреть, как это повлияет на время завершения.
           </p>
         </CardContent>
       </Card>

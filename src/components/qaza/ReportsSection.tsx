@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Share2, TrendingUp, Calendar, Target, Clock } from "lucide-react";
+import { Download, Share2, TrendingUp, Calendar, Target, Clock, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { localStorageAPI, eReplikaAPI } from "@/lib/api";
+import { eReplikaAPI } from "@/lib/api";
 import { useUserData } from "@/hooks/useUserData";
 import { calculateProgressStats, formatNumber } from "@/lib/prayer-utils";
 
@@ -12,8 +12,15 @@ export const ReportsSection = () => {
   const { userData, loading: userDataLoading } = useUserData();
   const [loading, setLoading] = useState(false);
 
-  // Мемоизация статистики
-  const stats = useMemo(() => calculateProgressStats(userData), [userData]);
+  // Мемоизация статистики с обработкой ошибок
+  const stats = useMemo(() => {
+    try {
+      return calculateProgressStats(userData);
+    } catch (error) {
+      console.error("Error calculating stats:", error);
+      return calculateProgressStats(null);
+    }
+  }, [userData]);
 
   const handleDownloadPDF = async () => {
     if (!userData) {
@@ -27,51 +34,26 @@ export const ReportsSection = () => {
 
     setLoading(true);
     try {
-      // Попытка скачать через API
-      try {
-        const blob = await prayerDebtAPI.downloadPDFReport();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `prayer-debt-report-${new Date().toISOString().split("T")[0]}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        toast({
-          title: "PDF отчёт скачан",
-          description: "Отчёт успешно сохранён",
-        });
-      } catch (apiError) {
-        // Fallback: генерация через e-Replika API
-        try {
-          const blob = await eReplikaAPI.generatePDFReport(userData.user_id, userData);
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `prayer-debt-report-${new Date().toISOString().split("T")[0]}.pdf`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
-          toast({
-            title: "PDF отчёт скачан",
-            description: "Отчёт сгенерирован через e-Replika API",
-          });
-        } catch (error) {
-          console.error("e-Replika API error:", error);
-          toast({
-            title: "Ошибка генерации PDF",
-            description: error instanceof Error ? error.message : "Не удалось сгенерировать PDF через e-Replika API",
-            variant: "destructive",
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Failed to download PDF:", error);
+      // Генерация через e-Replika API
+      const userId = userData.user_id || `user_${Date.now()}`;
+      const blob = await eReplikaAPI.generatePDFReport(userId, userData);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `prayer-debt-report-${new Date().toISOString().split("T")[0]}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
       toast({
-        title: "Ошибка",
-        description: "Не удалось сформировать PDF отчёт",
+        title: "PDF отчёт скачан",
+        description: "Отчёт успешно сохранён",
+      });
+    } catch (error) {
+      console.error("Failed to generate PDF:", error);
+      toast({
+        title: "Ошибка генерации PDF",
+        description: error instanceof Error ? error.message : "Не удалось сгенерировать PDF отчёт. Попробуйте позже.",
         variant: "destructive",
       });
     } finally {
@@ -86,6 +68,25 @@ export const ReportsSection = () => {
     });
   };
 
+  // Показываем загрузку
+  if (userDataLoading) {
+    return (
+      <div className="space-y-6 animate-in fade-in-50 duration-500">
+        <Card className="bg-gradient-card shadow-medium border-border/50">
+          <CardContent className="pt-6">
+            <div className="text-center py-8 space-y-4">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
+              <p className="text-muted-foreground">
+                Загрузка данных...
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Показываем сообщение, если нет данных
   if (!userData) {
     return (
       <div className="space-y-6 animate-in fade-in-50 duration-500">
@@ -102,33 +103,73 @@ export const ReportsSection = () => {
     );
   }
 
-  // Мемоизация массива статистики
-  const statsArray = useMemo(() => [
-    {
-      icon: Calendar,
-      label: "Дата начала",
-      value: stats.startDate.toLocaleDateString("ru-RU"),
-      description: "Начало отслеживания",
-    },
-    {
-      icon: Target,
-      label: "Всего восполнено",
-      value: formatNumber(stats.totalCompleted),
-      description: "намазов выполнено",
-    },
-    {
-      icon: TrendingUp,
-      label: "Осталось",
-      value: formatNumber(stats.remaining),
-      description: "намазов до завершения",
-    },
-    {
-      icon: Clock,
-      label: "Средний темп",
-      value: `${stats.dailyPace}/день`,
-      description: "намазов в день",
-    },
-  ], [stats]);
+  // Мемоизация массива статистики с безопасной обработкой даты
+  const statsArray = useMemo(() => {
+    try {
+      const startDate = stats.startDate instanceof Date && !isNaN(stats.startDate.getTime())
+        ? stats.startDate
+        : new Date();
+      
+      return [
+        {
+          icon: Calendar,
+          label: "Дата начала",
+          value: startDate.toLocaleDateString("ru-RU", { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          }),
+          description: "Начало отслеживания",
+        },
+        {
+          icon: Target,
+          label: "Всего восполнено",
+          value: formatNumber(stats.totalCompleted),
+          description: "намазов выполнено",
+        },
+        {
+          icon: TrendingUp,
+          label: "Осталось",
+          value: formatNumber(stats.remaining),
+          description: "намазов до завершения",
+        },
+        {
+          icon: Clock,
+          label: "Средний темп",
+          value: `${stats.dailyPace}/день`,
+          description: "намазов в день",
+        },
+      ];
+    } catch (error) {
+      console.error("Error creating stats array:", error);
+      return [
+        {
+          icon: Calendar,
+          label: "Дата начала",
+          value: new Date().toLocaleDateString("ru-RU"),
+          description: "Начало отслеживания",
+        },
+        {
+          icon: Target,
+          label: "Всего восполнено",
+          value: "0",
+          description: "намазов выполнено",
+        },
+        {
+          icon: TrendingUp,
+          label: "Осталось",
+          value: "0",
+          description: "намазов до завершения",
+        },
+        {
+          icon: Clock,
+          label: "Средний темп",
+          value: "0/день",
+          description: "намазов в день",
+        },
+      ];
+    }
+  }, [stats]);
 
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">

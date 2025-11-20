@@ -155,6 +155,12 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
           
           if (url) {
             setAudioUrl(url);
+            setAudioError(null);
+            console.log(`Audio loaded successfully for dua ${dua.id}`);
+          } else {
+            // Аудио не найдено в API - это нормально, будет использован TTS
+            console.log(`Audio not found in API for dua ${dua.id}, TTS will be used as fallback`);
+            setAudioError(null); // Не показываем ошибку, т.к. TTS доступен
           }
           setIsLoadingAudio(false);
         })
@@ -162,7 +168,12 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
           if (error.name === "AbortError" || !isMountedRef.current || signal.aborted) return;
           
           console.error("Error loading audio from API:", error);
-          setAudioError("Не удалось загрузить аудио");
+          // Не показываем ошибку, если TTS доступен
+          if (!isTTSAvailable) {
+            setAudioError("Не удалось загрузить аудио из API");
+          } else {
+            setAudioError(null); // TTS доступен, ошибка не критична
+          }
           setIsLoadingAudio(false);
         });
       

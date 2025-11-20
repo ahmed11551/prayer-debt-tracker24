@@ -9,6 +9,7 @@ interface DuaCardProps {
     id: string;
     arabic: string;
     transcription: string;
+    russianTranscription?: string;
     translation: string;
     reference: string;
     audioUrl: string | null;
@@ -22,7 +23,8 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = async () => {
-    const textToCopy = `${dua.arabic}\n\n${dua.transcription}\n\n${dua.translation}\n\n${dua.reference}`;
+    const russianTranscriptionText = dua.russianTranscription ? `\n${dua.russianTranscription}\n` : '';
+    const textToCopy = `${dua.arabic}\n\n${dua.transcription}${russianTranscriptionText}\n${dua.translation}\n\n${dua.reference}`;
     await navigator.clipboard.writeText(textToCopy);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
@@ -65,12 +67,21 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
           </p>
         </div>
 
-        {/* Transcription */}
+        {/* Transcription (Latin) */}
         <div className="bg-secondary/30 rounded-xl p-4 border border-border/30">
           <p className="text-center text-lg text-foreground/90 italic">
             {dua.transcription}
           </p>
         </div>
+
+        {/* Russian Transcription */}
+        {dua.russianTranscription && (
+          <div className="bg-accent/10 rounded-xl p-4 border border-accent/20">
+            <p className="text-center text-base text-foreground/90">
+              {dua.russianTranscription}
+            </p>
+          </div>
+        )}
 
         {/* Translation */}
         <div className="bg-primary/5 rounded-xl p-4 border border-primary/20">
@@ -87,57 +98,64 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
         </div>
 
         {/* Audio Player */}
-        <div className="flex items-center gap-2 bg-gradient-secondary rounded-xl p-3 border border-border/30">
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={togglePlay}
-            className="shrink-0 hover:bg-primary/10 hover:text-primary"
-          >
-            {isPlaying ? (
-              <Pause className="w-5 h-5" />
-            ) : (
-              <Play className="w-5 h-5" />
-            )}
-          </Button>
-          <div className="flex-1 h-2 bg-border/30 rounded-full overflow-hidden">
-            <div className="h-full bg-primary w-0 transition-all duration-300" />
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-foreground">Воспроизведение</div>
+          <p className="text-xs text-muted-foreground mb-3">
+            Аудио функция будет доступна в следующей версии
+          </p>
+          <div className="flex items-center gap-2 bg-gradient-secondary rounded-xl p-3 border border-border/30 opacity-60">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={togglePlay}
+              disabled
+              className="shrink-0 hover:bg-primary/10 hover:text-primary cursor-not-allowed"
+            >
+              {isPlaying ? (
+                <Pause className="w-5 h-5" />
+              ) : (
+                <Play className="w-5 h-5" />
+              )}
+            </Button>
+            <div className="flex-1 h-2 bg-border/30 rounded-full overflow-hidden">
+              <div className="h-full bg-primary w-0 transition-all duration-300" />
+            </div>
+            <Volume2 className="w-5 h-5 text-muted-foreground" />
           </div>
-          <Volume2 className="w-5 h-5 text-muted-foreground" />
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-center gap-2 pt-2">
+        <div className="flex items-center justify-center gap-2 pt-2 flex-wrap">
           <Button
             size="sm"
             variant="ghost"
             onClick={handleCopy}
-            className="hover:bg-primary/10 hover:text-primary transition-colors"
+            className="hover:bg-primary/10 hover:text-primary transition-colors flex-shrink-0"
           >
             {isCopied ? (
               <Check className="w-4 h-4 mr-2" />
             ) : (
               <Copy className="w-4 h-4 mr-2" />
             )}
-            {isCopied ? "Скопировано" : "Копировать"}
+            <span className="whitespace-nowrap">{isCopied ? "Скопировано" : "Копировать"}</span>
           </Button>
           <Button
             size="sm"
             variant="ghost"
             onClick={handleBookmark}
-            className="hover:bg-accent/10 hover:text-accent transition-colors"
+            className="hover:bg-accent/10 hover:text-accent transition-colors flex-shrink-0"
           >
             <BookmarkPlus className="w-4 h-4 mr-2" />
-            Сохранить
+            <span className="whitespace-nowrap">Сохранить</span>
           </Button>
           <Button
             size="sm"
             variant="ghost"
             onClick={handleShare}
-            className="hover:bg-primary/10 hover:text-primary transition-colors"
+            className="hover:bg-primary/10 hover:text-primary transition-colors flex-shrink-0"
           >
             <Share2 className="w-4 h-4 mr-2" />
-            Поделиться
+            <span className="whitespace-nowrap">Поделиться</span>
           </Button>
         </div>
       </CardContent>

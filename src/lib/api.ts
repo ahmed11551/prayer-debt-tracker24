@@ -4,6 +4,11 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://bot.e-replika.ru/api";
 const INTERNAL_API_URL = import.meta.env.VITE_INTERNAL_API_URL || "/api";
 
+// Supabase конфигурация
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://fvxkywczuqincnjilgzd.supabase.co";
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2eGt5d2N6dXFpbmNuamlsZ3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNDgwNTYsImV4cCI6MjA3NzkyNDA1Nn0.jBvLDl0T2u-slvf4Uu4oZj7yRWMQCKmiln0mXRU0q54";
+const SUPABASE_FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
+
 // Получение токена авторизации из Telegram или env
 function getAuthToken(): string | null {
   // В Telegram Mini App можно использовать initData для авторизации
@@ -187,75 +192,184 @@ export const eReplikaAPI = {
   },
 };
 
-// Внутренние API эндпоинты
+// Получение user_id для авторизации
+function getUserId(): string | null {
+  // Пытаемся получить из Telegram
+  if (typeof window !== "undefined" && window.Telegram?.WebApp) {
+    const user = window.Telegram.WebApp.initDataUnsafe.user;
+    if (user?.id) {
+      return `tg_${user.id}`;
+    }
+  }
+  return null;
+}
+
+// Внутренние API эндпоинты (через Supabase Edge Functions)
 export const prayerDebtAPI = {
   // Рассчитать долг намазов
-  async calculateDebt(request: CalculationRequest): Promise<UserPrayerDebt> {
-    const response = await fetch(`${INTERNAL_API_URL}/prayer-debt/calculate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-    });
+  async calculateDebt(request: CalculationRequest & { debt_calculation?: any; repayment_progress?: any }): Promise<UserPrayerDebt> {
+    const userId = getUserId();
+    
+    // Пробуем Supabase Edge Function
+    try {
+      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/prayer-debt-api/calculate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+          "apikey": SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({
+          ...request,
+          user_id: userId || request.user_id || `user_${Date.now()}`,
+        }),
+      });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: response.statusText }));
-      throw new Error(error.message || `Failed to calculate debt: ${response.statusText}`);
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (error) {
+      console.warn("Supabase API недоступен, используем localStorage:", error);
     }
 
-    return await response.json();
+    // Fallback на localStorage
+    const userData = localStorageAPI.getUserData();
+    if (userData) {
+      localStorageAPI.saveUserData(userData);
+      return userData;
+    }
+
+    throw new Error("Failed to calculate debt");
   },
 
   // Получить последний расчет и текущий прогресс
   async getSnapshot(): Promise<DebtSnapshot> {
-    const response = await fetch(`${INTERNAL_API_URL}/prayer-debt/snapshot`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to get snapshot: ${response.statusText}`);
+    const userId = getUserId();
+    
+    if (!userId) {
+      // Fallback на localStorage
+      const userData = localStorageAPI.getUserData();
+      if (userData) {
+        return {
+          user_id: userData.user_id,
+          debt_calculation: userData.debt_calculation,
+          repayment_progress: userData.repayment_progress,
+          overall_progress_percent: 0,
+          remaining_prayers: {} as any,
+        };
+      }
+      throw new Error("user_id required");
     }
 
-    return await response.json();
+    // Пробуем Supabase Edge Function
+    try {
+      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/prayer-debt-api/snapshot?user_id=${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+          "apikey": SUPABASE_ANON_KEY,
+        },
+      });
+
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (error) {
+      console.warn("Supabase API недоступен, используем localStorage:", error);
+    }
+
+    // Fallback на localStorage
+    const userData = localStorageAPI.getUserData();
+    if (userData && userData.user_id === userId) {
+      return {
+        user_id: userData.user_id,
+        debt_calculation: userData.debt_calculation,
+        repayment_progress: userData.repayment_progress,
+        overall_progress_percent: 0,
+        remaining_prayers: {} as any,
+      };
+    }
+
+    throw new Error("No data found");
   },
 
   // Обновить прогресс восполнения
   async updateProgress(request: ProgressUpdateRequest): Promise<RepaymentProgress> {
-    const response = await fetch(`${INTERNAL_API_URL}/prayer-debt/progress`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-    });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: response.statusText }));
-      throw new Error(error.message || `Failed to update progress: ${response.statusText}`);
+    const userId = getUserId();
+    
+    if (!userId) {
+      throw new Error("user_id required");
     }
 
-    return await response.json();
+    // Пробуем Supabase Edge Function
+    try {
+      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/prayer-debt-api/progress`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+          "apikey": SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({
+          ...request,
+          user_id: userId,
+        }),
+      });
+
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (error) {
+      console.warn("Supabase API недоступен, используем localStorage:", error);
+    }
+
+    // Fallback на localStorage
+    const userData = localStorageAPI.getUserData();
+    if (userData && userData.user_id === userId) {
+      // Обновляем прогресс локально
+      if (request.entries) {
+        request.entries.forEach((entry) => {
+          if (userData.repayment_progress.completed_prayers[entry.type as keyof typeof userData.repayment_progress.completed_prayers] !== undefined) {
+            (userData.repayment_progress.completed_prayers[entry.type as keyof typeof userData.repayment_progress.completed_prayers] as number) += entry.amount;
+          }
+        });
+      }
+      userData.repayment_progress.last_updated = new Date();
+      localStorageAPI.saveUserData(userData);
+      return userData.repayment_progress;
+    }
+
+    throw new Error("Failed to update progress");
   },
 
   // Асинхронный расчет (через e-Replika)
   async calculateDebtAsync(request: CalculationRequest): Promise<{ job_id: string; status_url: string }> {
-    const response = await fetch(`${INTERNAL_API_URL}/prayer-debt/calculations`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-    });
+    const userId = getUserId();
+    
+    // Пробуем Supabase Edge Function
+    try {
+      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/prayer-debt-api/calculations`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+          "apikey": SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({
+          ...request,
+          user_id: userId || `user_${Date.now()}`,
+        }),
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to start calculation: ${response.statusText}`);
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (error) {
+      console.warn("Supabase API недоступен:", error);
     }
 
-    return await response.json();
+    throw new Error("Failed to start calculation");
   },
 
   // Проверить статус асинхронного расчета
@@ -264,31 +378,63 @@ export const prayerDebtAPI = {
     result?: DebtSnapshot;
     error?: string;
   }> {
-    const response = await fetch(`${INTERNAL_API_URL}/prayer-debt/calculations/${jobId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    // Пробуем Supabase Edge Function
+    try {
+      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/prayer-debt-api/calculations/${jobId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+          "apikey": SUPABASE_ANON_KEY,
+        },
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to get calculation status: ${response.statusText}`);
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (error) {
+      console.warn("Supabase API недоступен:", error);
     }
 
-    return await response.json();
+    throw new Error("Failed to get calculation status");
   },
 
   // Скачать PDF отчет
   async downloadPDFReport(): Promise<Blob> {
-    const response = await fetch(`${INTERNAL_API_URL}/prayer-debt/report.pdf`, {
-      method: "GET",
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to download PDF: ${response.statusText}`);
+    const userId = getUserId();
+    
+    if (!userId) {
+      throw new Error("user_id required");
     }
 
-    return await response.blob();
+    // Пробуем Supabase Edge Function
+    try {
+      const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/prayer-debt-api/report.pdf?user_id=${userId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+          "apikey": SUPABASE_ANON_KEY,
+        },
+      });
+
+      if (response.ok) {
+        return await response.blob();
+      }
+    } catch (error) {
+      console.warn("Supabase API недоступен, пробуем e-Replika:", error);
+    }
+
+    // Fallback на e-Replika API
+    try {
+      const userData = localStorageAPI.getUserData();
+      if (userData) {
+        return await eReplikaAPI.generatePDFReport(userId, userData);
+      }
+    } catch (error) {
+      console.error("PDF generation failed:", error);
+    }
+
+    throw new Error("Failed to download PDF");
   },
 };
 

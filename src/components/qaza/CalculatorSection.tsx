@@ -347,16 +347,19 @@ export const CalculatorSection = () => {
               <span>Дни в пути (сафар)</span>
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="travelDays">Общее количество дней в путешествиях</Label>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <Label htmlFor="travelDays" className="text-sm whitespace-normal break-words">
+                  Общее количество дней в путешествиях
+                </Label>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => setTravelPeriodsDialogOpen(true)}
+                  className="shrink-0"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Добавить периоды
+                  <span className="whitespace-nowrap">Добавить периоды</span>
                 </Button>
               </div>
               <Input
@@ -374,7 +377,7 @@ export const CalculatorSection = () => {
                   Рассчитано из {travelPeriods.length} периодов
                 </div>
               )}
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground leading-relaxed break-words">
                 Укажите приблизительное количество дней, проведенных в путешествиях (сафар),
                 где вы сокращали намазы. Согласно позиции ДУМ РФ, сафаром считается путешествие
                 на расстояние не менее 90 км от места постоянного проживания.
@@ -398,7 +401,7 @@ export const CalculatorSection = () => {
       {/* Info Card */}
       <Card className="border-accent/30 bg-accent/5">
         <CardContent className="pt-6">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground leading-relaxed break-words">
             <strong className="text-accent">Примечание:</strong> Расчёт выполняется по методике
             ханафитского мазхаба. Витр включён в обязательные намазы. Для женщин учитываются
             периоды хайда и нифаса. В дни сафара учитывается сокращение четырёхракаатных намазов.
@@ -413,16 +416,16 @@ export const CalculatorSection = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3 text-sm text-muted-foreground">
-            <p>
+            <p className="leading-relaxed break-words">
               Согласно официальной позиции Духовного управления мусульман Российской Федерации (ДУМ РФ),
               сафаром (путешествием) считается перемещение на расстояние не менее <strong className="text-foreground">90 километров</strong> от
               места постоянного проживания.
             </p>
-            <p>
+            <p className="leading-relaxed break-words">
               В дни сафара разрешается сокращать четырёхракаатные намазы (Зухр, Аср, Иша) до двух ракаатов.
               Фаджр (2 ракаата), Магриб (3 ракаата) и Витр не сокращаются.
             </p>
-            <p>
+            <p className="leading-relaxed break-words">
               Если вы не помните точное количество дней в путешествиях, укажите приблизительное значение
               на основе ваших воспоминаний о поездках.
             </p>

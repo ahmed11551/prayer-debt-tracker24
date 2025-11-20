@@ -1,6 +1,6 @@
 // Компонент для добавления периодов путешествий
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,9 +11,25 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { TravelPeriod } from "@/types/prayer-debt";
+
+/**
+ * Рассчитать количество дней между датами (включительно обе даты)
+ * Например, с 20 по 21 ноября = 2 дня (20 и 21)
+ */
+function calculateDaysBetween(startDate: Date, endDate: Date): number {
+  if (endDate < startDate) {
+    return 0;
+  }
+  // Разница в миллисекундах
+  const diffTime = endDate.getTime() - startDate.getTime();
+  // Конвертируем в дни и добавляем 1, так как обе даты включены
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  return Math.max(1, diffDays);
+}
 
 interface TravelPeriodsDialogProps {
   open: boolean;
@@ -59,22 +75,68 @@ export const TravelPeriodsDialog = ({
       const start = new Date(updated[index].start_date);
       const end = new Date(updated[index].end_date);
       if (end >= start) {
-        updated[index].days_count = Math.ceil(
-          (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
-        );
+        // Автоматически пересчитываем дни на основе выбранного периода
+        updated[index].days_count = calculateDaysBetween(start, end);
       }
     }
 
     setLocalPeriods(updated);
   };
 
+  // Валидация периодов: проверяем, соответствует ли количество дней периоду
+  const periodValidationErrors = useMemo(() => {
+    const errors: Record<number, string> = {};
+    
+    localPeriods.forEach((period, index) => {
+      const start = new Date(period.start_date);
+      const end = new Date(period.end_date);
+      
+      if (end >= start) {
+        const actualDays = calculateDaysBetween(start, end);
+        if (period.days_count > actualDays) {
+          errors[index] = `В выбранном периоде (${start.toLocaleDateString("ru-RU")} - ${end.toLocaleDateString("ru-RU")}) всего ${actualDays} ${actualDays === 1 ? 'день' : actualDays < 5 ? 'дня' : 'дней'}, а вы указали ${period.days_count}`;
+        } else if (period.days_count < actualDays) {
+          errors[index] = `В выбранном периоде (${start.toLocaleDateString("ru-RU")} - ${end.toLocaleDateString("ru-RU")}) ${actualDays} ${actualDays === 1 ? 'день' : actualDays < 5 ? 'дня' : 'дней'}, а вы указали ${period.days_count}. Рекомендуется указать ${actualDays}`;
+        }
+      }
+    });
+    
+    return errors;
+  }, [localPeriods]);
+
   const handleSave = () => {
+    // Валидация: проверка соответствия количества дней периоду
+    if (Object.keys(periodValidationErrors).length > 0) {
+      const firstErrorIndex = parseInt(Object.keys(periodValidationErrors)[0]);
+      toast({
+        title: "Ошибка валидации",
+        description: periodValidationErrors[firstErrorIndex],
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Валидация периодов
-    for (const period of localPeriods) {
+    for (let i = 0; i < localPeriods.length; i++) {
+      const period = localPeriods[i];
       if (period.start_date >= period.end_date) {
         toast({
           title: "Ошибка",
-          description: "Дата начала должна быть раньше даты окончания",
+          description: `В периоде ${i + 1}: дата начала должна быть раньше даты окончания`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Проверка соответствия количества дней
+      const actualDays = calculateDaysBetween(
+        new Date(period.start_date),
+        new Date(period.end_date)
+      );
+      if (period.days_count !== actualDays) {
+        toast({
+          title: "Ошибка",
+          description: `В периоде ${i + 1}: количество дней (${period.days_count}) не соответствует выбранному периоду (${actualDays} ${actualDays === 1 ? 'день' : actualDays < 5 ? 'дня' : 'дней'})`,
           variant: "destructive",
         });
         return;
@@ -92,7 +154,7 @@ export const TravelPeriodsDialog = ({
         ) {
           toast({
             title: "Ошибка",
-            description: "Периоды путешествий не должны пересекаться",
+            description: `Периоды ${i + 1} и ${j + 1} пересекаются. Периоды путешествий не должны пересекаться.`,
             variant: "destructive",
           });
           return;
@@ -178,12 +240,23 @@ export const TravelPeriodsDialog = ({
                       id={`days-${index}`}
                       type="number"
                       value={period.days_count}
-                      onChange={(e) =>
-                        updatePeriod(index, "days_count", parseInt(e.target.value) || 0)
-                      }
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value) || 0;
+                        updatePeriod(index, "days_count", value);
+                      }}
                       min={1}
-                      className="bg-background"
+                      className={`bg-background ${
+                        periodValidationErrors[index] ? "border-destructive" : ""
+                      }`}
                     />
+                    {periodValidationErrors[index] && (
+                      <Alert variant="destructive" className="mt-2 py-2">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription className="text-xs">
+                          {periodValidationErrors[index]}
+                        </AlertDescription>
+                      </Alert>
+                    )}
                   </div>
                 </div>
               </div>

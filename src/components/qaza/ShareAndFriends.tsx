@@ -1,9 +1,9 @@
 // Компонент для поделиться и доступа друзьям (соревновательный эффект)
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Share2, Users, Trophy, TrendingUp } from "lucide-react";
+import { Share2, Users, Trophy, TrendingUp, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -16,15 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-
-interface Achievement {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  unlocked: boolean;
-  unlockedDate?: Date;
-}
+import { useUserData } from "@/hooks/useUserData";
+import { calculateAchievements, calculateProgressStats, type Achievement } from "@/lib/prayer-utils";
 
 interface Friend {
   id: string;
@@ -35,45 +28,19 @@ interface Friend {
 
 export const ShareAndFriends = () => {
   const { toast } = useToast();
+  const { userData, loading: userDataLoading } = useUserData();
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [friendsDialogOpen, setFriendsDialogOpen] = useState(false);
   const [friendCode, setFriendCode] = useState("");
 
-  // Mock данные достижений
-  const achievements: Achievement[] = [
-    {
-      id: "first-100",
-      title: "Первые 100",
-      description: "Восполнено 100 намазов",
-      icon: "✨",
-      unlocked: true,
-      unlockedDate: new Date("2024-01-20"),
-    },
-    {
-      id: "week-streak",
-      title: "7 дней подряд",
-      description: "Восполнение намазов 7 дней подряд",
-      icon: "🔥",
-      unlocked: true,
-      unlockedDate: new Date("2024-02-01"),
-    },
-    {
-      id: "thousand",
-      title: "1000 намазов",
-      description: "Восполнено 1000 намазов",
-      icon: "🌟",
-      unlocked: false,
-    },
-    {
-      id: "halfway",
-      title: "50% пути",
-      description: "Пройдена половина пути",
-      icon: "🎯",
-      unlocked: false,
-    },
-  ];
+  // Рассчитываем достижения на основе реальных данных
+  const achievements = useMemo(() => calculateAchievements(userData), [userData]);
 
-  // Mock данные друзей
+  // Рассчитываем реальный прогресс
+  const stats = useMemo(() => calculateProgressStats(userData), [userData]);
+  const overallProgress = stats.overallProgress;
+
+  // Mock данные друзей (в будущем можно интегрировать с API)
   const friends: Friend[] = [
     { id: "1", name: "Ахмад", progress: 75 },
     { id: "2", name: "Марьям", progress: 68 },
@@ -82,13 +49,16 @@ export const ShareAndFriends = () => {
 
   const handleShare = async (achievementId?: string) => {
     try {
+      const achievement = achievementId ? achievements.find((a) => a.id === achievementId) : null;
+      const shareText = achievement
+        ? `${achievement.description}. Прогресс: ${overallProgress}%`
+        : `Мой прогресс в восполнении намазов: ${overallProgress}%. Восполнено ${stats.totalCompleted} из ${stats.totalMissed} намазов.`;
+
       const shareData: ShareData = {
-        title: achievementId
-          ? `Я получил достижение "${achievements.find((a) => a.id === achievementId)?.title}"!`
+        title: achievement
+          ? `Я получил достижение "${achievement.title}"!`
           : "Мой прогресс в восполнении намазов",
-        text: achievementId
-          ? achievements.find((a) => a.id === achievementId)?.description
-          : "Посмотрите мой прогресс в восполнении пропущенных намазов",
+        text: shareText,
         url: window.location.href,
       };
 
@@ -100,19 +70,30 @@ export const ShareAndFriends = () => {
         });
       } else {
         // Fallback: копирование в буфер обмена
-        await navigator.clipboard.writeText(window.location.href);
-        toast({
-          title: "Ссылка скопирована",
-          description: "Ссылка на ваш прогресс скопирована в буфер обмена",
-        });
+        try {
+          await navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${shareData.url}`);
+          toast({
+            title: "Ссылка скопирована",
+            description: "Информация о вашем прогрессе скопирована в буфер обмена",
+          });
+        } catch (clipboardError) {
+          toast({
+            title: "Ошибка",
+            description: "Не удалось скопировать в буфер обмена",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
-      console.error("Error sharing:", error);
-      toast({
-        title: "Ошибка",
-        description: "Не удалось поделиться",
-        variant: "destructive",
-      });
+      // Пользователь отменил шаринг - это нормально, не показываем ошибку
+      if (error instanceof Error && error.name !== "AbortError") {
+        console.error("Error sharing:", error);
+        toast({
+          title: "Ошибка",
+          description: "Не удалось поделиться",
+          variant: "destructive",
+        });
+      }
     }
     setShareDialogOpen(false);
   };
@@ -136,7 +117,21 @@ export const ShareAndFriends = () => {
     setFriendsDialogOpen(false);
   };
 
-  const overallProgress = 70; // Mock данные
+  // Показываем загрузку, если данные еще не загружены
+  if (userDataLoading) {
+    return (
+      <div className="space-y-6">
+        <Card className="bg-gradient-card shadow-medium border-border/50">
+          <CardContent className="pt-6">
+            <div className="text-center py-8 space-y-4">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
+              <p className="text-muted-foreground">Загрузка данных...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -207,8 +202,19 @@ export const ShareAndFriends = () => {
                 </div>
                 {achievement.unlocked && achievement.unlockedDate && (
                   <Badge variant="secondary" className="mt-2 text-xs">
-                    {new Date(achievement.unlockedDate).toLocaleDateString("ru-RU")}
+                    {achievement.unlockedDate.toLocaleDateString("ru-RU")}
                   </Badge>
+                )}
+                {!achievement.unlocked && achievement.progress !== undefined && (
+                  <div className="mt-2">
+                    <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary transition-all duration-500"
+                        style={{ width: `${achievement.progress}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">{achievement.progress}%</p>
+                  </div>
                 )}
               </div>
             ))}

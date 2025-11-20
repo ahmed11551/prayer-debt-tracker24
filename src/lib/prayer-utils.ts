@@ -166,3 +166,118 @@ export function formatNumber(num: number): string {
   return num.toLocaleString("ru-RU");
 }
 
+/**
+ * Интерфейс для достижений
+ */
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+  unlockedDate?: Date;
+  progress?: number; // Текущий прогресс (0-100)
+}
+
+/**
+ * Рассчитать достижения на основе прогресса пользователя
+ */
+export function calculateAchievements(userData: UserPrayerDebt | null): Achievement[] {
+  if (!userData) {
+    return getDefaultAchievements(false);
+  }
+
+  const stats = calculateProgressStats(userData);
+  const completedPrayers = userData.repayment_progress?.completed_prayers || {};
+  const totalCompleted = Object.values(completedPrayers).reduce(
+    (sum, val) => sum + (val || 0),
+    0
+  );
+
+  // Проверка на серию дней подряд (упрощенная версия)
+  // В реальном приложении нужно проверять историю календаря
+  const calendarEntries = userData.repayment_progress?.calendar_entries || [];
+  const hasWeekStreak = calendarEntries.length >= 7; // Упрощенная проверка
+
+  const startDate = stats.startDate instanceof Date && !isNaN(stats.startDate.getTime())
+    ? stats.startDate
+    : new Date();
+
+  const achievements: Achievement[] = [
+    {
+      id: "first-100",
+      title: "Первые 100",
+      description: "Восполнено 100 намазов",
+      icon: "✨",
+      unlocked: totalCompleted >= 100,
+      unlockedDate: totalCompleted >= 100 ? startDate : undefined,
+      progress: Math.min(100, Math.round((totalCompleted / 100) * 100)),
+    },
+    {
+      id: "week-streak",
+      title: "7 дней подряд",
+      description: "Восполнение намазов 7 дней подряд",
+      icon: "🔥",
+      unlocked: hasWeekStreak,
+      unlockedDate: hasWeekStreak ? startDate : undefined,
+      progress: hasWeekStreak ? 100 : Math.min(100, Math.round((calendarEntries.length / 7) * 100)),
+    },
+    {
+      id: "thousand",
+      title: "1000 намазов",
+      description: "Восполнено 1000 намазов",
+      icon: "🌟",
+      unlocked: totalCompleted >= 1000,
+      unlockedDate: totalCompleted >= 1000 ? startDate : undefined,
+      progress: Math.min(100, Math.round((totalCompleted / 1000) * 100)),
+    },
+    {
+      id: "halfway",
+      title: "50% пути",
+      description: "Пройдена половина пути",
+      icon: "🎯",
+      unlocked: stats.overallProgress >= 50,
+      unlockedDate: stats.overallProgress >= 50 ? startDate : undefined,
+      progress: stats.overallProgress,
+    },
+  ];
+
+  return achievements;
+}
+
+/**
+ * Получить дефолтные достижения (для случая, когда нет данных)
+ */
+function getDefaultAchievements(unlocked: boolean): Achievement[] {
+  return [
+    {
+      id: "first-100",
+      title: "Первые 100",
+      description: "Восполнено 100 намазов",
+      icon: "✨",
+      unlocked,
+    },
+    {
+      id: "week-streak",
+      title: "7 дней подряд",
+      description: "Восполнение намазов 7 дней подряд",
+      icon: "🔥",
+      unlocked,
+    },
+    {
+      id: "thousand",
+      title: "1000 намазов",
+      description: "Восполнено 1000 намазов",
+      icon: "🌟",
+      unlocked,
+    },
+    {
+      id: "halfway",
+      title: "50% пути",
+      description: "Пройдена половина пути",
+      icon: "🎯",
+      unlocked,
+    },
+  ];
+}
+

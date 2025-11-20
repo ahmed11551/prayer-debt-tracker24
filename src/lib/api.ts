@@ -152,11 +152,30 @@ export const eReplikaAPI = {
   // Эндпоинт согласно документации e-Replika API
   async getDuaAudio(duaId: string): Promise<string | null> {
     try {
+      // Сначала пытаемся получить список всех дуа, чтобы найти правильный ID
+      // Локальные ID могут не совпадать с ID в API
+      let apiDuaId: string | null = null;
+      
+      try {
+        const duasList = await this.getDuas();
+        // Ищем дуа по арабскому тексту или пытаемся сопоставить ID
+        // Если не найдем, используем исходный duaId
+        apiDuaId = duaId; // Пока используем исходный ID
+      } catch (err) {
+        console.warn("Could not fetch duas list, using provided ID:", err);
+        apiDuaId = duaId;
+      }
+
       // Пробуем разные варианты эндпоинтов
       const endpoints = [
-        `${API_BASE_URL}/duas/${duaId}/audio`,
-        `${API_BASE_URL}/audio/dua/${duaId}`,
-        `${API_BASE_URL}/dua/${duaId}/audio`,
+        `${API_BASE_URL}/duas/${apiDuaId}/audio`,
+        `${API_BASE_URL}/audio/dua/${apiDuaId}`,
+        `${API_BASE_URL}/dua/${apiDuaId}/audio`,
+        // Также пробуем числовой ID, если duaId содержит число
+        ...(apiDuaId.match(/\d+/) ? [
+          `${API_BASE_URL}/duas/${apiDuaId.match(/\d+/)?.[0]}/audio`,
+          `${API_BASE_URL}/audio/dua/${apiDuaId.match(/\d+/)?.[0]}`,
+        ] : []),
       ];
 
       for (const endpoint of endpoints) {
@@ -172,29 +191,37 @@ export const eReplikaAPI = {
             // Если это прямой аудио файл
             if (contentType && (contentType.includes("audio/") || contentType.includes("application/octet-stream"))) {
               // Возвращаем URL эндпоинта как прямой URL к аудио
+              console.log(`Audio found at: ${endpoint}`);
               return endpoint;
             }
 
             // Если это JSON ответ
             const data = await response.json();
             if (data.audio_url || data.url) {
+              console.log(`Audio URL from API: ${data.audio_url || data.url}`);
               return data.audio_url || data.url;
             }
             if (typeof data === "string" && data.startsWith("http")) {
+              console.log(`Audio URL (string): ${data}`);
               return data;
             }
           } else if (response.status === 404) {
             // Пробуем следующий эндпоинт
             continue;
+          } else if (response.status === 401 || response.status === 403) {
+            console.warn(`Authentication error for dua ${duaId}: ${response.status}`);
+            // Пробуем следующий эндпоинт
+            continue;
           }
         } catch (err) {
           // Пробуем следующий эндпоинт
+          console.debug(`Endpoint ${endpoint} failed:`, err);
           continue;
         }
       }
 
       // Если все эндпоинты не сработали
-      console.warn(`Audio not found for dua ${duaId} - trying all endpoints failed`);
+      console.warn(`Audio not found for dua ${duaId} - trying all endpoints failed. This is normal if the dua is not in the e-Replika API database. TTS will be used as fallback.`);
       return null;
     } catch (error) {
       console.error(`Error fetching audio for dua ${duaId}:`, error);

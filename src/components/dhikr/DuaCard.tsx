@@ -752,12 +752,17 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
           {/* Status Messages */}
           {!audioUrl && !isLoadingAudio && isTTSAvailable && (
             <p className="text-xs text-muted-foreground/70 text-center">
-              Используется синтез речи браузера
+              Аудио из API недоступно. Используется синтез речи браузера
             </p>
           )}
           {!audioUrl && !isLoadingAudio && !isTTSAvailable && (
             <p className="text-xs text-muted-foreground/50 text-center">
-              Аудио воспроизведение недоступно
+              Аудио воспроизведение недоступно. Аудио не найдено в API, а синтез речи не поддерживается браузером.
+            </p>
+          )}
+          {audioError && !isLoadingAudio && (
+            <p className="text-xs text-destructive/70 text-center">
+              {audioError}
             </p>
           )}
         </div>

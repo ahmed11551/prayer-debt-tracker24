@@ -1,35 +1,25 @@
-import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Plane, Info } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { localStorageAPI, prayerDebtAPI } from "@/lib/api";
-import type { UserPrayerDebt } from "@/types/prayer-debt";
+import { useUserData } from "@/hooks/useUserData";
 
 export const TravelPrayersSection = () => {
-  const [userData, setUserData] = useState<UserPrayerDebt | null>(null);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        try {
-          await prayerDebtAPI.getSnapshot();
-        } catch {
-          // Если API недоступен, загружаем из localStorage
-        }
-        const savedData = localStorageAPI.getUserData();
-        if (savedData) {
-          setUserData(savedData);
-        }
-      } catch (error) {
-        console.error("Failed to load data:", error);
-      }
-    };
-
-    loadData();
-  }, []);
+  const { userData, loading } = useUserData();
 
   // Если данных нет, показываем сообщение
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-in fade-in-50 duration-500">
+        <Card className="bg-gradient-card shadow-medium border-border/50">
+          <CardContent className="pt-6">
+            <div className="text-center py-8 text-muted-foreground">Загрузка...</div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (!userData) {
     return (
       <div className="space-y-6 animate-in fade-in-50 duration-500">

@@ -1,35 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Share2, TrendingUp, Calendar, Target, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { localStorageAPI, prayerDebtAPI, eReplikaAPI } from "@/lib/api";
-import type { UserPrayerDebt } from "@/types/prayer-debt";
+import { localStorageAPI, eReplikaAPI } from "@/lib/api";
+import { useUserData } from "@/hooks/useUserData";
+import { calculateProgressStats, formatNumber } from "@/lib/prayer-utils";
 
 export const ReportsSection = () => {
   const { toast } = useToast();
-  const [userData, setUserData] = useState<UserPrayerDebt | null>(null);
+  const { userData, loading: userDataLoading } = useUserData();
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        try {
-          await prayerDebtAPI.getSnapshot();
-        } catch {
-          // Если API недоступен, загружаем из localStorage
-        }
-        const savedData = localStorageAPI.getUserData();
-        if (savedData) {
-          setUserData(savedData);
-        }
-      } catch (error) {
-        console.error("Failed to load data:", error);
-      }
-    };
-
-    loadData();
-  }, []);
+  // Мемоизация статистики
+  const stats = useMemo(() => calculateProgressStats(userData), [userData]);
 
   const handleDownloadPDF = async () => {
     if (!userData) {

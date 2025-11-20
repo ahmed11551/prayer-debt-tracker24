@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
@@ -8,7 +8,7 @@ interface AdhkarCardProps {
   dhikr: {
     id: string;
     title: string;
-    icon: any;
+    icon: React.ComponentType<{ className?: string }>;
     color: string;
     text: string;
     transcription: string;
@@ -18,7 +18,7 @@ interface AdhkarCardProps {
   };
 }
 
-export const AdhkarCard = ({ dhikr }: AdhkarCardProps) => {
+export const AdhkarCard = memo(({ dhikr }: AdhkarCardProps) => {
   const [currentCount, setCurrentCount] = useState(0);
 
   const handleClick = () => {
@@ -117,4 +117,6 @@ export const AdhkarCard = ({ dhikr }: AdhkarCardProps) => {
       </CardContent>
     </Card>
   );
-};
+});
+
+AdhkarCard.displayName = "AdhkarCard";

@@ -1,50 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Plus, TrendingUp } from "lucide-react";
 import { PrayerProgressCard } from "./PrayerProgressCard";
 import { AddPrayerDialog } from "./AddPrayerDialog";
-import { localStorageAPI, prayerDebtAPI } from "@/lib/api";
-import type { UserPrayerDebt } from "@/types/prayer-debt";
+import { useUserData } from "@/hooks/useUserData";
+import { getPrayersArray, calculateProgressStats, formatNumber } from "@/lib/prayer-utils";
 
 export const ProgressSection = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [userData, setUserData] = useState<UserPrayerDebt | null>(null);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        // Попытка загрузить из API
-        try {
-          const snapshot = await prayerDebtAPI.getSnapshot();
-          // Преобразуем snapshot в UserPrayerDebt для отображения
-          const savedData = localStorageAPI.getUserData();
-          if (savedData) {
-            setUserData(savedData);
-          }
-        } catch {
-          // Если API недоступен, загружаем из localStorage
-          const savedData = localStorageAPI.getUserData();
-          if (savedData) {
-            setUserData(savedData);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to load data:", error);
-      }
-    };
-
-    loadData();
-  }, []);
+  const { userData, loading, refreshData } = useUserData();
 
   // Обновление данных после добавления намазов
   const handleDataUpdate = () => {
-    const savedData = localStorageAPI.getUserData();
-    if (savedData) {
-      setUserData(savedData);
-    }
+    refreshData();
   };
+
+  // Мемоизация массива намазов
+  const prayers = useMemo(() => getPrayersArray(userData), [userData]);
+
+  // Мемоизация статистики
+  const stats = useMemo(() => calculateProgressStats(userData), [userData]);
 
   // Если данных нет, показываем сообщение
   if (!userData) {
@@ -73,71 +50,6 @@ export const ProgressSection = () => {
     );
   }
 
-  const missedPrayers = userData.debt_calculation?.missed_prayers || {};
-  const completedPrayers = userData.repayment_progress?.completed_prayers || {};
-
-  const prayers = [
-    {
-      name: "Фаджр",
-      completed: completedPrayers.fajr,
-      total: missedPrayers.fajr,
-      color: "prayer-fajr",
-      emoji: "🌅",
-    },
-    {
-      name: "Зухр",
-      completed: completedPrayers.dhuhr,
-      total: missedPrayers.dhuhr,
-      color: "prayer-dhuhr",
-      emoji: "☀️",
-    },
-    {
-      name: "Аср",
-      completed: completedPrayers.asr,
-      total: missedPrayers.asr,
-      color: "prayer-asr",
-      emoji: "🌤️",
-    },
-    {
-      name: "Магриб",
-      completed: completedPrayers.maghrib,
-      total: missedPrayers.maghrib,
-      color: "prayer-maghrib",
-      emoji: "🌇",
-    },
-    {
-      name: "Иша",
-      completed: completedPrayers.isha,
-      total: missedPrayers.isha,
-      color: "prayer-isha",
-      emoji: "🌙",
-    },
-    {
-      name: "Витр",
-      completed: completedPrayers.witr,
-      total: missedPrayers.witr,
-      color: "prayer-witr",
-      emoji: "✨",
-    },
-  ];
-
-  const totalCompleted = prayers.reduce((sum, p) => sum + p.completed, 0);
-  const totalPrayers = prayers.reduce((sum, p) => sum + p.total, 0);
-  const overallProgress = totalPrayers > 0 ? Math.round((totalCompleted / totalPrayers) * 100) : 0;
-
-  // Расчет статистики
-  const startDate = userData.debt_calculation?.period?.start 
-    ? new Date(userData.debt_calculation.period.start) 
-    : new Date();
-  const daysSinceStart = Math.max(
-    1,
-    Math.floor((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-  );
-  const dailyPace = Math.round(totalCompleted / daysSinceStart) || 0;
-  const weeklyPace = dailyPace * 7;
-  const remaining = totalPrayers - totalCompleted;
-  const daysToComplete = dailyPace > 0 ? Math.ceil(remaining / dailyPace) : 0;
-  const monthsToComplete = Math.floor(daysToComplete / 30);
 
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
@@ -148,25 +60,25 @@ export const ProgressSection = () => {
             <div>
               <CardTitle className="text-2xl">Общий прогресс</CardTitle>
               <CardDescription>
-                Восполнено {totalCompleted.toLocaleString()} из {totalPrayers.toLocaleString()} намазов
+                Восполнено {formatNumber(stats.totalCompleted)} из {formatNumber(stats.totalMissed)} намазов
               </CardDescription>
             </div>
             <div className="text-right">
               <div className="text-4xl font-bold gradient-text">
-                {overallProgress}%
+                {stats.overallProgress}%
               </div>
               <div className="text-sm text-muted-foreground flex items-center gap-1">
                 <TrendingUp className="w-3 h-3" />
-                {dailyPace} намазов/день
+                {stats.dailyPace} намазов/день
               </div>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <Progress value={overallProgress} className="h-4" />
+          <Progress value={stats.overallProgress} className="h-4" />
           <div className="mt-4 flex justify-between text-sm text-muted-foreground">
-            <span>Начато {startDate.toLocaleDateString("ru-RU")}</span>
-            <span>Осталось {remaining.toLocaleString()}</span>
+            <span>Начато {stats.startDate.toLocaleDateString("ru-RU")}</span>
+            <span>Осталось {formatNumber(stats.remaining)}</span>
           </div>
         </CardContent>
       </Card>
@@ -193,16 +105,16 @@ export const ProgressSection = () => {
         <CardContent className="pt-6">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <div className="text-2xl font-bold">{dailyPace}</div>
+              <div className="text-2xl font-bold">{stats.dailyPace}</div>
               <div className="text-sm opacity-90">Намазов/день</div>
             </div>
             <div>
-              <div className="text-2xl font-bold">{weeklyPace}</div>
+              <div className="text-2xl font-bold">{stats.weeklyPace}</div>
               <div className="text-sm opacity-90">Намазов/неделя</div>
             </div>
             <div>
               <div className="text-2xl font-bold">
-                {monthsToComplete > 0 ? `${monthsToComplete} мес.` : `${daysToComplete} дн.`}
+                {stats.monthsToComplete > 0 ? `${stats.monthsToComplete} мес.` : `${stats.daysToComplete} дн.`}
               </div>
               <div className="text-sm opacity-90">До завершения</div>
             </div>

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -19,7 +19,7 @@ interface DuaCardProps {
   categoryColor: string;
 }
 
-export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
+export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
   const { toast } = useToast();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -627,4 +627,6 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
       </CardContent>
     </Card>
   );
-};
+});
+
+DuaCard.displayName = "DuaCard";

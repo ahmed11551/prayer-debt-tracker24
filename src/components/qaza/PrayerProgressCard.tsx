@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
@@ -9,14 +10,14 @@ interface PrayerProgressCardProps {
   emoji: string;
 }
 
-export const PrayerProgressCard = ({
+export const PrayerProgressCard = memo(({
   name,
   completed,
   total,
   color,
   emoji,
 }: PrayerProgressCardProps) => {
-  const percentage = Math.round((completed / total) * 100);
+  const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (
     <Card className="bg-gradient-card hover:shadow-medium transition-shadow duration-300 border-border/50">
@@ -45,4 +46,6 @@ export const PrayerProgressCard = ({
       </CardContent>
     </Card>
   );
-};
+});
+
+PrayerProgressCard.displayName = "PrayerProgressCard";

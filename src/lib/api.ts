@@ -554,17 +554,24 @@ export const localStorageAPI = {
     const data = localStorage.getItem("userPrayerDebt");
     if (!data) return null;
 
-    // Десериализация дат из строк
-    return JSON.parse(data, (key, value) => {
-      // Проверяем, является ли значение строкой даты в формате ISO
-      if (
-        typeof value === "string" &&
-        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/.test(value)
-      ) {
-        return new Date(value);
-      }
-      return value;
-    });
+    try {
+      // Десериализация дат из строк
+      return JSON.parse(data, (key, value) => {
+        // Проверяем, является ли значение строкой даты в формате ISO
+        if (
+          typeof value === "string" &&
+          /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/.test(value)
+        ) {
+          return new Date(value);
+        }
+        return value;
+      });
+    } catch (error) {
+      console.error("Error parsing user data from localStorage:", error);
+      // Очищаем поврежденные данные
+      localStorage.removeItem("userPrayerDebt");
+      return null;
+    }
   },
 
   clearUserData(): void {

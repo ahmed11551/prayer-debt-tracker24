@@ -105,12 +105,18 @@ export const ManualInputSection = () => {
 
       // Попытка сохранить через API
       try {
-        await prayerDebtAPI.calculateDebt({
+        const response = await prayerDebtAPI.calculateDebt({
           calculation_method: "manual",
-          personal_data: userData.personal_data,
           missed_prayers: missedPrayers,
           travel_prayers: travelPrayers,
         });
+        
+        // Если API вернул данные, обновляем userData
+        if (response && response.debt_calculation) {
+          localStorageAPI.saveUserData(response);
+        } else {
+          localStorageAPI.saveUserData(userData);
+        }
       } catch (apiError) {
         console.warn("API недоступен, сохраняем локально:", apiError);
         localStorageAPI.saveUserData(userData);

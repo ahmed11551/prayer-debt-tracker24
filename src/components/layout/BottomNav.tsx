@@ -1,17 +1,24 @@
 import { Home, BookOpen } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useMobile } from "@/hooks/useMobile";
 
 export const BottomNav = () => {
   const location = useLocation();
+  const { isMobile } = useMobile();
 
   const navItems = [
     { path: "/", icon: Home, label: "Каза" },
     { path: "/dhikr", icon: BookOpen, label: "Зикры" },
   ];
 
+  // Скрываем навигацию на десктопе, если не в Telegram Mini App
+  if (!isMobile) {
+    return null;
+  }
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border/50 backdrop-blur-xl z-50">
+    <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border/50 backdrop-blur-xl z-50 safe-area-inset-bottom">
       <div className="container mx-auto px-4 max-w-5xl">
         <div className="flex justify-around items-center h-16">
           {navItems.map(({ path, icon: Icon, label }) => {

@@ -30,6 +30,7 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
   const [isMuted, setIsMuted] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(dua.audioUrl);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [isTTSAvailable, setIsTTSAvailable] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
 
@@ -43,6 +44,37 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
       setIsBookmarked(isInBookmarks);
     }
   }, [dua.id]);
+
+  // Проверяем доступность синтеза речи
+  useEffect(() => {
+    if ("speechSynthesis" in window) {
+      try {
+        const synth = window.speechSynthesis;
+        // Проверяем, есть ли доступные голоса
+        const voices = synth.getVoices();
+        setIsTTSAvailable(voices.length > 0);
+        synthRef.current = synth;
+        
+        // Если голоса еще не загружены, ждем события voiceschanged
+        if (voices.length === 0) {
+          const onVoicesChanged = () => {
+            const updatedVoices = synth.getVoices();
+            setIsTTSAvailable(updatedVoices.length > 0);
+            synth.removeEventListener("voiceschanged", onVoicesChanged);
+          };
+          synth.addEventListener("voiceschanged", onVoicesChanged);
+          return () => {
+            synth.removeEventListener("voiceschanged", onVoicesChanged);
+          };
+        }
+      } catch (error) {
+        console.warn("Speech synthesis check failed:", error);
+        setIsTTSAvailable(false);
+      }
+    } else {
+      setIsTTSAvailable(false);
+    }
+  }, []);
 
   const handleCopy = async () => {
     const russianTranscriptionText = dua.russianTranscription ? `\n${dua.russianTranscription}\n` : '';
@@ -140,12 +172,6 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
     }
   };
 
-  // Инициализация синтеза речи
-  useEffect(() => {
-    if ("speechSynthesis" in window) {
-      synthRef.current = window.speechSynthesis;
-    }
-  }, []);
 
   // Загрузка аудио из API, если не указано
   useEffect(() => {
@@ -209,12 +235,10 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
 
   // Воспроизведение через синтез речи (fallback)
   const playWithTTS = useCallback(() => {
-    if (!synthRef.current) {
-      toast({
-        title: "Синтез речи недоступен",
-        description: "Ваш браузер не поддерживает синтез речи",
-        variant: "destructive",
-      });
+    if (!synthRef.current || !isTTSAvailable) {
+      // Не показываем ошибку, просто не воспроизводим
+      console.warn("Speech synthesis is not available");
+      setIsPlaying(false);
       return;
     }
 
@@ -267,7 +291,7 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
     };
 
     synthRef.current.speak(arabicUtterance);
-  }, [dua.arabic, isMuted, volume, toast]);
+  }, [dua.arabic, isMuted, volume, isTTSAvailable]);
 
   // Останавливаем воспроизведение при размонтировании или смене дуа
   useEffect(() => {
@@ -322,18 +346,30 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
         audioRef.current.volume = isMuted ? 0 : volume;
         audioRef.current.play().catch((error) => {
           console.error("Play error:", error);
-          toast({
-            title: "Ошибка воспроизведения",
-            description: "Не удалось воспроизвести аудио. Используется синтез речи.",
-            variant: "destructive",
-          });
-          // Fallback на TTS
-          playWithTTS();
+          // Fallback на TTS только если доступен
+          if (isTTSAvailable) {
+            playWithTTS();
+          } else {
+            setIsPlaying(false);
+            toast({
+              title: "Воспроизведение недоступно",
+              description: "Аудио файл не загружен, а синтез речи не поддерживается браузером",
+              variant: "destructive",
+            });
+          }
         });
         setIsPlaying(true);
-      } else {
-        // Используем синтез речи
+      } else if (isTTSAvailable) {
+        // Используем синтез речи только если доступен
         playWithTTS();
+      } else {
+        // Нет способа воспроизведения
+        toast({
+          title: "Воспроизведение недоступно",
+          description: "Аудио файл не найден, а синтез речи не поддерживается вашим браузером",
+          variant: "destructive",
+        });
+        setIsPlaying(false);
       }
     }
   };
@@ -426,7 +462,8 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
               size="icon"
               variant="ghost"
               onClick={togglePlay}
-              className="shrink-0 hover:bg-primary/10 hover:text-primary transition-colors"
+              disabled={!audioUrl && !isTTSAvailable && !isLoadingAudio}
+              className="shrink-0 hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isPlaying ? (
                 <Pause className="w-5 h-5 text-primary" />
@@ -480,9 +517,14 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
               Загрузка аудио...
             </p>
           )}
-          {!audioUrl && !isLoadingAudio && (
+          {!audioUrl && !isLoadingAudio && isTTSAvailable && (
             <p className="text-xs text-muted-foreground text-center">
               Используется синтез речи браузера
+            </p>
+          )}
+          {!audioUrl && !isLoadingAudio && !isTTSAvailable && (
+            <p className="text-xs text-muted-foreground text-center">
+              Аудио недоступно. Загрузка из API...
             </p>
           )}
         </div>

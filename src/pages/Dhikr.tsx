@@ -16,93 +16,138 @@ const Dhikr = () => {
       <main className="container mx-auto px-4 py-6 max-w-5xl">
         <Tabs defaultValue="dua" className="w-full">
           {/* Enhanced Tabs Container */}
-          <div className="relative mb-6">
+          <div className="relative mb-6 overflow-visible">
             {/* Background with gradient glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 rounded-2xl blur-xl opacity-50" />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 rounded-2xl blur-xl opacity-50 -z-10" />
             
-            <TabsList className="relative flex w-full h-auto px-2 py-2 gap-2 overflow-x-auto overflow-y-visible bg-white/95 backdrop-blur-md rounded-2xl border border-border/60 shadow-lg shadow-primary/5 scroll-smooth snap-x snap-mandatory">
+            <TabsList className={cn(
+              "relative flex w-full h-auto items-center",
+              "px-3 py-2.5 gap-2.5",
+              "overflow-x-auto overflow-y-visible",
+              "bg-white/95 backdrop-blur-md",
+              "rounded-2xl border border-border/60",
+              "shadow-lg shadow-primary/5",
+              "scroll-smooth snap-x snap-mandatory",
+              "min-h-[52px]"
+            )}>
               <TabsTrigger 
                 value="dua"
                 className={cn(
-                  "flex-shrink-0 min-w-fit text-center rounded-xl transition-all duration-300 ease-out",
-                  "whitespace-nowrap px-5 py-3 text-sm font-semibold",
+                  "flex-shrink-0 flex items-center justify-center",
+                  "min-w-[80px] px-6 py-3",
+                  "text-center rounded-xl",
+                  "transition-all duration-300 ease-out",
+                  "whitespace-nowrap",
+                  "text-sm font-semibold",
                   "snap-start",
+                  "overflow-visible",
                   // Inactive state
-                  "text-foreground/80 bg-transparent",
-                  "hover:text-foreground hover:bg-primary/5",
-                  "active:scale-95",
+                  "text-foreground/90 bg-transparent",
+                  "hover:text-foreground hover:bg-primary/8",
+                  "active:scale-[0.98]",
                   // Active state
-                  "data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/90",
+                  "data-[state=active]:bg-gradient-to-r",
+                  "data-[state=active]:from-primary",
+                  "data-[state=active]:to-primary/90",
                   "data-[state=active]:text-white",
-                  "data-[state=active]:shadow-lg data-[state=active]:shadow-primary/30",
-                  "data-[state=active]:scale-105",
-                  "data-[state=active]:font-bold"
+                  "data-[state=active]:shadow-lg",
+                  "data-[state=active]:shadow-primary/30",
+                  "data-[state=active]:scale-[1.02]",
+                  "data-[state=active]:font-bold",
+                  "data-[state=active]:z-10"
                 )}
               >
-                <span className="relative z-10">Дуа</span>
+                <span className="relative z-10 px-1">Дуа</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="adhkar"
                 className={cn(
-                  "flex-shrink-0 min-w-fit text-center rounded-xl transition-all duration-300 ease-out",
-                  "whitespace-nowrap px-5 py-3 text-sm font-semibold",
+                  "flex-shrink-0 flex items-center justify-center",
+                  "min-w-[100px] px-6 py-3",
+                  "text-center rounded-xl",
+                  "transition-all duration-300 ease-out",
+                  "whitespace-nowrap",
+                  "text-sm font-semibold",
                   "snap-start",
+                  "overflow-visible",
                   // Inactive state
-                  "text-foreground/80 bg-transparent",
-                  "hover:text-foreground hover:bg-primary/5",
-                  "active:scale-95",
+                  "text-foreground/90 bg-transparent",
+                  "hover:text-foreground hover:bg-primary/8",
+                  "active:scale-[0.98]",
                   // Active state
-                  "data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/90",
+                  "data-[state=active]:bg-gradient-to-r",
+                  "data-[state=active]:from-primary",
+                  "data-[state=active]:to-primary/90",
                   "data-[state=active]:text-white",
-                  "data-[state=active]:shadow-lg data-[state=active]:shadow-primary/30",
-                  "data-[state=active]:scale-105",
-                  "data-[state=active]:font-bold"
+                  "data-[state=active]:shadow-lg",
+                  "data-[state=active]:shadow-primary/30",
+                  "data-[state=active]:scale-[1.02]",
+                  "data-[state=active]:font-bold",
+                  "data-[state=active]:z-10"
                 )}
               >
-                <span className="relative z-10">Азкары</span>
+                <span className="relative z-10 px-1">Азкары</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="salawat"
                 className={cn(
-                  "flex-shrink-0 min-w-fit text-center rounded-xl transition-all duration-300 ease-out",
-                  "whitespace-nowrap px-5 py-3 text-sm font-semibold",
+                  "flex-shrink-0 flex items-center justify-center",
+                  "min-w-[110px] px-6 py-3",
+                  "text-center rounded-xl",
+                  "transition-all duration-300 ease-out",
+                  "whitespace-nowrap",
+                  "text-sm font-semibold",
                   "snap-start",
+                  "overflow-visible",
                   // Inactive state
-                  "text-foreground/80 bg-transparent",
-                  "hover:text-foreground hover:bg-primary/5",
-                  "active:scale-95",
+                  "text-foreground/90 bg-transparent",
+                  "hover:text-foreground hover:bg-primary/8",
+                  "active:scale-[0.98]",
                   // Active state
-                  "data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/90",
+                  "data-[state=active]:bg-gradient-to-r",
+                  "data-[state=active]:from-primary",
+                  "data-[state=active]:to-primary/90",
                   "data-[state=active]:text-white",
-                  "data-[state=active]:shadow-lg data-[state=active]:shadow-primary/30",
-                  "data-[state=active]:scale-105",
-                  "data-[state=active]:font-bold"
+                  "data-[state=active]:shadow-lg",
+                  "data-[state=active]:shadow-primary/30",
+                  "data-[state=active]:scale-[1.02]",
+                  "data-[state=active]:font-bold",
+                  "data-[state=active]:z-10"
                 )}
               >
-                <span className="relative z-10">Салаваты</span>
+                <span className="relative z-10 px-1">Салаваты</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="kalima"
                 className={cn(
-                  "flex-shrink-0 min-w-fit text-center rounded-xl transition-all duration-300 ease-out",
-                  "whitespace-nowrap px-5 py-3 text-sm font-semibold",
+                  "flex-shrink-0 flex items-center justify-center",
+                  "min-w-[100px] px-6 py-3",
+                  "text-center rounded-xl",
+                  "transition-all duration-300 ease-out",
+                  "whitespace-nowrap",
+                  "text-sm font-semibold",
                   "snap-start",
+                  "overflow-visible",
                   // Inactive state
-                  "text-foreground/80 bg-transparent",
-                  "hover:text-foreground hover:bg-primary/5",
-                  "active:scale-95",
+                  "text-foreground/90 bg-transparent",
+                  "hover:text-foreground hover:bg-primary/8",
+                  "active:scale-[0.98]",
                   // Active state
-                  "data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/90",
+                  "data-[state=active]:bg-gradient-to-r",
+                  "data-[state=active]:from-primary",
+                  "data-[state=active]:to-primary/90",
                   "data-[state=active]:text-white",
-                  "data-[state=active]:shadow-lg data-[state=active]:shadow-primary/30",
-                  "data-[state=active]:scale-105",
-                  "data-[state=active]:font-bold"
+                  "data-[state=active]:shadow-lg",
+                  "data-[state=active]:shadow-primary/30",
+                  "data-[state=active]:scale-[1.02]",
+                  "data-[state=active]:font-bold",
+                  "data-[state=active]:z-10"
                 )}
               >
-                <span className="relative z-10">Калимы</span>
+                <span className="relative z-10 px-1">Калимы</span>
               </TabsTrigger>
             </TabsList>
           </div>

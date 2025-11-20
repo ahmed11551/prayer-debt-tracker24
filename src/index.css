@@ -278,4 +278,16 @@ All colors MUST be HSL.
   .tab-transition {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  /* Prevent text clipping in tabs */
+  [role="tablist"] {
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+
+  [role="tab"] {
+    overflow: visible !important;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
 }

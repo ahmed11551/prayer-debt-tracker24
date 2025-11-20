@@ -14,28 +14,28 @@ const Dhikr = () => {
 
       <main className="container mx-auto px-4 py-6 max-w-5xl">
         <Tabs defaultValue="dua" className="w-full">
-          <TabsList className="flex w-full mb-6 glass shadow-medium h-auto px-2 py-2 gap-2 overflow-x-auto bg-white/80 backdrop-blur-sm rounded-lg border border-border/30">
+          <TabsList className="flex w-full mb-6 bg-white/80 backdrop-blur-sm h-auto px-2 py-2 gap-2 overflow-x-auto rounded-lg border border-border/50">
             <TabsTrigger 
               value="dua"
-              className="flex-shrink-0 min-w-[120px] text-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
+              className="flex-shrink-0 min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
             >
               Дуа
             </TabsTrigger>
             <TabsTrigger 
               value="adhkar"
-              className="flex-shrink-0 min-w-[120px] text-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
+              className="flex-shrink-0 min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
             >
               Азкары
             </TabsTrigger>
             <TabsTrigger 
               value="salawat"
-              className="flex-shrink-0 min-w-[120px] text-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
+              className="flex-shrink-0 min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
             >
               Салаваты
             </TabsTrigger>
             <TabsTrigger 
               value="kalima"
-              className="flex-shrink-0 min-w-[120px] text-center data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
+              className="flex-shrink-0 min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
             >
               Калимы
             </TabsTrigger>

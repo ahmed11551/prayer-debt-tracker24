@@ -1,39 +1,24 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Moon, Sun, Sunrise, Sunset, Plane, Heart, Utensils, Car, Home, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, Moon, Sun, Sunrise, Sunset, Plane, Heart, Utensils, Car, Home, ChevronDown, ChevronUp, Star, Grid3x3 } from "lucide-react";
 import { DuaCard } from "./DuaCard";
 import { cn } from "@/lib/utils";
 
-interface Category {
-  id: string;
-  name: string;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
-  duas: Array<{
-    id: string;
-    arabic: string;
-    transcription: string;
-    russianTranscription?: string;
-    translation: string;
-    reference: string;
-    audioUrl: string | null;
-  }>;
-}
-
 export const DuaSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
-  const categories: Category[] = [
+  const categories = [
     {
       id: "sleep",
       name: "Перед сном",
       icon: Moon,
       color: "category-sleep",
+      description: "Дуа перед сном",
       duas: [
         {
           id: "sleep-1",
@@ -78,6 +63,7 @@ export const DuaSection = () => {
       name: "Утренние",
       icon: Sunrise,
       color: "category-morning",
+      description: "Дуа утром",
       duas: [
         {
           id: "morning-1",
@@ -113,6 +99,7 @@ export const DuaSection = () => {
       name: "Вечерние",
       icon: Sunset,
       color: "category-evening",
+      description: "Дуа вечером",
       duas: [
         {
           id: "evening-1",
@@ -135,80 +122,28 @@ export const DuaSection = () => {
       ],
     },
     {
-      id: "prayer",
-      name: "После намаза",
-      icon: Sun,
-      color: "category-prayer",
-      duas: [
-        {
-          id: "prayer-1",
-          arabic: "أَسْتَغْفِرُ اللَّهَ (ثَلاثًا)",
-          transcription: "Astaghfirullah (3 раза)",
-          russianTranscription: "Астагфируллах (3 раза)",
-          translation: "Прошу прощения у Аллаха",
-          reference: "Сахих Муслим 591",
-          audioUrl: null,
-        },
-        {
-          id: "prayer-2",
-          arabic: "اللَّهُمَّ أَنْتَ السَّلامُ وَمِنْكَ السَّلامُ",
-          transcription: "Allahumma antas-salam wa minkas-salam",
-          russianTranscription: "Аллахумма антас-саляму ва минкас-салям",
-          translation: "О Аллах, Ты — Мир, и от Тебя — мир",
-          reference: "Сахих Муслим 592",
-          audioUrl: null,
-        },
-        {
-          id: "prayer-3",
-          arabic: "اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ وَلَا مُعْطِيَ لِمَا مَنَعْتَ",
-          transcription: "Allahumma la mani'a lima a'tayta wa la mu'tiya lima mana'ta",
-          russianTranscription: "Аллахумма ля мани'а лима а'тайта ва ля му'тия лима мана'та",
-          translation: "О Аллах, нет препятствующего тому, что Ты дал, и нет дающего тому, что Ты удержал",
-          reference: "Сахих аль-Бухари 844",
-          audioUrl: null,
-        },
-        {
-          id: "prayer-4",
-          arabic: "اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ",
-          transcription: "Allahumma a'inni 'ala dhikrika wa shukrika wa husni 'ibadatik",
-          russianTranscription: "Аллахумма а'инни 'аля зикрика ва шукрика ва хусни 'ибадатик",
-          translation: "О Аллах, помоги мне поминать Тебя, благодарить Тебя и хорошо поклоняться Тебе",
-          reference: "Сахих Абу Дауд 1522",
-          audioUrl: null,
-        },
-      ],
-    },
-    {
-      id: "hajj",
-      name: "В хадже",
+      id: "travel",
+      name: "В путешествии",
       icon: Plane,
-      color: "category-hajj",
+      color: "category-travel",
+      description: "Дуа в пути",
       duas: [
         {
-          id: "hajj-1",
-          arabic: "لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ",
-          transcription: "Labbayka Allahumma labbayk",
-          russianTranscription: "Лаббайка Аллахумма лаббайк",
-          translation: "Вот я перед Тобой, О Аллах, вот я перед Тобой",
-          reference: "Сахих аль-Бухари 1549",
+          id: "travel-1",
+          arabic: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَىٰ رَبِّنَا لَمُنقَلِبُونَ",
+          transcription: "Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinin wa inna ila rabbina lamunqalibun",
+          russianTranscription: "Субханаллязи саххара ляна хаза ва ма кунна ляху мукринин ва инна иля раббина лямункалибун",
+          translation: "Свят Тот, Кто подчинил нам это, а мы не были способны на это сами, и, поистине, мы возвращаемся к нашему Господу",
+          reference: "Коран 43:13",
           audioUrl: null,
         },
         {
-          id: "hajj-2",
-          arabic: "لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ",
-          transcription: "Labbayka Allahumma labbayk, labbayk la sharika lak labbayk",
-          russianTranscription: "Лаббайка Аллахумма лаббайк, лаббайк ля шарика лак лаббайк",
-          translation: "Вот я перед Тобой, О Аллах, вот я перед Тобой. Нет у Тебя сотоварища, вот я перед Тобой",
-          reference: "Сахих аль-Бухари 1549",
-          audioUrl: null,
-        },
-        {
-          id: "hajj-3",
-          arabic: "اللَّهُمَّ إِنِّي أُرِيدُ الْحَجَّ فَيَسِّرْهُ لِي",
-          transcription: "Allahumma inni uridul-hajja fa yassirhu li",
-          russianTranscription: "Аллахумма инни уридуль-хаджжа фа яссирху ли",
-          translation: "О Аллах, я желаю совершить хадж, облегчи его мне",
-          reference: "Сахих Муслим 1181",
+          id: "travel-2",
+          arabic: "اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَٰذَا الْبِرَّ وَالتَّقْوَىٰ",
+          transcription: "Allahumma inni nas'aluka fi safarina hadhal-birra wat-taqwa",
+          russianTranscription: "Аллахумма инна нас'алюка фи сафарина хазаль-бирра ват-таква",
+          translation: "О Аллах, мы просим Тебя о благочестии и богобоязненности в этом нашем путешествии",
+          reference: "Сахих Муслим 1342",
           audioUrl: null,
         },
       ],
@@ -217,7 +152,8 @@ export const DuaSection = () => {
       id: "food",
       name: "Перед едой",
       icon: Utensils,
-      color: "category-general",
+      color: "category-food",
+      description: "Дуа перед едой",
       duas: [
         {
           id: "food-1",
@@ -230,62 +166,28 @@ export const DuaSection = () => {
         },
         {
           id: "food-2",
-          arabic: "بِسْمِ اللَّهِ وَعَلَى بَرَكَةِ اللَّهِ",
-          transcription: "Bismillahi wa 'ala barakatillah",
-          russianTranscription: "Бисмиллахи ва 'аля баракатиллах",
-          translation: "С именем Аллаха и с благословением Аллаха",
-          reference: "Сахих Абу Дауд 3767",
-          audioUrl: null,
-        },
-      ],
-    },
-    {
-      id: "travel",
-      name: "В путешествии",
-      icon: Car,
-      color: "category-hajj",
-      duas: [
-        {
-          id: "travel-1",
-          arabic: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ",
-          transcription: "Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinin",
-          russianTranscription: "Субханаллязи саххара ляна хаза ва ма кунна ляху мукринин",
-          translation: "Свят Тот, Кто подчинил нам это, а мы не были способны на это",
-          reference: "Сахих Муслим 1342",
-          audioUrl: null,
-        },
-        {
-          id: "travel-2",
-          arabic: "اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَذَا الْبِرَّ وَالتَّقْوَى",
-          transcription: "Allahumma inni nas'aluka fi safarina hadhal-birra wat-taqwa",
-          russianTranscription: "Аллахумма инна нас'алюка фи сафарина хазаль-бирра ват-таква",
-          translation: "О Аллах, мы просим Тебя в этом нашем путешествии о благочестии и богобоязненности",
-          reference: "Сахих Муслим 1342",
+          arabic: "اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَأَطْعِمْنَا خَيْرًا مِنْهُ",
+          transcription: "Allahumma barik lana fihi wa at'imna khayran minhu",
+          russianTranscription: "Аллахумма барик ляна фихи ва ат'имна хайран минху",
+          translation: "О Аллах, благослови нас в этом и накорми нас лучшим, чем это",
+          reference: "Сахих Ат-Тирмизи 3458",
           audioUrl: null,
         },
       ],
     },
     {
       id: "home",
-      name: "При входе/выходе",
+      name: "При входе в дом",
       icon: Home,
-      color: "category-prayer",
+      color: "category-home",
+      description: "Дуа при входе",
       duas: [
         {
           id: "home-1",
           arabic: "بِسْمِ اللَّهِ وَلَجْنَا وَبِسْمِ اللَّهِ خَرَجْنَا",
           transcription: "Bismillahi walajna wa bismillahi kharajna",
           russianTranscription: "Бисмиллахи валяджна ва бисмиллахи хараджна",
-          translation: "С именем Аллаха мы вошли и с именем Аллаха мы вышли",
-          reference: "Сахих Абу Дауд 5096",
-          audioUrl: null,
-        },
-        {
-          id: "home-2",
-          arabic: "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلِجِ وَخَيْرَ الْمَخْرَجِ",
-          transcription: "Allahumma inni as'aluka khayral-mawliji wa khayral-makhraj",
-          russianTranscription: "Аллахумма инни ас'алюка хайраль-маулиджи ва хайраль-махраж",
-          translation: "О Аллах, я прошу Тебя о лучшем входе и лучшем выходе",
+          translation: "С именем Аллаха мы входим, и с именем Аллаха мы выходим",
           reference: "Сахих Абу Дауд 5096",
           audioUrl: null,
         },
@@ -296,67 +198,83 @@ export const DuaSection = () => {
       name: "Общие",
       icon: Heart,
       color: "category-general",
+      description: "Общие дуа",
       duas: [
         {
           id: "general-1",
-          arabic: "الْحَمْدُ لِلَّهِ",
-          transcription: "Alhamdulillah",
-          russianTranscription: "Аль-хамду лиллах",
-          translation: "Хвала Аллаху",
-          reference: "Коран 1:2",
+          arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+          transcription: "Rabbana atina fid-dunya hasanatan wa fil-akhirati hasanatan wa qina 'adhaban-nar",
+          russianTranscription: "Раббана атина фид-дунья хасанатан ва филь-ахирати хасанатан ва кина 'азабан-нар",
+          translation: "Господь наш, даруй нам в этом мире благо и в Последней жизни благо, и защити нас от наказания Огня",
+          reference: "Коран 2:201",
           audioUrl: null,
         },
         {
           id: "general-2",
-          arabic: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
-          transcription: "Subhanallahi wa bihamdih",
-          russianTranscription: "Субханаллахи ва бихамдих",
-          translation: "Свят Аллах и хвала Ему",
-          reference: "Сахих Муслим 2691",
-          audioUrl: null,
-        },
-        {
-          id: "general-3",
-          arabic: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
-          transcription: "La hawla wa la quwwata illa billah",
-          russianTranscription: "Ля хауля ва ля куввата илля биллах",
-          translation: "Нет силы и мощи ни у кого, кроме Аллаха",
-          reference: "Сахих аль-Бухари 6610",
-          audioUrl: null,
-        },
-        {
-          id: "general-4",
-          arabic: "رَبِّ اغْفِرْ لِي وَتُبْ عَلَيَّ",
-          transcription: "Rabbi ighfir li wa tub 'alayya",
-          russianTranscription: "Рабби игфир ли ва туб 'аляййа",
-          translation: "Господи, прости меня и прими моё покаяние",
-          reference: "Сахих Ат-Тирмизи 3434",
+          arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحُزْنِ",
+          transcription: "Allahumma inni a'udhu bika minal-hammi wal-huzn",
+          russianTranscription: "Аллахумма инни а'узу бика миналь-хамми валь-хузн",
+          translation: "О Аллах, я прибегаю к Тебе от печали и горя",
+          reference: "Сахих аль-Бухари 6369",
           audioUrl: null,
         },
       ],
     },
   ];
 
-  // Initialize: expand all categories if no search query
-  useEffect(() => {
-    if (!searchQuery) {
-      setExpandedCategories(new Set(categories.map(cat => cat.id)));
+  // Get favorites from localStorage
+  const favorites = useMemo(() => {
+    try {
+      const bookmarks = localStorage.getItem("prayer_debt_bookmarks");
+      if (bookmarks) {
+        const parsed = JSON.parse(bookmarks);
+        if (Array.isArray(parsed)) {
+          return new Set(parsed.map((b: { id: string }) => b.id));
+        }
+      }
+    } catch (error) {
+      console.error("Error reading favorites:", error);
     }
-  }, [searchQuery]);
+    return new Set<string>();
+  }, []);
 
-  const filteredCategories = categories.map(category => ({
-    ...category,
-    duas: category.duas.filter(dua =>
-      dua.arabic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      dua.transcription.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (dua.russianTranscription && dua.russianTranscription.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      dua.translation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      category.name.toLowerCase().includes(searchQuery.toLowerCase())
-    ),
-  })).filter(category => category.duas.length > 0);
+  // Filter categories and duas
+  const filteredCategories = useMemo(() => {
+    let filtered = categories;
+
+    // Filter by search query
+    if (searchQuery) {
+      filtered = categories.map((category) => ({
+        ...category,
+        duas: category.duas.filter(
+          (dua) =>
+            dua.arabic.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            dua.transcription.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (dua.russianTranscription && dua.russianTranscription.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            dua.translation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            dua.reference.toLowerCase().includes(searchQuery.toLowerCase())
+        ),
+      })).filter((category) => category.duas.length > 0);
+    }
+
+    // Filter by selected category
+    if (selectedCategory) {
+      filtered = filtered.filter((category) => category.id === selectedCategory);
+    }
+
+    // Filter by favorites
+    if (showFavoritesOnly) {
+      filtered = filtered.map((category) => ({
+        ...category,
+        duas: category.duas.filter((dua) => favorites.has(dua.id)),
+      })).filter((category) => category.duas.length > 0);
+    }
+
+    return filtered;
+  }, [searchQuery, selectedCategory, showFavoritesOnly, favorites]);
 
   const toggleCategory = (categoryId: string) => {
-    setExpandedCategories(prev => {
+    setExpandedCategories((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(categoryId)) {
         newSet.delete(categoryId);
@@ -367,76 +285,105 @@ export const DuaSection = () => {
     });
   };
 
-  const scrollToCategory = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    const element = categoryRefs.current[categoryId];
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-      // Expand category if collapsed
-      if (!expandedCategories.has(categoryId)) {
-        setExpandedCategories(prev => new Set(prev).add(categoryId));
-      }
-    }
+  const isCategoryExpanded = (categoryId: string) => {
+    return expandedCategories.has(categoryId);
   };
+
+  const totalDuas = categories.reduce((sum, cat) => sum + cat.duas.length, 0);
+  const favoriteCount = categories.reduce((sum, cat) => 
+    sum + cat.duas.filter((dua) => favorites.has(dua.id)).length, 0
+  );
 
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
-      {/* Search Bar */}
+      {/* Search and Filters Bar */}
       <Card className="glass shadow-medium border-border/50">
-        <CardContent className="pt-6">
+        <CardContent className="pt-6 space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
-              placeholder="Поиск по дуа, категориям..."
+              placeholder="Поиск по дуа..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 bg-background/50 border-border/50 focus:border-primary"
             />
           </div>
+
+          {/* Quick Filters */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              variant={selectedCategory === null ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory(null)}
+              className="rounded-full"
+            >
+              <Grid3x3 className="w-4 h-4 mr-2" />
+              Все ({totalDuas})
+            </Button>
+            <Button
+              variant={showFavoritesOnly ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+              className="rounded-full"
+            >
+              <Star className={cn("w-4 h-4 mr-2", showFavoritesOnly && "fill-current")} />
+              Избранное ({favoriteCount})
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Quick Category Navigation */}
-      {!searchQuery && (
-        <Card className="glass shadow-medium border-border/50 overflow-hidden">
-          <CardHeader className="pb-3">
+      {/* Category Quick Access */}
+      {!searchQuery && !selectedCategory && (
+        <Card className="glass shadow-medium border-border/50">
+          <CardHeader>
             <CardTitle className="text-lg">Категории</CardTitle>
-            <CardDescription>Быстрый переход к категориям</CardDescription>
+            <CardDescription>Быстрый доступ к категориям дуа</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {categories.map((category) => {
                 const Icon = category.icon;
-                const isSelected = selectedCategory === category.id;
+                const categoryDuasCount = category.duas.length;
+                const favoriteDuasInCategory = category.duas.filter((dua) => favorites.has(dua.id)).length;
+                
                 return (
                   <Button
                     key={category.id}
-                    variant="ghost"
-                    onClick={() => scrollToCategory(category.id)}
+                    variant={selectedCategory === category.id ? "default" : "outline"}
                     className={cn(
-                      "shrink-0 flex flex-col items-center gap-2 h-auto py-3 px-4 rounded-xl transition-all duration-200",
-                      "hover:bg-primary/10 hover:scale-105",
-                      isSelected && "bg-primary/10 border-2 border-primary/30"
+                      "h-auto flex-col gap-2 p-4 rounded-xl transition-all duration-200",
+                      "hover:scale-105 hover:shadow-md",
+                      selectedCategory === category.id && "bg-primary text-primary-foreground shadow-glow"
                     )}
+                    onClick={() => {
+                      setSelectedCategory(selectedCategory === category.id ? null : category.id);
+                      setSearchQuery("");
+                    }}
                   >
                     <div className={cn(
-                      "w-10 h-10 rounded-lg flex items-center justify-center transition-colors",
-                      isSelected ? "bg-primary/20" : "bg-primary/10"
+                      "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
+                      selectedCategory === category.id 
+                        ? "bg-primary-foreground/20" 
+                        : "bg-primary/10"
                     )}>
                       <Icon className={cn(
-                        "w-5 h-5 transition-colors",
-                        isSelected ? "text-primary" : "text-primary/70"
+                        "w-6 h-6",
+                        selectedCategory === category.id ? "text-primary-foreground" : "text-primary"
                       )} />
                     </div>
-                    <span className={cn(
-                      "text-xs font-medium text-center whitespace-nowrap",
-                      isSelected ? "text-primary" : "text-foreground/70"
-                    )}>
-                      {category.name}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">
-                      {category.duas.length}
-                    </span>
+                    <div className="text-center">
+                      <div className="font-semibold text-sm">{category.name}</div>
+                      <div className={cn(
+                        "text-xs mt-1",
+                        selectedCategory === category.id ? "text-primary-foreground/80" : "text-muted-foreground"
+                      )}>
+                        {categoryDuasCount} дуа
+                        {favoriteDuasInCategory > 0 && (
+                          <span className="ml-1">⭐ {favoriteDuasInCategory}</span>
+                        )}
+                      </div>
+                    </div>
                   </Button>
                 );
               })}
@@ -445,82 +392,81 @@ export const DuaSection = () => {
         </Card>
       )}
 
-      {/* Categories */}
+      {/* Categories List */}
       {filteredCategories.length === 0 ? (
         <Card className="glass shadow-medium">
           <CardContent className="pt-6 text-center text-muted-foreground">
-            Ничего не найдено. Попробуйте другой запрос.
+            <p className="text-lg mb-2">Ничего не найдено</p>
+            <p className="text-sm">Попробуйте другой запрос или выберите другую категорию</p>
           </CardContent>
         </Card>
       ) : (
         filteredCategories.map((category) => {
           const Icon = category.icon;
-          const isExpanded = expandedCategories.has(category.id);
-          const isSelected = selectedCategory === category.id;
-          
+          const isExpanded = isCategoryExpanded(category.id);
+          const shouldShow = !selectedCategory || selectedCategory === category.id;
+
+          if (!shouldShow) return null;
+
           return (
-            <div 
-              key={category.id} 
-              ref={(el) => { categoryRefs.current[category.id] = el; }}
-              className={cn(
-                "transition-all duration-300",
-                isSelected && "ring-2 ring-primary/30 rounded-2xl p-1"
-              )}
-            >
+            <div key={category.id} className="space-y-4">
               <Card className="glass shadow-medium border-border/50 overflow-hidden hover:shadow-strong transition-all duration-300">
                 <div className="h-1 bg-gradient-to-r from-primary/50 to-transparent" />
-                <CardHeader 
-                  className="cursor-pointer"
-                  onClick={() => toggleCategory(category.id)}
-                >
+                <CardHeader className="cursor-pointer" onClick={() => toggleCategory(category.id)}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 flex-1">
-                      <div className={cn(
-                        "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200",
-                        isSelected ? "bg-primary/20 shadow-glow" : "bg-primary/10"
-                      )}>
-                        <Icon className={cn(
-                          "w-6 h-6 transition-colors",
-                          isSelected ? "text-primary" : "text-primary/80"
-                        )} />
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                        <Icon className="w-6 h-6 text-primary" />
                       </div>
                       <div className="flex-1">
                         <CardTitle className="text-xl">{category.name}</CardTitle>
                         <CardDescription>
-                          {category.duas.length} {category.duas.length === 1 ? "дуа" : "дуа"}
+                          {category.duas.length} {category.duas.length === 1 ? "дуа" : "дуа"} 
+                          {category.description && ` • ${category.description}`}
                         </CardDescription>
                       </div>
                     </div>
                     <Button
-                      size="icon"
                       variant="ghost"
-                      className="h-8 w-8 shrink-0"
+                      size="icon"
+                      className="shrink-0"
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleCategory(category.id);
                       }}
                     >
                       {isExpanded ? (
-                        <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                        <ChevronUp className="w-5 h-5" />
                       ) : (
-                        <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                        <ChevronDown className="w-5 h-5" />
                       )}
                     </Button>
                   </div>
                 </CardHeader>
-                
-                {isExpanded && (
-                  <CardContent className="pt-0 space-y-4 animate-in slide-in-from-top-2 duration-300">
-                    {category.duas.map((dua) => (
-                      <DuaCard key={dua.id} dua={dua} categoryColor={category.color} />
-                    ))}
-                  </CardContent>
-                )}
               </Card>
+
+              {/* Duas List */}
+              {(isExpanded || selectedCategory === category.id) && (
+                <div className="space-y-4 animate-in fade-in-50 duration-300">
+                  {category.duas.map((dua) => (
+                    <DuaCard key={dua.id} dua={dua} categoryColor={category.color} />
+                  ))}
+                </div>
+              )}
             </div>
           );
         })
       )}
+
+      {/* Info Card */}
+      <Card className="border-accent/30 bg-accent/5">
+        <CardContent className="pt-6">
+          <p className="text-sm text-muted-foreground text-center">
+            <strong className="text-accent">Совет:</strong> Используйте поиск для быстрого нахождения нужного дуа, 
+            или выберите категорию для просмотра всех дуа в ней. Сохраняйте избранные дуа для быстрого доступа.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 };

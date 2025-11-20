@@ -107,15 +107,59 @@ async function handleCalculate(
     userId = body.user_id || `user_${Date.now()}`;
   }
 
-  // Валидация данных
-  if (!body.personal_data || !body.travel_data) {
-    return new Response(
-      JSON.stringify({ error: "Missing required fields" }),
-      {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+  // Валидация данных в зависимости от метода расчета
+  if (body.calculation_method === "manual") {
+    // Для ручного ввода нужны только missed_prayers и travel_prayers
+    if (!body.missed_prayers && !body.travel_prayers) {
+      return new Response(
+        JSON.stringify({ error: "Missing missed_prayers or travel_prayers for manual calculation" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+  } else {
+    // Для калькулятора нужны personal_data и travel_data
+    if (!body.personal_data || !body.travel_data) {
+      return new Response(
+        JSON.stringify({ error: "Missing required fields" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+  }
+
+  // Формируем debt_calculation в зависимости от метода
+  let debtCalculation = body.debt_calculation;
+  
+  if (body.calculation_method === "manual" && !debtCalculation) {
+    // Создаем debt_calculation из ручного ввода
+    const now = new Date();
+    debtCalculation = {
+      period: {
+        start: now,
+        end: now,
+      },
+      total_days: 0,
+      excluded_days: 0,
+      effective_days: 0,
+      missed_prayers: body.missed_prayers || {
+        fajr: 0,
+        dhuhr: 0,
+        asr: 0,
+        maghrib: 0,
+        isha: 0,
+        witr: 0,
+      },
+      travel_prayers: body.travel_prayers || {
+        dhuhr_safar: 0,
+        asr_safar: 0,
+        isha_safar: 0,
+      },
+    };
   }
 
   // Здесь должна быть логика расчета через prayer-calculator
@@ -125,10 +169,20 @@ async function handleCalculate(
     calc_version: "1.0.0",
     madhab: body.madhab || "hanafi",
     calculation_method: body.calculation_method || "calculator",
-    personal_data: body.personal_data,
+    personal_data: body.personal_data || {
+      birth_date: new Date(),
+      gender: "male",
+      bulugh_age: 15,
+      bulugh_date: new Date(),
+      prayer_start_date: new Date(),
+      today_as_start: true,
+    },
     women_data: body.women_data || null,
-    travel_data: body.travel_data,
-    debt_calculation: body.debt_calculation || {},
+    travel_data: body.travel_data || {
+      total_travel_days: 0,
+      travel_periods: [],
+    },
+    debt_calculation: debtCalculation || {},
     repayment_progress: body.repayment_progress || {
       completed_prayers: {
         fajr: 0,

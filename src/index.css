@@ -283,11 +283,32 @@ All colors MUST be HSL.
   [role="tablist"] {
     overflow-x: auto;
     overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.3) transparent;
+  }
+
+  [role="tablist"]::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  [role="tablist"]::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  [role="tablist"]::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.3);
+    border-radius: 2px;
+  }
+
+  [role="tablist"]::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
   }
 
   [role="tab"] {
     overflow: visible !important;
     text-overflow: clip;
     white-space: nowrap;
+    flex-shrink: 0;
   }
 }

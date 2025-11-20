@@ -80,18 +80,6 @@ export const AdhkarSection = () => {
       color: "category-morning",
       adhkar: [
         {
-          id: "morning-tasbih",
-          title: "Тасбих утром",
-          icon: Sunrise,
-          color: "category-morning",
-          text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
-          transcription: "Subhanallahi wa bihamdih",
-          russianTranscription: "Субханаллахи ва бихамдих",
-          translation: "Свят Аллах и хвала Ему",
-          count: 100,
-          category: "Утренние",
-        },
-        {
           id: "morning-la-ilaha",
           title: "Ля иляха",
           icon: Heart,
@@ -124,18 +112,6 @@ export const AdhkarSection = () => {
       color: "category-evening",
       adhkar: [
         {
-          id: "evening-tasbih",
-          title: "Тасбих вечером",
-          icon: Sunset,
-          color: "category-evening",
-          text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
-          transcription: "Subhanallahi wa bihamdih",
-          russianTranscription: "Субханаллахи ва бихамдих",
-          translation: "Свят Аллах и хвала Ему",
-          count: 100,
-          category: "Вечерние",
-        },
-        {
           id: "evening-la-ilaha",
           title: "Ля иляха",
           icon: Heart,
@@ -155,18 +131,6 @@ export const AdhkarSection = () => {
       icon: Moon,
       color: "category-sleep",
       adhkar: [
-        {
-          id: "sleep-tasbih",
-          title: "Тасбих перед сном",
-          icon: Moon,
-          color: "category-sleep",
-          text: "سُبْحَانَ اللَّهِ",
-          transcription: "Subhanallah",
-          russianTranscription: "Субханаллах",
-          translation: "Свят Аллах",
-          count: 33,
-          category: "Перед сном",
-        },
         {
           id: "sleep-tahmid",
           title: "Тахмид перед сном",

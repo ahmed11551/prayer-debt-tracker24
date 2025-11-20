@@ -511,6 +511,8 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
         const filtered = bookmarks.filter((b) => b.id !== dua.id);
         localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(filtered));
         setIsBookmarked(false);
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('bookmarksUpdated'));
         toast({
           title: "Удалено из избранного",
           description: "Дуа удалено из ваших закладок",
@@ -519,6 +521,8 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
         bookmarks.push({ id: dua.id });
         localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
         setIsBookmarked(true);
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('bookmarksUpdated'));
         toast({
           title: "Добавлено в избранное",
           description: "Дуа сохранено в ваших закладках",

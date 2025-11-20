@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -222,7 +222,9 @@ export const DuaSection = () => {
     },
   ];
 
-  // Get favorites from localStorage
+  // Get favorites from localStorage with state to trigger updates
+  const [bookmarksUpdated, setBookmarksUpdated] = useState(0);
+  
   const favorites = useMemo(() => {
     try {
       const bookmarks = localStorage.getItem("prayer_debt_bookmarks");
@@ -236,6 +238,24 @@ export const DuaSection = () => {
       console.error("Error reading favorites:", error);
     }
     return new Set<string>();
+  }, [bookmarksUpdated]);
+
+  // Listen for storage changes to update favorites
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setBookmarksUpdated(prev => prev + 1);
+    };
+
+    // Listen for storage events (from other tabs/windows)
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Listen for custom event (from same tab)
+    window.addEventListener('bookmarksUpdated', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('bookmarksUpdated', handleStorageChange);
+    };
   }, []);
 
   // Filter categories and duas

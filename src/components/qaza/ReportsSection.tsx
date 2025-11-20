@@ -102,50 +102,33 @@ export const ReportsSection = () => {
     );
   }
 
-  const completedPrayers = userData.repayment_progress?.completed_prayers || {};
-  const missedPrayers = userData.debt_calculation?.missed_prayers || {};
-  const totalCompleted = Object.values(completedPrayers).reduce((sum, val) => sum + (val || 0), 0);
-  const totalMissed = Object.values(missedPrayers).reduce((sum, val) => sum + (val || 0), 0);
-  const remaining = totalMissed - totalCompleted;
-  const startDate = userData.debt_calculation?.period?.start 
-    ? new Date(userData.debt_calculation.period.start) 
-    : new Date();
-  const daysSinceStart = Math.max(
-    1,
-    Math.floor((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-  );
-  const dailyPace = Math.round(totalCompleted / daysSinceStart) || 0;
-  const daysToComplete = dailyPace > 0 ? Math.ceil(remaining / dailyPace) : 0;
-  const monthsToComplete = Math.floor(daysToComplete / 30);
-  const daysRemaining = daysToComplete % 30;
-  const overallProgress = totalMissed > 0 ? Math.round((totalCompleted / totalMissed) * 100) : 0;
-
-  const stats = [
+  // Мемоизация массива статистики
+  const statsArray = useMemo(() => [
     {
       icon: Calendar,
       label: "Дата начала",
-      value: startDate.toLocaleDateString("ru-RU"),
+      value: stats.startDate.toLocaleDateString("ru-RU"),
       description: "Начало отслеживания",
     },
     {
       icon: Target,
       label: "Всего восполнено",
-      value: totalCompleted.toLocaleString(),
+      value: formatNumber(stats.totalCompleted),
       description: "намазов выполнено",
     },
     {
       icon: TrendingUp,
       label: "Осталось",
-      value: remaining.toLocaleString(),
+      value: formatNumber(stats.remaining),
       description: "намазов до завершения",
     },
     {
       icon: Clock,
       label: "Средний темп",
-      value: `${dailyPace}/день`,
+      value: `${stats.dailyPace}/день`,
       description: "намазов в день",
     },
-  ];
+  ], [stats]);
 
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
@@ -161,7 +144,7 @@ export const ReportsSection = () => {
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
+        {statsArray.map((stat) => (
           <Card key={stat.label} className="bg-gradient-card border-border/50">
             <CardContent className="pt-6">
               <div className="space-y-2">
@@ -186,20 +169,20 @@ export const ReportsSection = () => {
             <h3 className="text-xl font-semibold">Прогноз завершения</h3>
             <div className="grid md:grid-cols-3 gap-4 text-center">
               <div className="space-y-1">
-                <div className="text-3xl font-bold">{monthsToComplete}</div>
+                <div className="text-3xl font-bold">{stats.monthsToComplete}</div>
                 <div className="text-sm opacity-90">месяцев</div>
               </div>
               <div className="space-y-1">
-                <div className="text-3xl font-bold">{daysRemaining}</div>
+                <div className="text-3xl font-bold">{stats.daysRemaining}</div>
                 <div className="text-sm opacity-90">дней</div>
               </div>
               <div className="space-y-1">
-                <div className="text-3xl font-bold">{overallProgress}%</div>
+                <div className="text-3xl font-bold">{stats.overallProgress}%</div>
                 <div className="text-sm opacity-90">выполнено</div>
               </div>
             </div>
             <p className="text-sm opacity-90 text-center">
-              При текущем темпе ({dailyPace} намазов/день)
+              При текущем темпе ({stats.dailyPace} намазов/день)
             </p>
           </div>
         </CardContent>

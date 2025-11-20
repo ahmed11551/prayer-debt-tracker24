@@ -12,6 +12,7 @@ interface AdhkarCardProps {
     color: string;
     text: string;
     transcription: string;
+    russianTranscription?: string;
     translation: string;
     count: number;
     category: string;
@@ -80,8 +81,11 @@ export const AdhkarCard = memo(({ dhikr }: AdhkarCardProps) => {
         </div>
 
         {/* Transcription */}
-        <div className="text-center">
+        <div className="text-center space-y-2">
           <p className="text-sm text-muted-foreground italic">{dhikr.transcription}</p>
+          {dhikr.russianTranscription && (
+            <p className="text-sm text-foreground/80 font-medium">{dhikr.russianTranscription}</p>
+          )}
           <p className="text-sm text-foreground mt-1">{dhikr.translation}</p>
         </div>
 

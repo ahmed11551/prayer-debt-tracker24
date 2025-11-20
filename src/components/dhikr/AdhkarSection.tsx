@@ -18,6 +18,7 @@ interface AdhkarCategory {
     color: string;
     text: string;
     transcription: string;
+    russianTranscription?: string;
     translation: string;
     count: number;
     category: string;
@@ -41,6 +42,7 @@ export const AdhkarSection = () => {
           color: "primary",
           text: "سُبْحَانَ اللَّهِ",
           transcription: "Subhanallah",
+          russianTranscription: "Субханаллах",
           translation: "Свят Аллах",
           count: 33,
           category: "После намаза",
@@ -52,6 +54,7 @@ export const AdhkarSection = () => {
           color: "accent",
           text: "الْحَمْدُ لِلَّهِ",
           transcription: "Alhamdulillah",
+          russianTranscription: "Альхамдулиллах",
           translation: "Хвала Аллаху",
           count: 33,
           category: "После намаза",
@@ -63,6 +66,7 @@ export const AdhkarSection = () => {
           color: "category-prayer",
           text: "اللَّهُ أَكْبَرُ",
           transcription: "Allahu Akbar",
+          russianTranscription: "Аллаху Акбар",
           translation: "Аллах Велик",
           count: 34,
           category: "После намаза",
@@ -82,6 +86,7 @@ export const AdhkarSection = () => {
           color: "category-morning",
           text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
           transcription: "Subhanallahi wa bihamdih",
+          russianTranscription: "Субханаллахи ва бихамдих",
           translation: "Свят Аллах и хвала Ему",
           count: 100,
           category: "Утренние",
@@ -93,6 +98,7 @@ export const AdhkarSection = () => {
           color: "primary",
           text: "لَا إِلَٰهَ إِلَّا ٱللَّٰهُ",
           transcription: "La ilaha illallah",
+          russianTranscription: "Ля иляха илляллах",
           translation: "Нет божества, кроме Аллаха",
           count: 100,
           category: "Утренние",
@@ -104,6 +110,7 @@ export const AdhkarSection = () => {
           color: "accent",
           text: "أَسْتَغْفِرُ اللَّهَ",
           transcription: "Astaghfirullah",
+          russianTranscription: "Астагфируллах",
           translation: "Прошу прощения у Аллаха",
           count: 100,
           category: "Утренние",
@@ -123,6 +130,7 @@ export const AdhkarSection = () => {
           color: "category-evening",
           text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
           transcription: "Subhanallahi wa bihamdih",
+          russianTranscription: "Субханаллахи ва бихамдих",
           translation: "Свят Аллах и хвала Ему",
           count: 100,
           category: "Вечерние",
@@ -134,6 +142,7 @@ export const AdhkarSection = () => {
           color: "primary",
           text: "لَا إِلَٰهَ إِلَّا ٱللَّٰهُ",
           transcription: "La ilaha illallah",
+          russianTranscription: "Ля иляха илляллах",
           translation: "Нет божества, кроме Аллаха",
           count: 100,
           category: "Вечерние",
@@ -153,6 +162,7 @@ export const AdhkarSection = () => {
           color: "category-sleep",
           text: "سُبْحَانَ اللَّهِ",
           transcription: "Subhanallah",
+          russianTranscription: "Субханаллах",
           translation: "Свят Аллах",
           count: 33,
           category: "Перед сном",
@@ -164,6 +174,7 @@ export const AdhkarSection = () => {
           color: "accent",
           text: "الْحَمْدُ لِلَّهِ",
           transcription: "Alhamdulillah",
+          russianTranscription: "Альхамдулиллах",
           translation: "Хвала Аллаху",
           count: 33,
           category: "Перед сном",
@@ -175,6 +186,7 @@ export const AdhkarSection = () => {
           color: "primary",
           text: "اللَّهُ أَكْبَرُ",
           transcription: "Allahu Akbar",
+          russianTranscription: "Аллаху Акбар",
           translation: "Аллах Велик",
           count: 34,
           category: "Перед сном",
@@ -194,6 +206,7 @@ export const AdhkarSection = () => {
           color: "primary",
           text: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
           transcription: "La hawla wa la quwwata illa billah",
+          russianTranscription: "Ля хауля ва ля куввата илля биллях",
           translation: "Нет силы и мощи ни у кого, кроме Аллаха",
           count: 100,
           category: "Общие",
@@ -205,6 +218,7 @@ export const AdhkarSection = () => {
           color: "accent",
           text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ سُبْحَانَ اللَّهِ الْعَظِيمِ",
           transcription: "Subhanallahi wa bihamdih, subhanallahil 'azim",
+          russianTranscription: "Субханаллахи ва бихамдих, субханаллахиль 'азим",
           translation: "Свят Аллах и хвала Ему, Свят Великий Аллах",
           count: 100,
           category: "Общие",
@@ -220,6 +234,7 @@ export const AdhkarSection = () => {
         dhikr.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         dhikr.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
         dhikr.transcription.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (dhikr.russianTranscription && dhikr.russianTranscription.toLowerCase().includes(searchQuery.toLowerCase())) ||
         dhikr.translation.toLowerCase().includes(searchQuery.toLowerCase())
     ),
   })).filter((category) => category.adhkar.length > 0);

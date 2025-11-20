@@ -305,17 +305,17 @@ export const prayerDebtAPI = {
     // Пробуем Supabase Edge Function
     try {
       const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/prayer-debt-api/calculate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
           "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
           "apikey": SUPABASE_ANON_KEY,
-        },
+      },
         body: JSON.stringify({
           ...request,
           user_id: userId || request.user_id || `user_${Date.now()}`,
         }),
-      });
+    });
 
       if (response.ok) {
         return await response.json();
@@ -356,13 +356,13 @@ export const prayerDebtAPI = {
     // Пробуем Supabase Edge Function
     try {
       const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/prayer-debt-api/snapshot?user_id=${userId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
           "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
           "apikey": SUPABASE_ANON_KEY,
-        },
-      });
+      },
+    });
 
       if (response.ok) {
         return await response.json();
@@ -397,17 +397,17 @@ export const prayerDebtAPI = {
     // Пробуем Supabase Edge Function
     try {
       const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/prayer-debt-api/progress`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
           "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
           "apikey": SUPABASE_ANON_KEY,
-        },
+      },
         body: JSON.stringify({
           ...request,
           user_id: userId,
         }),
-      });
+    });
 
       if (response.ok) {
         return await response.json();
@@ -444,17 +444,17 @@ export const prayerDebtAPI = {
     // Пробуем Supabase Edge Function
     try {
       const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/prayer-debt-api/calculations`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
           "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
           "apikey": SUPABASE_ANON_KEY,
-        },
+      },
         body: JSON.stringify({
           ...request,
           user_id: userId || `user_${Date.now()}`,
         }),
-      });
+    });
 
       if (response.ok) {
         return await response.json();
@@ -475,13 +475,13 @@ export const prayerDebtAPI = {
     // Пробуем Supabase Edge Function
     try {
       const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/prayer-debt-api/calculations/${jobId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
           "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
           "apikey": SUPABASE_ANON_KEY,
-        },
-      });
+      },
+    });
 
       if (response.ok) {
         return await response.json();
@@ -504,12 +504,12 @@ export const prayerDebtAPI = {
     // Пробуем Supabase Edge Function
     try {
       const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/prayer-debt-api/report.pdf?user_id=${userId}`, {
-        method: "GET",
+      method: "GET",
         headers: {
           "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
           "apikey": SUPABASE_ANON_KEY,
         },
-      });
+    });
 
       if (response.ok) {
         return await response.blob();

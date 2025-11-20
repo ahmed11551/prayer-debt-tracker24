@@ -81,12 +81,29 @@ export const AdhkarCard = memo(({ dhikr }: AdhkarCardProps) => {
         </div>
 
         {/* Transcription */}
-        <div className="text-center space-y-2">
-          <p className="text-sm text-muted-foreground italic">{dhikr.transcription}</p>
+        <div className="space-y-3">
+          {/* Latin Transcription */}
+          <div className="bg-gradient-to-br from-secondary/40 to-secondary/20 rounded-xl p-4 border border-border/40 shadow-inner backdrop-blur-sm">
+            <p className="text-center text-sm sm:text-base text-foreground/95 italic leading-relaxed">
+              {dhikr.transcription}
+            </p>
+          </div>
+          
+          {/* Russian Transcription */}
           {dhikr.russianTranscription && (
-            <p className="text-sm text-foreground/80 font-medium">{dhikr.russianTranscription}</p>
+            <div className="bg-gradient-to-br from-accent/15 to-accent/5 rounded-xl p-4 border border-accent/30 shadow-inner backdrop-blur-sm">
+              <p className="text-center text-sm sm:text-base text-foreground/95 leading-relaxed font-medium">
+                {dhikr.russianTranscription}
+              </p>
+            </div>
           )}
-          <p className="text-sm text-foreground mt-1">{dhikr.translation}</p>
+          
+          {/* Translation */}
+          <div className="bg-gradient-to-br from-primary/8 to-primary/3 rounded-xl p-4 border border-primary/25 shadow-inner backdrop-blur-sm">
+            <p className="text-center text-sm sm:text-base text-foreground leading-relaxed">
+              {dhikr.translation}
+            </p>
+          </div>
         </div>
 
         {/* Counter */}

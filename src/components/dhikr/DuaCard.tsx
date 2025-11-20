@@ -601,8 +601,9 @@ export const DuaCard = memo(({ dua, categoryColor }: DuaCardProps) => {
               size="icon"
               variant="ghost"
               onClick={togglePlay}
-              disabled={!audioUrl && !isTTSAvailable}
+              disabled={!audioUrl && !isTTSAvailable && isLoadingAudio}
               className="shrink-0 hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title={!audioUrl && !isTTSAvailable ? "Аудио недоступно" : isPlaying ? "Пауза" : "Воспроизвести"}
             >
               {isPlaying ? (
                 <Pause className="w-5 h-5 text-primary" />

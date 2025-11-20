@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Play, Pause, Volume2, VolumeX, BookmarkPlus, BookmarkCheck, Share2, Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { eReplikaAPI } from "@/lib/api";
 
 interface DuaCardProps {
   dua: {
@@ -27,6 +28,8 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(dua.audioUrl);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
 
@@ -144,10 +147,29 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
     }
   }, []);
 
+  // Загрузка аудио из API, если не указано
+  useEffect(() => {
+    if (!dua.audioUrl && dua.id) {
+      setIsLoadingAudio(true);
+      eReplikaAPI.getDuaAudio(dua.id)
+        .then((url) => {
+          if (url) {
+            setAudioUrl(url);
+          }
+        })
+        .catch((error) => {
+          console.error("Error loading audio from API:", error);
+        })
+        .finally(() => {
+          setIsLoadingAudio(false);
+        });
+    }
+  }, [dua.id, dua.audioUrl]);
+
   // Инициализация аудио
   useEffect(() => {
     // Если есть audioUrl, создаем HTML5 Audio элемент
-    if (dua.audioUrl) {
+    if (audioUrl) {
       const audio = new Audio(dua.audioUrl);
       audioRef.current = audio;
 
@@ -183,7 +205,7 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
     } else {
       audioRef.current = null;
     }
-  }, [dua.audioUrl, toast]);
+  }, [audioUrl, toast]);
 
   // Воспроизведение через синтез речи (fallback)
   const playWithTTS = useCallback(() => {
@@ -295,7 +317,7 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
         return;
       }
 
-      if (dua.audioUrl && audioRef.current) {
+      if (audioUrl && audioRef.current) {
         // Используем аудио файл
         audioRef.current.volume = isMuted ? 0 : volume;
         audioRef.current.play().catch((error) => {
@@ -453,7 +475,12 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
               </div>
             </div>
           </div>
-          {!dua.audioUrl && (
+          {isLoadingAudio && (
+            <p className="text-xs text-muted-foreground text-center">
+              Загрузка аудио...
+            </p>
+          )}
+          {!audioUrl && !isLoadingAudio && (
             <p className="text-xs text-muted-foreground text-center">
               Используется синтез речи браузера
             </p>

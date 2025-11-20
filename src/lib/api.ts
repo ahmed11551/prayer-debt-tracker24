@@ -15,7 +15,8 @@ function getAuthToken(): string | null {
   if (typeof window !== "undefined" && window.Telegram?.WebApp) {
     return window.Telegram.WebApp.initData;
   }
-  return import.meta.env.VITE_API_TOKEN || null;
+  // Используем test_token_123 по умолчанию для e-Replika API
+  return import.meta.env.VITE_API_TOKEN || "test_token_123";
 }
 
 // Получение заголовков для запросов к e-Replika API
@@ -144,6 +145,78 @@ export const eReplikaAPI = {
     } catch (error) {
       console.error("Error converting from Hijri:", error);
       throw error;
+    }
+  },
+
+  // Получить аудио URL для дуа
+  // Эндпоинт согласно документации e-Replika API
+  async getDuaAudio(duaId: string): Promise<string | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/duas/${duaId}/audio`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.warn(`Audio not found for dua ${duaId}`);
+          return null;
+        }
+        throw new Error(`Failed to fetch audio: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      // Поддерживаем разные форматы ответа
+      if (data.audio_url) {
+        return data.audio_url;
+      }
+      if (data.url) {
+        return data.url;
+      }
+      if (typeof data === "string" && data.startsWith("http")) {
+        return data;
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error fetching audio for dua ${duaId}:`, error);
+      return null;
+    }
+  },
+
+  // Получить список всех дуа с аудио
+  async getDuas(): Promise<Array<{ id: string; audioUrl: string | null }>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/duas`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.warn("Duas endpoint not found");
+          return [];
+        }
+        throw new Error(`Failed to fetch duas: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      // Поддерживаем разные форматы ответа
+      if (Array.isArray(data)) {
+        return data.map((dua: any) => ({
+          id: dua.id || dua.dua_id,
+          audioUrl: dua.audio_url || dua.audioUrl || null,
+        }));
+      }
+      if (data.duas && Array.isArray(data.duas)) {
+        return data.duas.map((dua: any) => ({
+          id: dua.id || dua.dua_id,
+          audioUrl: dua.audio_url || dua.audioUrl || null,
+        }));
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching duas:", error);
+      return [];
     }
   },
 

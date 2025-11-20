@@ -255,15 +255,33 @@ export const PrayerCalendar = () => {
               />
             </div>
 
-            {/* Month Summary */}
-            <div className="p-3 rounded-lg bg-secondary/50 border border-border">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  Всего за {format(selectedDate, "MMMM yyyy")}
-                </span>
-                <Badge variant="outline" className="text-lg">
-                  {currentMonthTotal} намазов
-                </Badge>
+            {/* Month Summary with Legend */}
+            <div className="space-y-3">
+              <div className="p-3 rounded-lg bg-secondary/50 border border-border">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    Всего за {format(selectedDate, "MMMM yyyy")}
+                  </span>
+                  <Badge variant="outline" className="text-lg">
+                    {currentMonthTotal} намазов
+                  </Badge>
+                </div>
+              </div>
+              
+              {/* Legend */}
+              <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground flex-wrap">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full border-2 border-green-500 bg-green-50"></div>
+                  <span>Много ({Math.round(dailyGoal * 1.5)}+)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full border-2 border-yellow-500 bg-yellow-50"></div>
+                  <span>Среднее ({Math.round(dailyGoal * 0.7)}+)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full border-2 border-red-500 bg-red-50"></div>
+                  <span>Мало (&lt;{Math.round(dailyGoal * 0.7)})</span>
+                </div>
               </div>
             </div>
           </div>

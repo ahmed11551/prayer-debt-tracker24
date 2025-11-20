@@ -9,6 +9,7 @@ import { TermsDictionary } from "@/components/qaza/TermsDictionary";
 import { ShareAndFriends } from "@/components/qaza/ShareAndFriends";
 import { GoalsAndHabits } from "@/components/qaza/GoalsAndHabits";
 import { PrayerCalendar } from "@/components/qaza/PrayerCalendar";
+import { RemindersManager } from "@/components/qaza/RemindersManager";
 import { MainHeader } from "@/components/layout/MainHeader";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { WelcomeDialog } from "@/components/qaza/WelcomeDialog";
@@ -99,8 +100,9 @@ const Index = () => {
             <GoalsAndHabits />
           </TabsContent>
 
-          <TabsContent value="calendar">
+          <TabsContent value="calendar" className="space-y-6">
             <PrayerCalendar />
+            <RemindersManager />
           </TabsContent>
         </Tabs>
       </main>

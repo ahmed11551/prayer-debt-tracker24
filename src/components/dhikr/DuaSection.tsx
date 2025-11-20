@@ -1,13 +1,34 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search, Moon, Sun, Sunrise, Sunset, Plane, Heart, Utensils, Car, Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Search, Moon, Sun, Sunrise, Sunset, Plane, Heart, Utensils, Car, Home, ChevronDown, ChevronUp } from "lucide-react";
 import { DuaCard } from "./DuaCard";
+import { cn } from "@/lib/utils";
+
+interface Category {
+  id: string;
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+  duas: Array<{
+    id: string;
+    arabic: string;
+    transcription: string;
+    russianTranscription?: string;
+    translation: string;
+    reference: string;
+    audioUrl: string | null;
+  }>;
+}
 
 export const DuaSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const categoryRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
-  const categories = [
+  const categories: Category[] = [
     {
       id: "sleep",
       name: "Перед сном",
@@ -246,7 +267,7 @@ export const DuaSection = () => {
     },
     {
       id: "home",
-      name: "При входе/выходе из дома",
+      name: "При входе/выходе",
       icon: Home,
       color: "category-prayer",
       duas: [
@@ -316,15 +337,47 @@ export const DuaSection = () => {
     },
   ];
 
+  // Initialize: expand all categories if no search query
+  useEffect(() => {
+    if (!searchQuery) {
+      setExpandedCategories(new Set(categories.map(cat => cat.id)));
+    }
+  }, [searchQuery]);
+
   const filteredCategories = categories.map(category => ({
     ...category,
     duas: category.duas.filter(dua =>
       dua.arabic.toLowerCase().includes(searchQuery.toLowerCase()) ||
       dua.transcription.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (dua.russianTranscription && dua.russianTranscription.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      dua.translation.toLowerCase().includes(searchQuery.toLowerCase())
+      dua.translation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      category.name.toLowerCase().includes(searchQuery.toLowerCase())
     ),
   })).filter(category => category.duas.length > 0);
+
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategories(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+      }
+      return newSet;
+    });
+  };
+
+  const scrollToCategory = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    const element = categoryRefs.current[categoryId];
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      // Expand category if collapsed
+      if (!expandedCategories.has(categoryId)) {
+        setExpandedCategories(prev => new Set(prev).add(categoryId));
+      }
+    }
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
@@ -334,7 +387,7 @@ export const DuaSection = () => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
-              placeholder="Поиск по дуа..."
+              placeholder="Поиск по дуа, категориям..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 bg-background/50 border-border/50 focus:border-primary"
@@ -342,6 +395,55 @@ export const DuaSection = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Quick Category Navigation */}
+      {!searchQuery && (
+        <Card className="glass shadow-medium border-border/50 overflow-hidden">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Категории</CardTitle>
+            <CardDescription>Быстрый переход к категориям</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+              {categories.map((category) => {
+                const Icon = category.icon;
+                const isSelected = selectedCategory === category.id;
+                return (
+                  <Button
+                    key={category.id}
+                    variant="ghost"
+                    onClick={() => scrollToCategory(category.id)}
+                    className={cn(
+                      "shrink-0 flex flex-col items-center gap-2 h-auto py-3 px-4 rounded-xl transition-all duration-200",
+                      "hover:bg-primary/10 hover:scale-105",
+                      isSelected && "bg-primary/10 border-2 border-primary/30"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-10 h-10 rounded-lg flex items-center justify-center transition-colors",
+                      isSelected ? "bg-primary/20" : "bg-primary/10"
+                    )}>
+                      <Icon className={cn(
+                        "w-5 h-5 transition-colors",
+                        isSelected ? "text-primary" : "text-primary/70"
+                      )} />
+                    </div>
+                    <span className={cn(
+                      "text-xs font-medium text-center whitespace-nowrap",
+                      isSelected ? "text-primary" : "text-foreground/70"
+                    )}>
+                      {category.name}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {category.duas.length}
+                    </span>
+                  </Button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Categories */}
       {filteredCategories.length === 0 ? (
@@ -351,30 +453,73 @@ export const DuaSection = () => {
           </CardContent>
         </Card>
       ) : (
-        filteredCategories.map((category) => (
-          <div key={category.id} className="space-y-4">
-            <Card className="glass shadow-medium border-border/50 overflow-hidden">
-              <div className="h-1 bg-gradient-to-r from-primary/50 to-transparent" />
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <category.icon className="w-6 h-6 text-primary" />
+        filteredCategories.map((category) => {
+          const Icon = category.icon;
+          const isExpanded = expandedCategories.has(category.id);
+          const isSelected = selectedCategory === category.id;
+          
+          return (
+            <div 
+              key={category.id} 
+              ref={(el) => { categoryRefs.current[category.id] = el; }}
+              className={cn(
+                "transition-all duration-300",
+                isSelected && "ring-2 ring-primary/30 rounded-2xl p-1"
+              )}
+            >
+              <Card className="glass shadow-medium border-border/50 overflow-hidden hover:shadow-strong transition-all duration-300">
+                <div className="h-1 bg-gradient-to-r from-primary/50 to-transparent" />
+                <CardHeader 
+                  className="cursor-pointer"
+                  onClick={() => toggleCategory(category.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className={cn(
+                        "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200",
+                        isSelected ? "bg-primary/20 shadow-glow" : "bg-primary/10"
+                      )}>
+                        <Icon className={cn(
+                          "w-6 h-6 transition-colors",
+                          isSelected ? "text-primary" : "text-primary/80"
+                        )} />
+                      </div>
+                      <div className="flex-1">
+                        <CardTitle className="text-xl">{category.name}</CardTitle>
+                        <CardDescription>
+                          {category.duas.length} {category.duas.length === 1 ? "дуа" : "дуа"}
+                        </CardDescription>
+                      </div>
+                    </div>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleCategory(category.id);
+                      }}
+                    >
+                      {isExpanded ? (
+                        <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                      )}
+                    </Button>
                   </div>
-                  <div>
-                    <CardTitle className="text-xl">{category.name}</CardTitle>
-                    <CardDescription>{category.duas.length} дуа</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-            </Card>
-
-            <div className="space-y-4">
-              {category.duas.map((dua) => (
-                <DuaCard key={dua.id} dua={dua} categoryColor={category.color} />
-              ))}
+                </CardHeader>
+                
+                {isExpanded && (
+                  <CardContent className="pt-0 space-y-4 animate-in slide-in-from-top-2 duration-300">
+                    {category.duas.map((dua) => (
+                      <DuaCard key={dua.id} dua={dua} categoryColor={category.color} />
+                    ))}
+                  </CardContent>
+                )}
+              </Card>
             </div>
-          </div>
-        ))
+          );
+        })
       )}
     </div>
   );

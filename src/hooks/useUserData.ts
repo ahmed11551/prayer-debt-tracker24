@@ -128,8 +128,20 @@ export function useUserData() {
     isMountedRef.current = true;
     loadData();
 
+    // Слушаем события обновления данных
+    const handleDataUpdate = () => {
+      if (isMountedRef.current) {
+        loadData(false);
+      }
+    };
+
+    window.addEventListener('userDataUpdated', handleDataUpdate);
+    window.addEventListener('storage', handleDataUpdate); // Слушаем изменения localStorage
+
     return () => {
       isMountedRef.current = false;
+      window.removeEventListener('userDataUpdated', handleDataUpdate);
+      window.removeEventListener('storage', handleDataUpdate);
     };
   }, [loadData]);
 

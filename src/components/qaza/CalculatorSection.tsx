@@ -124,7 +124,7 @@ export const CalculatorSection = () => {
 
       // Попытка сохранить через API, если недоступно - в localStorage
       try {
-        await prayerDebtAPI.calculateDebt({
+        const response = await prayerDebtAPI.calculateDebt({
           calculation_method: "calculator",
           personal_data: {
             ...personalData,
@@ -133,6 +133,13 @@ export const CalculatorSection = () => {
           women_data: womenData,
           travel_data: travelData,
         });
+        
+        // Если API вернул данные, обновляем userData
+        if (response) {
+          localStorageAPI.saveUserData(response);
+        } else {
+          localStorageAPI.saveUserData(userData);
+        }
       } catch (apiError) {
         console.warn("API недоступен, сохраняем локально:", apiError);
         localStorageAPI.saveUserData(userData);
@@ -150,10 +157,8 @@ export const CalculatorSection = () => {
         description: `Найдено ${totalMissed.toLocaleString()} пропущенных намазов и ${totalTravel.toLocaleString()} сафар-намазов.`,
       });
 
-      // Перезагрузка страницы для обновления данных
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
+      // Обновляем данные через событие, чтобы все компоненты обновились
+      window.dispatchEvent(new CustomEvent('userDataUpdated'));
     } catch (error) {
       console.error("Calculation error:", error);
       toast({

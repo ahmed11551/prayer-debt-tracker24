@@ -88,63 +88,111 @@ export function getPrayersArray(userData: UserPrayerDebt | null): PrayerStats[] 
  * Рассчитать статистику прогресса
  */
 export function calculateProgressStats(userData: UserPrayerDebt | null): ProgressStats {
+  // Безопасная проверка на null/undefined
   if (!userData) {
-    return {
-      totalCompleted: 0,
-      totalMissed: 0,
-      remaining: 0,
-      overallProgress: 0,
-      dailyPace: 0,
-      weeklyPace: 0,
-      daysToComplete: 0,
-      monthsToComplete: 0,
-      daysRemaining: 0,
-      startDate: new Date(),
-      daysSinceStart: 0,
-    };
+    return getDefaultStats();
   }
 
-  const completedPrayers = userData.repayment_progress?.completed_prayers || {};
-  const missedPrayers = userData.debt_calculation?.missed_prayers || {};
-  
-  const totalCompleted = Object.values(completedPrayers).reduce(
-    (sum, val) => sum + (val || 0),
-    0
-  );
-  const totalMissed = Object.values(missedPrayers).reduce(
-    (sum, val) => sum + (val || 0),
-    0
-  );
-  const remaining = totalMissed - totalCompleted;
-  const overallProgress = totalMissed > 0 ? Math.round((totalCompleted / totalMissed) * 100) : 0;
+  // Безопасная проверка структуры данных
+  try {
+    const completedPrayers = userData.repayment_progress?.completed_prayers;
+    const missedPrayers = userData.debt_calculation?.missed_prayers;
+    
+    // Проверяем, что объекты существуют и являются объектами
+    if (!completedPrayers || typeof completedPrayers !== 'object') {
+      console.warn("Invalid completed_prayers structure");
+      return getDefaultStats();
+    }
+    
+    if (!missedPrayers || typeof missedPrayers !== 'object') {
+      console.warn("Invalid missed_prayers structure");
+      return getDefaultStats();
+    }
+    
+    const totalCompleted = Object.values(completedPrayers).reduce(
+      (sum, val) => {
+        const num = typeof val === 'number' ? val : 0;
+        return sum + (isNaN(num) ? 0 : num);
+      },
+      0
+    );
+    
+    const totalMissed = Object.values(missedPrayers).reduce(
+      (sum, val) => {
+        const num = typeof val === 'number' ? val : 0;
+        return sum + (isNaN(num) ? 0 : num);
+      },
+      0
+    );
+    
+    const remaining = Math.max(0, totalMissed - totalCompleted);
+    const overallProgress = totalMissed > 0 
+      ? Math.min(100, Math.max(0, Math.round((totalCompleted / totalMissed) * 100)))
+      : 0;
 
-  const startDate = userData.debt_calculation?.period?.start
-    ? new Date(userData.debt_calculation.period.start)
-    : new Date();
-  
-  const daysSinceStart = Math.max(
-    1,
-    Math.floor((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-  );
+    // Безопасная обработка даты
+    let startDate: Date;
+    try {
+      if (userData.debt_calculation?.period?.start) {
+        const date = new Date(userData.debt_calculation.period.start);
+        if (!isNaN(date.getTime())) {
+          startDate = date;
+        } else {
+          startDate = new Date();
+        }
+      } else {
+        startDate = new Date();
+      }
+    } catch {
+      startDate = new Date();
+    }
+    
+    const daysSinceStart = Math.max(
+      1,
+      Math.floor((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+    );
 
-  const dailyPace = Math.round(totalCompleted / daysSinceStart) || 0;
-  const weeklyPace = dailyPace * 7;
-  const daysToComplete = dailyPace > 0 ? Math.ceil(remaining / dailyPace) : 0;
-  const monthsToComplete = Math.floor(daysToComplete / 30);
-  const daysRemaining = daysToComplete % 30;
+    const dailyPace = daysSinceStart > 0 ? Math.round(totalCompleted / daysSinceStart) : 0;
+    const weeklyPace = dailyPace * 7;
+    const daysToComplete = dailyPace > 0 ? Math.ceil(remaining / dailyPace) : 0;
+    const monthsToComplete = Math.floor(daysToComplete / 30);
+    const daysRemaining = daysToComplete % 30;
 
+    return {
+      totalCompleted,
+      totalMissed,
+      remaining,
+      overallProgress,
+      dailyPace,
+      weeklyPace,
+      daysToComplete,
+      monthsToComplete,
+      daysRemaining,
+      startDate,
+      daysSinceStart,
+    };
+  } catch (error) {
+    console.error("Error in calculateProgressStats:", error);
+    return getDefaultStats();
+  }
+}
+
+/**
+ * Получить дефолтную статистику
+ */
+function getDefaultStats(): ProgressStats {
   return {
-    totalCompleted,
-    totalMissed,
-    remaining,
-    overallProgress,
-    dailyPace,
-    weeklyPace,
-    daysToComplete,
-    monthsToComplete,
-    daysRemaining,
-    startDate,
-    daysSinceStart,
+    totalCompleted: 0,
+    totalMissed: 0,
+    remaining: 0,
+    overallProgress: 0,
+    dailyPace: 0,
+    weeklyPace: 0,
+    daysToComplete: 0,
+    monthsToComplete: 0,
+    daysRemaining: 0,
+    startDate: new Date(),
+    daysSinceStart: 0,
   };
 }
 

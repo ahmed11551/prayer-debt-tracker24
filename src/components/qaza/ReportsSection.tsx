@@ -9,18 +9,52 @@ import { calculateProgressStats, formatNumber } from "@/lib/prayer-utils";
 
 export const ReportsSection = () => {
   const { toast } = useToast();
-  const { userData, loading: userDataLoading } = useUserData();
+  const { userData, loading: userDataLoading, refreshData } = useUserData();
   const [loading, setLoading] = useState(false);
+
+  // Обновляем данные при монтировании и при событиях обновления
+  useEffect(() => {
+    const handleDataUpdate = () => {
+      refreshData();
+    };
+
+    window.addEventListener('userDataUpdated', handleDataUpdate);
+    
+    return () => {
+      window.removeEventListener('userDataUpdated', handleDataUpdate);
+    };
+  }, [refreshData]);
+
+  // Валидация данных перед расчетом статистики
+  const isValidUserData = useMemo(() => {
+    if (!userData) return false;
+    
+    // Проверяем наличие обязательных полей
+    const hasDebtCalculation = userData.debt_calculation && 
+      typeof userData.debt_calculation === 'object' &&
+      userData.debt_calculation.missed_prayers &&
+      typeof userData.debt_calculation.missed_prayers === 'object';
+    
+    const hasRepaymentProgress = userData.repayment_progress &&
+      typeof userData.repayment_progress === 'object' &&
+      userData.repayment_progress.completed_prayers &&
+      typeof userData.repayment_progress.completed_prayers === 'object';
+    
+    return hasDebtCalculation && hasRepaymentProgress;
+  }, [userData]);
 
   // Мемоизация статистики с обработкой ошибок
   const stats = useMemo(() => {
     try {
+      if (!isValidUserData) {
+        return calculateProgressStats(null);
+      }
       return calculateProgressStats(userData);
     } catch (error) {
       console.error("Error calculating stats:", error);
       return calculateProgressStats(null);
     }
-  }, [userData]);
+  }, [userData, isValidUserData]);
 
   const handleDownloadPDF = async () => {
     if (!userData) {
@@ -86,15 +120,17 @@ export const ReportsSection = () => {
     );
   }
 
-  // Показываем сообщение, если нет данных
-  if (!userData) {
+  // Показываем сообщение, если нет данных или данные невалидны
+  if (!userData || !isValidUserData) {
     return (
       <div className="space-y-6 animate-in fade-in-50 duration-500">
         <Card className="bg-gradient-card shadow-medium border-border/50">
           <CardContent className="pt-6">
             <div className="text-center py-8 space-y-4">
               <p className="text-muted-foreground">
-                Для отображения отчётов необходимо сначала рассчитать долг намазов
+                {!userData 
+                  ? "Для отображения отчётов необходимо сначала рассчитать долг намазов"
+                  : "Данные неполные. Пожалуйста, выполните расчет заново."}
               </p>
             </div>
           </CardContent>

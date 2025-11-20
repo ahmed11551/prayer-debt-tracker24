@@ -175,36 +175,27 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
 
   // Загрузка аудио из API, если не указано
   useEffect(() => {
-    if (!dua.audioUrl && dua.id) {
+    if (!dua.audioUrl && dua.id && !audioUrl) {
       setIsLoadingAudio(true);
-      // Пробуем загрузить аудио из API
       eReplikaAPI.getDuaAudio(dua.id)
         .then((url) => {
           if (url) {
             setAudioUrl(url);
+            setIsLoadingAudio(false);
           } else {
-            // Если API вернул null, пробуем загрузить список всех дуа
-            // и найти аудио по ID
-            eReplikaAPI.getDuas()
-              .then((duas) => {
-                const foundDua = duas.find((d) => d.id === dua.id);
-                if (foundDua && foundDua.audioUrl) {
-                  setAudioUrl(foundDua.audioUrl);
-                }
-              })
-              .catch((error) => {
-                // Тихая ошибка - не показываем пользователю
-                console.warn("Could not load audio from API:", error);
-              });
+            // Аудио не найдено в API - это нормально, используем TTS
+            setIsLoadingAudio(false);
           }
         })
         .catch((error) => {
-          // Тихая ошибка - не показываем пользователю
-          console.warn("Could not load audio from API:", error);
-        })
-        .finally(() => {
+          console.error("Error loading audio from API:", error);
+          // Не показываем ошибку пользователю - это нормально, если API недоступен
           setIsLoadingAudio(false);
         });
+    } else if (dua.audioUrl) {
+      // Если audioUrl указан в пропсах, используем его
+      setAudioUrl(dua.audioUrl);
+      setIsLoadingAudio(false);
     }
   }, [dua.id, dua.audioUrl]);
 
@@ -212,7 +203,7 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
   useEffect(() => {
     // Если есть audioUrl, создаем HTML5 Audio элемент
     if (audioUrl) {
-      const audio = new Audio(dua.audioUrl);
+      const audio = new Audio(audioUrl);
       audioRef.current = audio;
 
       audio.addEventListener("loadedmetadata", () => {
@@ -530,7 +521,7 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
           </div>
           {isLoadingAudio && (
             <p className="text-xs text-muted-foreground text-center">
-              Загрузка аудио...
+              Загрузка аудио из API...
             </p>
           )}
           {!audioUrl && !isLoadingAudio && isTTSAvailable && (
@@ -540,7 +531,7 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
           )}
           {!audioUrl && !isLoadingAudio && !isTTSAvailable && (
             <p className="text-xs text-muted-foreground text-center">
-              Аудио файл не найден. Доступен только текст.
+              Аудио файл не найден. Доступен синтез речи.
             </p>
           )}
         </div>

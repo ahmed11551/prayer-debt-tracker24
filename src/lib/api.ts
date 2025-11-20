@@ -152,37 +152,52 @@ export const eReplikaAPI = {
   // Эндпоинт согласно документации e-Replika API
   async getDuaAudio(duaId: string): Promise<string | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/duas/${duaId}/audio`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
+      // Пробуем разные варианты эндпоинтов
+      const endpoints = [
+        `${API_BASE_URL}/duas/${duaId}/audio`,
+        `${API_BASE_URL}/audio/dua/${duaId}`,
+        `${API_BASE_URL}/dua/${duaId}/audio`,
+      ];
 
-      if (!response.ok) {
-        // Тихая ошибка - не логируем как ошибку
-        if (response.status === 404) {
-          console.debug(`Audio not found for dua ${duaId} (404)`);
-          return null;
+      for (const endpoint of endpoints) {
+        try {
+          const response = await fetch(endpoint, {
+            method: "GET",
+            headers: getAuthHeaders(),
+          });
+
+          if (response.ok) {
+            const contentType = response.headers.get("content-type");
+            
+            // Если это прямой аудио файл
+            if (contentType && (contentType.includes("audio/") || contentType.includes("application/octet-stream"))) {
+              // Возвращаем URL эндпоинта как прямой URL к аудио
+              return endpoint;
+            }
+
+            // Если это JSON ответ
+            const data = await response.json();
+            if (data.audio_url || data.url) {
+              return data.audio_url || data.url;
+            }
+            if (typeof data === "string" && data.startsWith("http")) {
+              return data;
+            }
+          } else if (response.status === 404) {
+            // Пробуем следующий эндпоинт
+            continue;
+          }
+        } catch (err) {
+          // Пробуем следующий эндпоинт
+          continue;
         }
-        // Для других ошибок тоже тихо возвращаем null
-        console.debug(`Audio endpoint returned ${response.status} for dua ${duaId}`);
-        return null;
       }
 
-      const data = await response.json();
-      // Поддерживаем разные форматы ответа
-      if (data.audio_url) {
-        return data.audio_url;
-      }
-      if (data.url) {
-        return data.url;
-      }
-      if (typeof data === "string" && data.startsWith("http")) {
-        return data;
-      }
+      // Если все эндпоинты не сработали
+      console.warn(`Audio not found for dua ${duaId} - trying all endpoints failed`);
       return null;
     } catch (error) {
-      // Тихая ошибка - не логируем как ошибку, просто возвращаем null
-      console.debug(`Could not fetch audio for dua ${duaId}:`, error);
+      console.error(`Error fetching audio for dua ${duaId}:`, error);
       return null;
     }
   },
@@ -196,13 +211,11 @@ export const eReplikaAPI = {
       });
 
       if (!response.ok) {
-        // Тихая ошибка - не логируем как ошибку
         if (response.status === 404) {
-          console.debug("Duas endpoint not found (404)");
+          console.warn("Duas endpoint not found");
           return [];
         }
-        console.debug(`Duas endpoint returned ${response.status}`);
-        return [];
+        throw new Error(`Failed to fetch duas: ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -221,8 +234,7 @@ export const eReplikaAPI = {
       }
       return [];
     } catch (error) {
-      // Тихая ошибка - не логируем как ошибку
-      console.debug("Could not fetch duas list:", error);
+      console.error("Error fetching duas:", error);
       return [];
     }
   },

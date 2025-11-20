@@ -158,11 +158,14 @@ export const eReplikaAPI = {
       });
 
       if (!response.ok) {
+        // Тихая ошибка - не логируем как ошибку
         if (response.status === 404) {
-          console.warn(`Audio not found for dua ${duaId}`);
+          console.debug(`Audio not found for dua ${duaId} (404)`);
           return null;
         }
-        throw new Error(`Failed to fetch audio: ${response.statusText}`);
+        // Для других ошибок тоже тихо возвращаем null
+        console.debug(`Audio endpoint returned ${response.status} for dua ${duaId}`);
+        return null;
       }
 
       const data = await response.json();
@@ -178,7 +181,8 @@ export const eReplikaAPI = {
       }
       return null;
     } catch (error) {
-      console.error(`Error fetching audio for dua ${duaId}:`, error);
+      // Тихая ошибка - не логируем как ошибку, просто возвращаем null
+      console.debug(`Could not fetch audio for dua ${duaId}:`, error);
       return null;
     }
   },
@@ -192,11 +196,13 @@ export const eReplikaAPI = {
       });
 
       if (!response.ok) {
+        // Тихая ошибка - не логируем как ошибку
         if (response.status === 404) {
-          console.warn("Duas endpoint not found");
+          console.debug("Duas endpoint not found (404)");
           return [];
         }
-        throw new Error(`Failed to fetch duas: ${response.statusText}`);
+        console.debug(`Duas endpoint returned ${response.status}`);
+        return [];
       }
 
       const data = await response.json();
@@ -215,7 +221,8 @@ export const eReplikaAPI = {
       }
       return [];
     } catch (error) {
-      console.error("Error fetching duas:", error);
+      // Тихая ошибка - не логируем как ошибку
+      console.debug("Could not fetch duas list:", error);
       return [];
     }
   },

@@ -177,14 +177,30 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
   useEffect(() => {
     if (!dua.audioUrl && dua.id) {
       setIsLoadingAudio(true);
+      // Пробуем загрузить аудио из API
       eReplikaAPI.getDuaAudio(dua.id)
         .then((url) => {
           if (url) {
             setAudioUrl(url);
+          } else {
+            // Если API вернул null, пробуем загрузить список всех дуа
+            // и найти аудио по ID
+            eReplikaAPI.getDuas()
+              .then((duas) => {
+                const foundDua = duas.find((d) => d.id === dua.id);
+                if (foundDua && foundDua.audioUrl) {
+                  setAudioUrl(foundDua.audioUrl);
+                }
+              })
+              .catch((error) => {
+                // Тихая ошибка - не показываем пользователю
+                console.warn("Could not load audio from API:", error);
+              });
           }
         })
         .catch((error) => {
-          console.error("Error loading audio from API:", error);
+          // Тихая ошибка - не показываем пользователю
+          console.warn("Could not load audio from API:", error);
         })
         .finally(() => {
           setIsLoadingAudio(false);
@@ -524,7 +540,7 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
           )}
           {!audioUrl && !isLoadingAudio && !isTTSAvailable && (
             <p className="text-xs text-muted-foreground text-center">
-              Аудио недоступно. Загрузка из API...
+              Аудио файл не найден. Доступен только текст.
             </p>
           )}
         </div>

@@ -46,7 +46,11 @@ export const TravelPrayersSection = () => {
     );
   }
 
-  const travelPrayersData = userData.debt_calculation.travel_prayers;
+  const travelPrayersData = userData.debt_calculation?.travel_prayers || {
+    dhuhr_safar: 0,
+    asr_safar: 0,
+    isha_safar: 0,
+  };
   // В реальном приложении здесь будет отдельный трекинг для сафар-намазов
   // Для демо используем 0 как начальное значение
   const travelPrayers = [

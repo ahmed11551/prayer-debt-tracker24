@@ -48,7 +48,18 @@ export const PrayerCalendar = () => {
   const loadCalendarData = () => {
     const saved = localStorage.getItem(CALENDAR_STORAGE_KEY);
     if (saved) {
-      setEntries(JSON.parse(saved));
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === "object") {
+          setEntries(parsed);
+        } else {
+          console.warn("Calendar data is not an object, resetting to empty");
+          setEntries({});
+        }
+      } catch (error) {
+        console.error("Failed to parse calendar data from localStorage:", error);
+        setEntries({});
+      }
     }
   };
 
@@ -99,11 +110,15 @@ export const PrayerCalendar = () => {
     saveCalendarData(updatedEntries);
 
     // Обновляем прогресс в основных данных
-    if (userData) {
-      userData.repayment_progress.completed_prayers[prayerType as keyof typeof userData.repayment_progress.completed_prayers] += count;
-      userData.repayment_progress.last_updated = new Date();
-      localStorageAPI.saveUserData(userData);
-      setUserData(userData);
+    if (userData?.repayment_progress?.completed_prayers) {
+      const prayerKey = prayerType as keyof typeof userData.repayment_progress.completed_prayers;
+      if (userData.repayment_progress.completed_prayers[prayerKey] !== undefined) {
+        userData.repayment_progress.completed_prayers[prayerKey] = 
+          (userData.repayment_progress.completed_prayers[prayerKey] || 0) + count;
+        userData.repayment_progress.last_updated = new Date();
+        localStorageAPI.saveUserData(userData);
+        setUserData(userData);
+      }
 
       // Логирование в AuditLog
       const userId = getTelegramUserId() || userData.user_id;

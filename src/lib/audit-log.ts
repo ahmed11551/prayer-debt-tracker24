@@ -30,7 +30,20 @@ export function createAuditLogEntry(
 export function saveAuditLogEntry(entry: AuditLogEntry): void {
   try {
     const existing = localStorage.getItem(AUDIT_LOG_STORAGE_KEY);
-    const logs: AuditLogEntry[] = existing ? JSON.parse(existing) : [];
+    let logs: AuditLogEntry[] = [];
+    
+    if (existing) {
+      try {
+        logs = JSON.parse(existing);
+        // Валидация, что это массив
+        if (!Array.isArray(logs)) {
+          logs = [];
+        }
+      } catch (parseError) {
+        console.error("Failed to parse audit log from localStorage:", parseError);
+        logs = [];
+      }
+    }
 
     // Десериализация дат
     const parsedLogs = logs.map((log) => ({
@@ -66,7 +79,17 @@ export function getAuditLogEntries(userId?: string): AuditLogEntry[] {
     const existing = localStorage.getItem(AUDIT_LOG_STORAGE_KEY);
     if (!existing) return [];
 
-    const logs: AuditLogEntry[] = JSON.parse(existing);
+    let logs: AuditLogEntry[] = [];
+    try {
+      logs = JSON.parse(existing);
+      // Валидация, что это массив
+      if (!Array.isArray(logs)) {
+        return [];
+      }
+    } catch (parseError) {
+      console.error("Failed to parse audit log from localStorage:", parseError);
+      return [];
+    }
 
     // Десериализация дат
     const parsedLogs = logs.map((log) => ({

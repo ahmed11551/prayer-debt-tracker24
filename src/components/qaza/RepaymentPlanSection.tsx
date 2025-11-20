@@ -89,19 +89,31 @@ export const RepaymentPlanSection = () => {
         // Для демо используем localStorage
         const savedData = localStorage.getItem("userPrayerDebt");
         if (savedData) {
-          const userData = JSON.parse(savedData);
+          let userData: any;
+          try {
+            userData = JSON.parse(savedData);
+            // Валидация структуры данных
+            if (!userData || !userData.debt_calculation || !userData.repayment_progress) {
+              throw new Error("Invalid user data structure");
+            }
+          } catch (parseError) {
+            console.error("Failed to parse user data from localStorage:", parseError);
+            setLoading(false);
+            return;
+          }
+          
           const snapshot: DebtSnapshot = {
             user_id: userData.user_id,
             debt_calculation: userData.debt_calculation,
             repayment_progress: userData.repayment_progress,
             overall_progress_percent: 0,
             remaining_prayers: {
-              fajr: userData.debt_calculation.missed_prayers.fajr - userData.repayment_progress.completed_prayers.fajr,
-              dhuhr: userData.debt_calculation.missed_prayers.dhuhr - userData.repayment_progress.completed_prayers.dhuhr,
-              asr: userData.debt_calculation.missed_prayers.asr - userData.repayment_progress.completed_prayers.asr,
-              maghrib: userData.debt_calculation.missed_prayers.maghrib - userData.repayment_progress.completed_prayers.maghrib,
-              isha: userData.debt_calculation.missed_prayers.isha - userData.repayment_progress.completed_prayers.isha,
-              witr: userData.debt_calculation.missed_prayers.witr - userData.repayment_progress.completed_prayers.witr,
+              fajr: (userData.debt_calculation.missed_prayers?.fajr || 0) - (userData.repayment_progress.completed_prayers?.fajr || 0),
+              dhuhr: (userData.debt_calculation.missed_prayers?.dhuhr || 0) - (userData.repayment_progress.completed_prayers?.dhuhr || 0),
+              asr: (userData.debt_calculation.missed_prayers?.asr || 0) - (userData.repayment_progress.completed_prayers?.asr || 0),
+              maghrib: (userData.debt_calculation.missed_prayers?.maghrib || 0) - (userData.repayment_progress.completed_prayers?.maghrib || 0),
+              isha: (userData.debt_calculation.missed_prayers?.isha || 0) - (userData.repayment_progress.completed_prayers?.isha || 0),
+              witr: (userData.debt_calculation.missed_prayers?.witr || 0) - (userData.repayment_progress.completed_prayers?.witr || 0),
             },
           };
 
@@ -109,12 +121,14 @@ export const RepaymentPlanSection = () => {
           setPlan(calculatedPlan);
 
           // AI-мотиватор
-          const totalCompleted = Object.values(snapshot.repayment_progress.completed_prayers).reduce(
-            (sum, val) => sum + val,
+          const completedPrayers = snapshot.repayment_progress?.completed_prayers || {};
+          const missedPrayers = snapshot.debt_calculation?.missed_prayers || {};
+          const totalCompleted = Object.values(completedPrayers).reduce(
+            (sum, val) => sum + (val || 0),
             0
           );
-          const totalMissed = Object.values(snapshot.debt_calculation.missed_prayers).reduce(
-            (sum, val) => sum + val,
+          const totalMissed = Object.values(missedPrayers).reduce(
+            (sum, val) => sum + (val || 0),
             0
           );
           const progressPercent = totalMissed > 0 ? Math.round((totalCompleted / totalMissed) * 100) : 0;
@@ -122,11 +136,13 @@ export const RepaymentPlanSection = () => {
           setMotivationalMessage(message);
 
           // Умный трекер пропусков
-          const warning = detectMissedPrayerPatterns(
-            snapshot.repayment_progress,
-            snapshot.debt_calculation.missed_prayers
-          );
-          setPatternWarning(warning);
+          if (snapshot.repayment_progress && snapshot.debt_calculation) {
+            const warning = detectMissedPrayerPatterns(
+              snapshot.repayment_progress,
+              snapshot.debt_calculation.missed_prayers
+            );
+            setPatternWarning(warning);
+          }
         } else {
           // Дефолтный план, если данных нет
           setPlan({

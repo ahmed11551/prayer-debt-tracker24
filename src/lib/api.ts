@@ -420,10 +420,12 @@ export const prayerDebtAPI = {
     const userData = localStorageAPI.getUserData();
     if (userData && userData.user_id === userId) {
       // Обновляем прогресс локально
-      if (request.entries) {
+      if (request.entries && userData.repayment_progress?.completed_prayers) {
         request.entries.forEach((entry) => {
-          if (userData.repayment_progress.completed_prayers[entry.type as keyof typeof userData.repayment_progress.completed_prayers] !== undefined) {
-            (userData.repayment_progress.completed_prayers[entry.type as keyof typeof userData.repayment_progress.completed_prayers] as number) += entry.amount;
+          const prayerKey = entry.type as keyof typeof userData.repayment_progress.completed_prayers;
+          if (userData.repayment_progress.completed_prayers[prayerKey] !== undefined) {
+            (userData.repayment_progress.completed_prayers[prayerKey] as number) = 
+              (userData.repayment_progress.completed_prayers[prayerKey] as number || 0) + entry.amount;
           }
         });
       }

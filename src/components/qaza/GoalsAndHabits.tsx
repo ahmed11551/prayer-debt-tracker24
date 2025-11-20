@@ -40,13 +40,23 @@ export const GoalsAndHabits = () => {
   const loadGoals = () => {
     const saved = localStorage.getItem(GOALS_STORAGE_KEY);
     if (saved) {
-      const parsed = JSON.parse(saved, (key, value) => {
-        if (key === "startDate" || key === "endDate") {
-          return new Date(value);
+      try {
+        const parsed = JSON.parse(saved, (key, value) => {
+          if (key === "startDate" || key === "endDate") {
+            return new Date(value);
+          }
+          return value;
+        });
+        if (Array.isArray(parsed)) {
+          setGoals(parsed);
+        } else {
+          console.warn("Goals data is not an array, resetting to empty");
+          setGoals([]);
         }
-        return value;
-      });
-      setGoals(parsed);
+      } catch (error) {
+        console.error("Failed to parse goals from localStorage:", error);
+        setGoals([]);
+      }
     }
   };
 
@@ -60,8 +70,8 @@ export const GoalsAndHabits = () => {
     if (!userData) return;
 
     const totalRemaining =
-      Object.values(userData.debt_calculation.missed_prayers).reduce((sum, val) => sum + val, 0) +
-      Object.values(userData.debt_calculation.travel_prayers).reduce((sum, val) => sum + val, 0);
+      Object.values(userData.debt_calculation?.missed_prayers || {}).reduce((sum, val) => sum + val, 0) +
+      Object.values(userData.debt_calculation?.travel_prayers || {}).reduce((sum, val) => sum + val, 0);
 
     // Автоматическая цель: восполнить 10% от оставшегося за месяц
     const monthlyTarget = Math.max(30, Math.ceil(totalRemaining * 0.1));

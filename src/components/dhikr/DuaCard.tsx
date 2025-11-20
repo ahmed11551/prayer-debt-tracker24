@@ -39,9 +39,16 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
     const bookmarksKey = "prayer_debt_bookmarks";
     const existingBookmarks = localStorage.getItem(bookmarksKey);
     if (existingBookmarks) {
-      const bookmarks = JSON.parse(existingBookmarks);
-      const isInBookmarks = bookmarks.some((b: any) => b.id === dua.id);
-      setIsBookmarked(isInBookmarks);
+      try {
+        const bookmarks = JSON.parse(existingBookmarks);
+        if (Array.isArray(bookmarks)) {
+          const isInBookmarks = bookmarks.some((b: { id: string }) => b.id === dua.id);
+          setIsBookmarked(isInBookmarks);
+        }
+      } catch (error) {
+        console.error("Failed to parse bookmarks from localStorage:", error);
+        setIsBookmarked(false);
+      }
     }
   }, [dua.id]);
 
@@ -129,14 +136,24 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
       // Получаем сохраненные закладки из localStorage
       const bookmarksKey = "prayer_debt_bookmarks";
       const existingBookmarks = localStorage.getItem(bookmarksKey);
-      const bookmarks = existingBookmarks ? JSON.parse(existingBookmarks) : [];
+      let bookmarks: Array<{ id: string; [key: string]: unknown }> = [];
+      
+      if (existingBookmarks) {
+        try {
+          const parsed = JSON.parse(existingBookmarks);
+          bookmarks = Array.isArray(parsed) ? parsed : [];
+        } catch (parseError) {
+          console.error("Failed to parse bookmarks from localStorage:", parseError);
+          bookmarks = [];
+        }
+      }
 
       // Проверяем, не добавлено ли уже
-      const isBookmarked = bookmarks.some((b: any) => b.id === dua.id);
+      const isBookmarked = bookmarks.some((b) => b.id === dua.id);
 
       if (isBookmarked) {
         // Удаляем из закладок
-        const filtered = bookmarks.filter((b: any) => b.id !== dua.id);
+        const filtered = bookmarks.filter((b) => b.id !== dua.id);
         localStorage.setItem(bookmarksKey, JSON.stringify(filtered));
         setIsBookmarked(false);
         toast({
@@ -177,27 +194,40 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
   useEffect(() => {
     if (!dua.audioUrl && dua.id && !audioUrl) {
       setIsLoadingAudio(true);
+      
+      // Используем AbortController для отмены предыдущих запросов
+      const abortController = new AbortController();
+      let isMounted = true;
+      
       eReplikaAPI.getDuaAudio(dua.id)
         .then((url) => {
-          if (url) {
-            setAudioUrl(url);
-            setIsLoadingAudio(false);
-          } else {
-            // Аудио не найдено в API - это нормально, используем TTS
+          // Проверяем, что компонент еще смонтирован и запрос не отменен
+          if (isMounted && !abortController.signal.aborted) {
+            if (url) {
+              setAudioUrl(url);
+            }
             setIsLoadingAudio(false);
           }
         })
         .catch((error) => {
-          console.error("Error loading audio from API:", error);
-          // Не показываем ошибку пользователю - это нормально, если API недоступен
-          setIsLoadingAudio(false);
+          // Игнорируем ошибки отмены запроса
+          if (error.name !== "AbortError" && isMounted && !abortController.signal.aborted) {
+            console.error("Error loading audio from API:", error);
+            setIsLoadingAudio(false);
+          }
         });
+      
+      // Cleanup: отменяем запрос при размонтировании или изменении зависимостей
+      return () => {
+        isMounted = false;
+        abortController.abort();
+      };
     } else if (dua.audioUrl) {
       // Если audioUrl указан в пропсах, используем его
       setAudioUrl(dua.audioUrl);
       setIsLoadingAudio(false);
     }
-  }, [dua.id, dua.audioUrl]);
+  }, [dua.id, dua.audioUrl, audioUrl]);
 
   // Инициализация аудио
   useEffect(() => {
@@ -206,31 +236,45 @@ export const DuaCard = ({ dua, categoryColor }: DuaCardProps) => {
       const audio = new Audio(audioUrl);
       audioRef.current = audio;
 
-      audio.addEventListener("loadedmetadata", () => {
-        setDuration(audio.duration);
-      });
+      // Обработчики событий
+      const handleLoadedMetadata = () => {
+        if (audio.duration && !isNaN(audio.duration)) {
+          setDuration(audio.duration);
+        }
+      };
 
-      audio.addEventListener("timeupdate", () => {
-        if (audio.duration) {
+      const handleTimeUpdate = () => {
+        if (audio.duration && !isNaN(audio.duration)) {
           setProgress((audio.currentTime / audio.duration) * 100);
         }
-      });
+      };
 
-      audio.addEventListener("ended", () => {
+      const handleEnded = () => {
         setIsPlaying(false);
         setProgress(0);
-      });
+      };
 
-      audio.addEventListener("error", (e) => {
+      const handleError = (e: Event) => {
         console.error("Audio error:", e);
         toast({
           title: "Ошибка воспроизведения",
           description: "Не удалось загрузить аудио. Используется синтез речи.",
           variant: "destructive",
         });
-      });
+      };
 
+      // Добавляем обработчики
+      audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.addEventListener("timeupdate", handleTimeUpdate);
+      audio.addEventListener("ended", handleEnded);
+      audio.addEventListener("error", handleError);
+
+      // Cleanup: удаляем все обработчики и освобождаем ресурсы
       return () => {
+        audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+        audio.removeEventListener("timeupdate", handleTimeUpdate);
+        audio.removeEventListener("ended", handleEnded);
+        audio.removeEventListener("error", handleError);
         audio.pause();
         audio.src = "";
         audioRef.current = null;

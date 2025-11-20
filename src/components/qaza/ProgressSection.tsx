@@ -73,8 +73,8 @@ export const ProgressSection = () => {
     );
   }
 
-  const missedPrayers = userData.debt_calculation.missed_prayers;
-  const completedPrayers = userData.repayment_progress.completed_prayers;
+  const missedPrayers = userData.debt_calculation?.missed_prayers || {};
+  const completedPrayers = userData.repayment_progress?.completed_prayers || {};
 
   const prayers = [
     {
@@ -126,7 +126,9 @@ export const ProgressSection = () => {
   const overallProgress = totalPrayers > 0 ? Math.round((totalCompleted / totalPrayers) * 100) : 0;
 
   // Расчет статистики
-  const startDate = new Date(userData.debt_calculation.period.start);
+  const startDate = userData.debt_calculation?.period?.start 
+    ? new Date(userData.debt_calculation.period.start) 
+    : new Date();
   const daysSinceStart = Math.max(
     1,
     Math.floor((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))

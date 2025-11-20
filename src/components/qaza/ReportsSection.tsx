@@ -118,12 +118,14 @@ export const ReportsSection = () => {
     );
   }
 
-  const completedPrayers = userData.repayment_progress.completed_prayers;
-  const missedPrayers = userData.debt_calculation.missed_prayers;
-  const totalCompleted = Object.values(completedPrayers).reduce((sum, val) => sum + val, 0);
-  const totalMissed = Object.values(missedPrayers).reduce((sum, val) => sum + val, 0);
+  const completedPrayers = userData.repayment_progress?.completed_prayers || {};
+  const missedPrayers = userData.debt_calculation?.missed_prayers || {};
+  const totalCompleted = Object.values(completedPrayers).reduce((sum, val) => sum + (val || 0), 0);
+  const totalMissed = Object.values(missedPrayers).reduce((sum, val) => sum + (val || 0), 0);
   const remaining = totalMissed - totalCompleted;
-  const startDate = new Date(userData.debt_calculation.period.start);
+  const startDate = userData.debt_calculation?.period?.start 
+    ? new Date(userData.debt_calculation.period.start) 
+    : new Date();
   const daysSinceStart = Math.max(
     1,
     Math.floor((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))

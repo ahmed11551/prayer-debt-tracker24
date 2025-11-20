@@ -299,7 +299,12 @@ function getUserId(): string | null {
 // Внутренние API эндпоинты (через Supabase Edge Functions)
 export const prayerDebtAPI = {
   // Рассчитать долг намазов
-  async calculateDebt(request: CalculationRequest & { debt_calculation?: any; repayment_progress?: any }): Promise<UserPrayerDebt> {
+  async calculateDebt(request: CalculationRequest & { 
+    debt_calculation?: any; 
+    repayment_progress?: any;
+    missed_prayers?: MissedPrayers;
+    travel_prayers?: TravelPrayers;
+  }): Promise<UserPrayerDebt> {
     const userId = getUserId();
     
     // Пробуем Supabase Edge Function

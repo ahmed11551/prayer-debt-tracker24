@@ -91,9 +91,11 @@ export interface DebtSnapshot {
 
 export interface CalculationRequest {
   calculation_method: CalculationMethod;
-  personal_data: Omit<PersonalData, "bulugh_date">;
+  personal_data?: Omit<PersonalData, "bulugh_date">;
   women_data?: WomenData;
-  travel_data: TravelData;
+  travel_data?: TravelData;
+  missed_prayers?: MissedPrayers;
+  travel_prayers?: TravelPrayers;
 }
 
 export interface ProgressUpdateRequest {

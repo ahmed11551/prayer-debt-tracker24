@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calculator, Calendar, User, Plane, AlertCircle, BookOpen, Plus } from "lucide-react";
+import { Calculator, Calendar, User, Plane, AlertCircle, BookOpen, Plus, HelpCircle, CheckSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { calculateBulughDate, calculatePrayerDebt, validateCalculationData } from "@/lib/prayer-calculator";
@@ -15,9 +15,13 @@ import { getTelegramUserId } from "@/lib/telegram";
 import { logCalculation } from "@/lib/audit-log";
 import type { Gender, Madhab, TravelPeriod } from "@/types/prayer-debt";
 import { TravelPeriodsDialog } from "./TravelPeriodsDialog";
+import { ManualInputSection } from "./ManualInputSection";
+
+type CalculatorMode = "choice" | "manual" | "calculator";
 
 export const CalculatorSection = () => {
   const { toast } = useToast();
+  const [mode, setMode] = useState<CalculatorMode>("choice");
   const [gender, setGender] = useState<Gender>("male");
   const [madhab, setMadhab] = useState<Madhab>("hanafi");
   const [useTodayAsStart, setUseTodayAsStart] = useState(true);
@@ -171,14 +175,104 @@ export const CalculatorSection = () => {
     }
   };
 
+  // Экран выбора режима
+  if (mode === "choice") {
+    return (
+      <div className="space-y-6 animate-in fade-in-50 duration-500">
+        <Card className="bg-gradient-card shadow-medium border-border/50">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Calculator className="w-5 h-5 text-primary" />
+              <CardTitle>Калькулятор пропущенных намазов</CardTitle>
+            </div>
+            <CardDescription>
+              Выберите способ расчета пропущенных намазов
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button
+              onClick={() => setMode("manual")}
+              size="lg"
+              variant="outline"
+              className="w-full h-auto p-6 flex flex-col items-start gap-3 hover:bg-primary/5"
+            >
+              <div className="flex items-center gap-3 w-full">
+                <CheckSquare className="w-6 h-6 text-primary" />
+                <div className="flex-1 text-left">
+                  <div className="font-semibold text-lg">Я знаю количество пропущенных</div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    Введите количество пропущенных намазов вручную по каждому виду
+                  </div>
+                </div>
+              </div>
+            </Button>
+
+            <Button
+              onClick={() => setMode("calculator")}
+              size="lg"
+              variant="outline"
+              className="w-full h-auto p-6 flex flex-col items-start gap-3 hover:bg-primary/5"
+            >
+              <div className="flex items-center gap-3 w-full">
+                <HelpCircle className="w-6 h-6 text-primary" />
+                <div className="flex-1 text-left">
+                  <div className="font-semibold text-lg">Помощь посчитать</div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    Автоматический расчет на основе даты рождения и других параметров
+                  </div>
+                </div>
+              </div>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Режим ручного ввода
+  if (mode === "manual") {
+    return (
+      <div className="space-y-6 animate-in fade-in-50 duration-500">
+        <Card className="bg-gradient-card shadow-medium border-border/50">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckSquare className="w-5 h-5 text-primary" />
+                <CardTitle>Ручной ввод</CardTitle>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMode("choice")}
+              >
+                ← Назад
+              </Button>
+            </div>
+          </CardHeader>
+        </Card>
+        <ManualInputSection />
+      </div>
+    );
+  }
+
+  // Режим калькулятора (существующий функционал)
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
       {/* Introduction Card */}
       <Card className="bg-gradient-card shadow-medium border-border/50">
         <CardHeader>
-          <div className="flex items-center gap-2">
-            <Calculator className="w-5 h-5 text-primary" />
-            <CardTitle>Калькулятор пропущенных намазов</CardTitle>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <HelpCircle className="w-5 h-5 text-primary" />
+              <CardTitle>Помощь посчитать</CardTitle>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMode("choice")}
+            >
+              ← Назад
+            </Button>
           </div>
           <CardDescription>
             Рассчитайте количество пропущенных обязательных намазов с момента совершеннолетия (булюг)

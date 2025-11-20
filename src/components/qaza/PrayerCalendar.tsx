@@ -1,6 +1,6 @@
 // Компонент календаря намазов с интеграцией каза-намазов
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -18,6 +18,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { CalendarDayProgress } from "./CalendarDayProgress";
+import { useUserData } from "@/hooks/useUserData";
 
 interface CalendarEntry {
   date: string; // YYYY-MM-DD
@@ -36,6 +38,7 @@ const CALENDAR_STORAGE_KEY = "prayer_calendar_entries";
 
 export const PrayerCalendar = () => {
   const { toast } = useToast();
+  const { userData: userDataFromHook } = useUserData();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [entries, setEntries] = useState<Record<string, CalendarEntry>>({});
   const [userData, setUserData] = useState<UserPrayerDebt | null>(null);
@@ -72,6 +75,8 @@ export const PrayerCalendar = () => {
     const data = localStorageAPI.getUserData();
     if (data) {
       setUserData(data);
+    } else if (userDataFromHook) {
+      setUserData(userDataFromHook);
     }
   };
 
@@ -153,6 +158,27 @@ export const PrayerCalendar = () => {
   const selectedEntry = getEntryForDate(selectedDate);
   const currentMonthTotal = getTotalForMonth(selectedDate);
 
+  // Получаем ежедневную цель из плана (если есть)
+  const dailyGoal = useMemo(() => {
+    if (userDataFromHook?.repayment_progress?.completed_prayers) {
+      // Пытаемся вычислить средний темп
+      const totalCompleted = Object.values(
+        userDataFromHook.repayment_progress.completed_prayers
+      ).reduce((sum, val) => sum + (val || 0), 0);
+      
+      if (userDataFromHook.debt_calculation?.period?.start) {
+        const startDate = new Date(userDataFromHook.debt_calculation.period.start);
+        const daysSinceStart = Math.max(
+          1,
+          Math.floor((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+        );
+        return Math.round(totalCompleted / daysSinceStart) || 10;
+      }
+    }
+    return 10; // Дефолтная цель
+  }, [userDataFromHook]);
+
+
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
       {/* Calendar Card */}
@@ -168,21 +194,66 @@ export const PrayerCalendar = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => date && setSelectedDate(date)}
-              className="rounded-md border"
-              modifiers={{
-                hasQaza: (date) => {
-                  const entry = getEntryForDate(date);
-                  return entry !== null && entry.total > 0;
-                },
-              }}
-              modifiersClassNames={{
-                hasQaza: "bg-primary/20 border-primary",
-              }}
-            />
+            <div className="relative">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => date && setSelectedDate(date)}
+                className="rounded-md border"
+                components={{
+                  Day: ({ date, displayMonth }) => {
+                    const entry = getEntryForDate(date);
+                    const total = entry?.total || 0;
+                    const isToday = format(date, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
+                    const isSelected = format(date, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
+                    const isCurrentMonth = date.getMonth() === displayMonth.getMonth();
+
+                    // Определяем цвет на основе интенсивности
+                    let intensityColor = "";
+                    if (total > 0) {
+                      if (total >= dailyGoal * 1.5) {
+                        intensityColor = "border-green-500/50 bg-green-50/50";
+                      } else if (total >= dailyGoal * 0.7) {
+                        intensityColor = "border-yellow-500/50 bg-yellow-50/50";
+                      } else {
+                        intensityColor = "border-red-500/50 bg-red-50/50";
+                      }
+                    }
+
+                    return (
+                      <div
+                        className={cn(
+                          "relative h-9 w-9 flex items-center justify-center rounded-md transition-all cursor-pointer hover:bg-accent",
+                          isToday && "ring-2 ring-primary/50",
+                          isSelected && "bg-primary text-primary-foreground",
+                          !isCurrentMonth && "opacity-30",
+                          total > 0 && intensityColor,
+                          total === 0 && "border border-transparent"
+                        )}
+                        onClick={() => setSelectedDate(date)}
+                      >
+                        <CalendarDayProgress
+                          total={total}
+                          dailyGoal={dailyGoal}
+                          size={32}
+                          className="absolute"
+                        />
+                        <span
+                          className={cn(
+                            "text-xs font-medium z-10 relative",
+                            isSelected && "text-primary-foreground",
+                            !isSelected && isToday && "text-primary font-bold",
+                            !isSelected && !isToday && "text-foreground"
+                          )}
+                        >
+                          {date.getDate()}
+                        </span>
+                      </div>
+                    );
+                  },
+                }}
+              />
+            </div>
 
             {/* Month Summary */}
             <div className="p-3 rounded-lg bg-secondary/50 border border-border">

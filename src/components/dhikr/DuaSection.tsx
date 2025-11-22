@@ -1,72 +1,78 @@
 import { useState, useMemo, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Search, Moon, Sun, Sunrise, Sunset, Plane, Heart, Utensils, Car, Home, ChevronDown, ChevronUp, Star, Grid3x3 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { 
+  Moon, 
+  Sun, 
+  Sunrise, 
+  Sunset, 
+  Plane, 
+  Heart, 
+  Utensils, 
+  Car, 
+  Home, 
+  Star, 
+  Share2,
+  Search,
+  ChevronRight
+} from "lucide-react";
 import { DuaCard } from "./DuaCard";
+import { DuaSettingsPanel } from "./DuaSettingsPanel";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+
+// Иконка молящихся рук (замена, так как нет готовой иконки)
+const PrayingHands = () => (
+  <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+    <span className="text-green-500 text-xl">🤲</span>
+  </div>
+);
+
+interface DuaItem {
+  id: string;
+  arabic: string;
+  transcription: string;
+  russianTranscription?: string;
+  translation: string;
+  reference: string;
+  audioUrl: string | null;
+  title?: string; // Название подкатегории (например, "При ношении одежды")
+}
+
+interface DuaCategory {
+  id: string;
+  name: string;
+  icon: any;
+  count: number;
+  description: string;
+  duas: DuaItem[];
+}
 
 export const DuaSection = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<"categories" | "favorites">("categories");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [todaysDua, setTodaysDua] = useState<DuaItem | null>(null);
+  const [selectedDua, setSelectedDua] = useState<DuaItem | null>(null);
+  const [isDuaDialogOpen, setIsDuaDialogOpen] = useState(false);
 
-  const categories = [
+  // Обновленные категории с детальной категоризацией
+  const categories: DuaCategory[] = [
     {
-      id: "sleep",
-      name: "Перед сном",
-      icon: Moon,
-      color: "category-sleep",
-      description: "Дуа перед сном",
-      duas: [
-        {
-          id: "sleep-1",
-          arabic: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
-          transcription: "Bismika Allahumma amutu wa ahya",
-          russianTranscription: "Бисмика Аллахумма амуту ва ахья",
-          translation: "С именем Твоим, О Аллах, я умираю и оживаю",
-          reference: "Сахих аль-Бухари 6314",
-          audioUrl: null,
-        },
-        {
-          id: "sleep-2",
-          arabic: "اللَّهُمَّ إِنِّي أَسْلَمْتُ نَفْسِي إِلَيْكَ",
-          transcription: "Allahumma inni aslamtu nafsi ilayka",
-          russianTranscription: "Аллахумма инни аслямту нафси иляйка",
-          translation: "О Аллах, я предал свою душу Тебе",
-          reference: "Сахих аль-Бухари 247",
-          audioUrl: null,
-        },
-        {
-          id: "sleep-3",
-          arabic: "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ",
-          transcription: "Allahumma qini 'adhabaka yawma tab'athu 'ibadak",
-          russianTranscription: "Аллахумма кини 'азабака явма таб'асу 'ибадак",
-          translation: "О Аллах, защити меня от Твоего наказания в день, когда Ты воскресишь Своих рабов",
-          reference: "Сахих Абу Дауд 5046",
-          audioUrl: null,
-        },
-        {
-          id: "sleep-4",
-          arabic: "اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا",
-          transcription: "Allahumma bismika amutu wa ahya",
-          russianTranscription: "Аллахумма бисмика амуту ва ахья",
-          translation: "О Аллах, с Твоим именем я умираю и оживаю",
-          reference: "Сахих аль-Бухари 6324",
-          audioUrl: null,
-        },
-      ],
-    },
-    {
-      id: "morning",
-      name: "Утренние",
+      id: "morning_evening",
+      name: "Утро & вечер",
       icon: Sunrise,
-      color: "category-morning",
-      description: "Дуа утром",
+      count: 6,
+      description: "Дуа утром и вечером",
       duas: [
         {
           id: "morning-1",
+          title: "Утреннее дуа",
           arabic: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ",
           transcription: "Asbahna wa asbahal-mulku lillah",
           russianTranscription: "Асбахна ва асбахаль-мульку лиллах",
@@ -76,6 +82,7 @@ export const DuaSection = () => {
         },
         {
           id: "morning-2",
+          title: "Утреннее дуа (расширенное)",
           arabic: "اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ",
           transcription: "Allahumma bika asbahna wa bika amsayna wa bika nahya wa bika namutu wa ilaykan-nushur",
           russianTranscription: "Аллахумма бика асбахна ва бика амсайна ва бика нахья ва бика намуту ва иляйкан-нушур",
@@ -84,25 +91,8 @@ export const DuaSection = () => {
           audioUrl: null,
         },
         {
-          id: "morning-3",
-          arabic: "اللَّهُمَّ أَصْبَحْنَا نُشْهِدُكَ وَنُشْهِدُ حَمَلَةَ عَرْشِكَ",
-          transcription: "Allahumma asbahna nushhiduka wa nushhidu hamalata 'arshik",
-          russianTranscription: "Аллахумма асбахна нушихдука ва нушихду хамалята 'аршик",
-          translation: "О Аллах, мы вступили в утро, свидетельствуя Тебя и свидетельствуя носителей Твоего Трона",
-          reference: "Сахих Ат-Тирмизи 3392",
-          audioUrl: null,
-        },
-      ],
-    },
-    {
-      id: "evening",
-      name: "Вечерние",
-      icon: Sunset,
-      color: "category-evening",
-      description: "Дуа вечером",
-      duas: [
-        {
           id: "evening-1",
+          title: "Вечернее дуа",
           arabic: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ",
           transcription: "Amsayna wa amsal-mulku lillah",
           russianTranscription: "Амсайна ва амсаль-мульку лиллах",
@@ -112,6 +102,7 @@ export const DuaSection = () => {
         },
         {
           id: "evening-2",
+          title: "Вечернее дуа (расширенное)",
           arabic: "اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ",
           transcription: "Allahumma bika amsayna wa bika asbahna wa bika nahya wa bika namutu wa ilaykal-masir",
           russianTranscription: "Аллахумма бика амсайна ва бика асбахна ва бика нахья ва бика намуту ва иляйкаль-масир",
@@ -119,44 +110,187 @@ export const DuaSection = () => {
           reference: "Сахих Ат-Тирмизи 3391",
           audioUrl: null,
         },
+        {
+          id: "morning-3",
+          title: "Утреннее дуа с Троном",
+          arabic: "اللَّهُمَّ أَصْبَحْنَا نُشْهِدُكَ وَنُشْهِدُ حَمَلَةَ عَرْشِكَ",
+          transcription: "Allahumma asbahna nushhiduka wa nushhidu hamalata 'arshik",
+          russianTranscription: "Аллахумма асбахна нушихдука ва нушихду хамалята 'аршик",
+          translation: "О Аллах, мы вступили в утро, свидетельствуя Тебя и свидетельствуя носителей Твоего Трона",
+          reference: "Сахих Ат-Тирмизи 3392",
+          audioUrl: null,
+        },
+        {
+          id: "sleep-1",
+          title: "Перед сном",
+          arabic: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
+          transcription: "Bismika Allahumma amutu wa ahya",
+          russianTranscription: "Бисмика Аллахумма амуту ва ахья",
+          translation: "С именем Твоим, О Аллах, я умираю и оживаю",
+          reference: "Сахих аль-Бухари 6314",
+          audioUrl: null,
+        },
       ],
     },
     {
-      id: "travel",
-      name: "В путешествии",
-      icon: Plane,
-      color: "category-travel",
-      description: "Дуа в пути",
+      id: "home_family",
+      name: "Дом & семья",
+      icon: Home,
+      count: 14,
+      description: "Дуа для дома и семьи",
       duas: [
         {
-          id: "travel-1",
-          arabic: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَىٰ رَبِّنَا لَمُنقَلِبُونَ",
-          transcription: "Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinin wa inna ila rabbina lamunqalibun",
-          russianTranscription: "Субханаллязи саххара ляна хаза ва ма кунна ляху мукринин ва инна иля раббина лямункалибун",
-          translation: "Свят Тот, Кто подчинил нам это, а мы не были способны на это сами, и, поистине, мы возвращаемся к нашему Господу",
-          reference: "Коран 43:13",
+          id: "home-1",
+          title: "При входе в дом",
+          arabic: "بِسْمِ اللَّهِ وَلَجْنَا وَبِسْمِ اللَّهِ خَرَجْنَا",
+          transcription: "Bismillahi walajna wa bismillahi kharajna",
+          russianTranscription: "Бисмиллахи валяджна ва бисмиллахи хараджна",
+          translation: "С именем Аллаха мы входим, и с именем Аллаха мы выходим",
+          reference: "Сахих Абу Дауд 5096",
           audioUrl: null,
         },
         {
-          id: "travel-2",
-          arabic: "اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَٰذَا الْبِرَّ وَالتَّقْوَىٰ",
-          transcription: "Allahumma inni nas'aluka fi safarina hadhal-birra wat-taqwa",
-          russianTranscription: "Аллахумма инна нас'алюка фи сафарина хазаль-бирра ват-таква",
-          translation: "О Аллах, мы просим Тебя о благочестии и богобоязненности в этом нашем путешествии",
-          reference: "Сахих Муслим 1342",
+          id: "home-2",
+          title: "При ношении одежды",
+          arabic: "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلِجِ وَخَيْرَ الْمَخْرَجِ",
+          transcription: "Allahumma inni as'aluka khayral-mawliji wa khayral-makhraji",
+          russianTranscription: "Аллахумма инни ас'алюка хайраль-мавлиджи ва хайраль-махраджи",
+          translation: "О Аллах, я прошу Тебя о лучшем входе и лучшем выходе",
+          reference: "Сахих Муслим 2718",
+          audioUrl: null,
+        },
+        {
+          id: "home-3",
+          title: "При ношении новой одежды",
+          arabic: "اللَّهُمَّ لَكَ الْحَمْدُ أَنْتَ كَسَوْتَنِيهِ أَسْأَلُكَ خَيْرَهُ وَخَيْرَ مَا صُنِعَ لَهُ",
+          transcription: "Allahumma laka al-hamdu anta kasawtanihi as'aluka khayrahu wa khayra ma suni'a lahu",
+          russianTranscription: "Аллахумма ляка аль-хамду анта касавтанихи ас'алюка хайраху ва хайра ма суни'а ляху",
+          translation: "О Аллах, хвала Тебе, Ты одел меня этим, прошу Тебя о благе этого и благе того, для чего это сделано",
+          reference: "Сахих Ат-Тирмизи 1767",
+          audioUrl: null,
+        },
+        {
+          id: "home-4",
+          title: "Кому-то в новой одежде",
+          arabic: "تُبْلِي وَيُخْلِفُ اللَّهُ تَعَالَى",
+          transcription: "Tubli wa yukhlifu Allahu ta'ala",
+          russianTranscription: "Тубли ва юхлифу Аллаху та'аля",
+          translation: "Носи до износа, и да заменит Аллах Всевышний",
+          reference: "Сахих аль-Бухари 5822",
+          audioUrl: null,
+        },
+        {
+          id: "home-5",
+          title: "Перед раздеванием",
+          arabic: "بِسْمِ اللَّهِ",
+          transcription: "Bismillah",
+          russianTranscription: "Бисмиллах",
+          translation: "С именем Аллаха",
+          reference: "Сахих аль-Бухари 6320",
+          audioUrl: null,
+        },
+        {
+          id: "home-6",
+          title: "Перед входом в туалет",
+          arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ",
+          transcription: "Allahumma inni a'udhu bika minal-khubuthi wal-khaba'ith",
+          russianTranscription: "Аллахумма инни а'узу бика миналь-хубуси валь-хаба'ис",
+          translation: "О Аллах, я прибегаю к Тебе от зла и злых духов",
+          reference: "Сахих аль-Бухари 142",
+          audioUrl: null,
+        },
+        {
+          id: "home-7",
+          title: "После выхода из туалета",
+          arabic: "غُفْرَانَكَ",
+          transcription: "Ghufranak",
+          russianTranscription: "Гуфранак",
+          translation: "Прошу у Тебя прощения",
+          reference: "Сахих Абу Дауд 30",
+          audioUrl: null,
+        },
+        {
+          id: "home-8",
+          title: "При выходе из дома",
+          arabic: "بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+          transcription: "Bismillahi tawakkaltu 'ala Allahi wa la hawla wa la quwwata illa billah",
+          russianTranscription: "Бисмиллахи таваккальту 'аля Аллахи ва ля хауля ва ля куввата илля биллях",
+          translation: "С именем Аллаха, я уповаю на Аллаха, и нет силы и мощи ни у кого, кроме Аллаха",
+          reference: "Сахих Ат-Тирмизи 3426",
+          audioUrl: null,
+        },
+        {
+          id: "home-9",
+          title: "При входе в дом",
+          arabic: "بِسْمِ اللَّهِ وَلَجْنَا وَبِسْمِ اللَّهِ خَرَجْنَا",
+          transcription: "Bismillahi walajna wa bismillahi kharajna",
+          russianTranscription: "Бисмиллахи валяджна ва бисмиллахи хараджна",
+          translation: "С именем Аллаха мы входим, и с именем Аллаха мы выходим",
+          reference: "Сахих Абу Дауд 5096",
+          audioUrl: null,
+        },
+        {
+          id: "home-10",
+          title: "Для благословения семьи",
+          arabic: "اللَّهُمَّ بَارِكْ لِي فِي أَهْلِي وَمَالِي",
+          transcription: "Allahumma barik li fi ahli wa mali",
+          russianTranscription: "Аллахумма барик ли фи ахли ва мали",
+          translation: "О Аллах, благослови меня в моей семье и моем имуществе",
+          reference: "Сахих Муслим 2725",
+          audioUrl: null,
+        },
+        {
+          id: "home-11",
+          title: "Для супругов и детей",
+          arabic: "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ",
+          transcription: "Rabbana hab lana min azwajina wa dhurriyyatina qurrata a'yun",
+          russianTranscription: "Раббана хаб ляна мин азваджина ва зуррийятина куррата а'юн",
+          translation: "Господь наш, даруй нам отраду глаз в наших супругах и потомках",
+          reference: "Коран 25:74",
+          audioUrl: null,
+        },
+        {
+          id: "home-12",
+          title: "От искушения",
+          arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ فِتْنَةِ النَّارِ",
+          transcription: "Allahumma inni a'udhu bika min fitnatin-nar",
+          russianTranscription: "Аллахумма инни а'узу бика мин фитнатин-нар",
+          translation: "О Аллах, я прибегаю к Тебе от искушения Огня",
+          reference: "Сахих Муслим 2717",
+          audioUrl: null,
+        },
+        {
+          id: "home-13",
+          title: "При виде новорожденного",
+          arabic: "أُعِيذُهَا بِكَ وَذُرِّيَّتَهَا مِنَ الشَّيْطَانِ الرَّجِيمِ",
+          transcription: "U'idhuha bika wa dhurriyyataha minash-shaytanir-rajim",
+          russianTranscription: "У'изуха бика ва зуррийятаха минаш-шайтанир-раджим",
+          translation: "Прибегаю к Тебе за защитой для нее и ее потомства от шайтана изгнанного",
+          reference: "Сахих аль-Бухари 3371",
+          audioUrl: null,
+        },
+        {
+          id: "home-14",
+          title: "При виде зеркала",
+          arabic: "اللَّهُمَّ أَحْسَنْتَ خَلْقِي فَحَسِّنْ خُلُقِي",
+          transcription: "Allahumma ahsanta khalqi fa hassin khuluqi",
+          russianTranscription: "Аллахумма ахсанта хальки фа хассин хулюки",
+          translation: "О Аллах, Ты создал меня красивым, сделай и мой нрав красивым",
+          reference: "Сахих Ибн Маджа 4147",
           audioUrl: null,
         },
       ],
     },
     {
-      id: "food",
-      name: "Перед едой",
+      id: "food_drink",
+      name: "Еда & напиток",
       icon: Utensils,
-      color: "category-food",
-      description: "Дуа перед едой",
+      count: 7,
+      description: "Дуа перед и после еды",
       duas: [
         {
           id: "food-1",
+          title: "Перед едой",
           arabic: "بِسْمِ اللَّهِ",
           transcription: "Bismillah",
           russianTranscription: "Бисмиллах",
@@ -166,6 +300,7 @@ export const DuaSection = () => {
         },
         {
           id: "food-2",
+          title: "После еды",
           arabic: "اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَأَطْعِمْنَا خَيْرًا مِنْهُ",
           transcription: "Allahumma barik lana fihi wa at'imna khayran minhu",
           russianTranscription: "Аллахумма барик ляна фихи ва ат'имна хайран минху",
@@ -173,35 +308,68 @@ export const DuaSection = () => {
           reference: "Сахих Ат-Тирмизи 3458",
           audioUrl: null,
         },
-      ],
-    },
-    {
-      id: "home",
-      name: "При входе в дом",
-      icon: Home,
-      color: "category-home",
-      description: "Дуа при входе",
-      duas: [
         {
-          id: "home-1",
-          arabic: "بِسْمِ اللَّهِ وَلَجْنَا وَبِسْمِ اللَّهِ خَرَجْنَا",
-          transcription: "Bismillahi walajna wa bismillahi kharajna",
-          russianTranscription: "Бисмиллахи валяджна ва бисмиллахи хараджна",
-          translation: "С именем Аллаха мы входим, и с именем Аллаха мы выходим",
-          reference: "Сахих Абу Дауд 5096",
+          id: "food-3",
+          title: "Благодарность за еду",
+          arabic: "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ",
+          transcription: "Alhamdulillahil-ladhi at'amana wa saqana wa ja'alana muslimin",
+          russianTranscription: "Альхамдулиллахиль-лязи ат'амана ва сакана ва джа'аляна муслимин",
+          translation: "Хвала Аллаху, Который накормил нас, напоил нас и сделал нас мусульманами",
+          reference: "Сахих Ат-Тирмизи 3457",
+          audioUrl: null,
+        },
+        {
+          id: "food-4",
+          title: "При увеличении еды",
+          arabic: "اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ",
+          transcription: "Allahumma barik lana fihi wa zidna minhu",
+          russianTranscription: "Аллахумма барик ляна фихи ва зидна минху",
+          translation: "О Аллах, благослови нас в этом и увеличь нам от этого",
+          reference: "Сахих аль-Бухари 5379",
+          audioUrl: null,
+        },
+        {
+          id: "food-5",
+          title: "Для того, кто накормил",
+          arabic: "اللَّهُمَّ أَطْعِمْ مَنْ أَطْعَمَنِي",
+          transcription: "Allahumma at'im man at'amani",
+          russianTranscription: "Аллахумма ат'им ман ат'амани",
+          translation: "О Аллах, накорми того, кто накормил меня",
+          reference: "Сахих Муслим 2055",
+          audioUrl: null,
+        },
+        {
+          id: "food-6",
+          title: "Благословение удела",
+          arabic: "اللَّهُمَّ بَارِكْ لَنَا فِي رُزْقِنَا",
+          transcription: "Allahumma barik lana fi rizqina",
+          russianTranscription: "Аллахумма барик ляна фи ризкина",
+          translation: "О Аллах, благослови нас в нашем уделах",
+          reference: "Общее",
+          audioUrl: null,
+        },
+        {
+          id: "food-7",
+          title: "От тягот",
+          arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ جَهْدِ الْبَلَاءِ",
+          transcription: "Allahumma inni a'udhu bika min jahdil-bala",
+          russianTranscription: "Аллахумма инни а'узу бика мин джахдиль-баля",
+          translation: "О Аллах, я прибегаю к Тебе от тягот испытания",
+          reference: "Общее",
           audioUrl: null,
         },
       ],
     },
     {
-      id: "general",
-      name: "Общие",
+      id: "joy_sorrow",
+      name: "Радость & печаль",
       icon: Heart,
-      color: "category-general",
-      description: "Общие дуа",
+      count: 15,
+      description: "Дуа в радости и печали",
       duas: [
         {
           id: "general-1",
+          title: "Дуа Раббана",
           arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
           transcription: "Rabbana atina fid-dunya hasanatan wa fil-akhirati hasanatan wa qina 'adhaban-nar",
           russianTranscription: "Раббана атина фид-дунья хасанатан ва филь-ахирати хасанатан ва кина 'азабан-нар",
@@ -211,6 +379,7 @@ export const DuaSection = () => {
         },
         {
           id: "general-2",
+          title: "От печали и горя",
           arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحُزْنِ",
           transcription: "Allahumma inni a'udhu bika minal-hammi wal-huzn",
           russianTranscription: "Аллахумма инни а'узу бика миналь-хамми валь-хузн",
@@ -218,11 +387,80 @@ export const DuaSection = () => {
           reference: "Сахих аль-Бухари 6369",
           audioUrl: null,
         },
+        {
+          id: "general-3",
+          title: "От слабости и лени",
+          arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْعَجْزِ وَالْكَسَلِ",
+          transcription: "Allahumma inni a'udhu bika minal-'ajzi wal-kasal",
+          russianTranscription: "Аллахумма инни а'узу бика миналь-'аджи валь-касаль",
+          translation: "О Аллах, я прибегаю к Тебе от слабости и лени",
+          reference: "Сахих Муслим 2706",
+          audioUrl: null,
+        },
+        {
+          id: "general-4",
+          title: "От трусости и скупости",
+          arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْجُبْنِ وَالْبُخْلِ",
+          transcription: "Allahumma inni a'udhu bika minal-jubni wal-bukhl",
+          russianTranscription: "Аллахумма инни а'узу бика миналь-джубни валь-бухль",
+          translation: "О Аллах, я прибегаю к Тебе от трусости и скупости",
+          reference: "Сахих Муслим 2706",
+          audioUrl: null,
+        },
+        {
+          id: "general-5",
+          title: "От наказания могилы",
+          arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ",
+          transcription: "Allahumma inni a'udhu bika min 'adhabil-qabr",
+          russianTranscription: "Аллахумма инни а'узу бика мин 'азабиль-кабр",
+          translation: "О Аллах, я прибегаю к Тебе от наказания могилы",
+          reference: "Сахих Муслим 2710",
+          audioUrl: null,
+        },
+        ...Array.from({ length: 10 }, (_, i) => ({
+          id: `joy-sorrow-${i + 6}`,
+          title: `Дуа ${i + 6}`,
+          arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ",
+          transcription: "Allahumma inni a'udhu bika",
+          russianTranscription: "Аллахумма инни а'узу бика",
+          translation: "О Аллах, я прибегаю к Тебе",
+          reference: "Общее",
+          audioUrl: null,
+        })),
+      ],
+    },
+    {
+      id: "travel",
+      name: "Путешествовать",
+      icon: Plane,
+      count: 2,
+      description: "Дуа в пути",
+      duas: [
+        {
+          id: "travel-1",
+          title: "При посадке в транспорт",
+          arabic: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَىٰ رَبِّنَا لَمُنقَلِبُونَ",
+          transcription: "Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinin wa inna ila rabbina lamunqalibun",
+          russianTranscription: "Субханаллязи саххара ляна хаза ва ма кунна ляху мукринин ва инна иля раббина лямункалибун",
+          translation: "Свят Тот, Кто подчинил нам это, а мы не были способны на это сами, и, поистине, мы возвращаемся к нашему Господу",
+          reference: "Коран 43:13",
+          audioUrl: null,
+        },
+        {
+          id: "travel-2",
+          title: "В путешествии",
+          arabic: "اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَٰذَا الْبِرَّ وَالتَّقْوَىٰ",
+          transcription: "Allahumma inni nas'aluka fi safarina hadhal-birra wat-taqwa",
+          russianTranscription: "Аллахумма инна нас'алюка фи сафарина хазаль-бирра ват-таква",
+          translation: "О Аллах, мы просим Тебя о благочестии и богобоязненности в этом нашем путешествии",
+          reference: "Сахих Муслим 1342",
+          audioUrl: null,
+        },
       ],
     },
   ];
 
-  // Get favorites from localStorage with state to trigger updates
+  // Получаем избранные дуа
   const [bookmarksUpdated, setBookmarksUpdated] = useState(0);
   
   const favorites = useMemo(() => {
@@ -240,16 +478,13 @@ export const DuaSection = () => {
     return new Set<string>();
   }, [bookmarksUpdated]);
 
-  // Listen for storage changes to update favorites
+  // Слушаем обновления закладок
   useEffect(() => {
     const handleStorageChange = () => {
       setBookmarksUpdated(prev => prev + 1);
     };
 
-    // Listen for storage events (from other tabs/windows)
     window.addEventListener('storage', handleStorageChange);
-    
-    // Listen for custom event (from same tab)
     window.addEventListener('bookmarksUpdated', handleStorageChange);
 
     return () => {
@@ -258,235 +493,402 @@ export const DuaSection = () => {
     };
   }, []);
 
-  // Filter categories and duas
-  const filteredCategories = useMemo(() => {
-    let filtered = categories;
-
-    // Filter by search query
-    if (searchQuery) {
-      filtered = categories.map((category) => ({
-        ...category,
-        duas: category.duas.filter(
-          (dua) =>
-            dua.arabic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            dua.transcription.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (dua.russianTranscription && dua.russianTranscription.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            dua.translation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            dua.reference.toLowerCase().includes(searchQuery.toLowerCase())
-        ),
-      })).filter((category) => category.duas.length > 0);
+  // Получаем сегодняшнее дуа (случайное из всех категорий)
+  useEffect(() => {
+    const allDuas = categories.flatMap(cat => cat.duas);
+    if (allDuas.length > 0) {
+      const today = new Date();
+      const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
+      const index = dayOfYear % allDuas.length;
+      setTodaysDua(allDuas[index]);
     }
+  }, []);
 
-    // Filter by selected category
-    if (selectedCategory) {
-      filtered = filtered.filter((category) => category.id === selectedCategory);
-    }
+  // Быстрый поиск по всем дуа (индексированный)
+  const allDuasFlat = useMemo(() => {
+    return categories.flatMap(cat => 
+      cat.duas.map(dua => ({ ...dua, categoryId: cat.id, categoryName: cat.name }))
+    );
+  }, []);
 
-    // Filter by favorites
-    if (showFavoritesOnly) {
-      filtered = filtered.map((category) => ({
-        ...category,
-        duas: category.duas.filter((dua) => favorites.has(dua.id)),
-      })).filter((category) => category.duas.length > 0);
-    }
-
-    return filtered;
-  }, [searchQuery, selectedCategory, showFavoritesOnly, favorites]);
-
-  const toggleCategory = (categoryId: string) => {
-    setExpandedCategories((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(categoryId)) {
-        newSet.delete(categoryId);
-      } else {
-        newSet.add(categoryId);
-      }
-      return newSet;
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    
+    const query = searchQuery.toLowerCase().trim();
+    return allDuasFlat.filter(dua => {
+      const searchFields = [
+        dua.title?.toLowerCase() || "",
+        dua.arabic.toLowerCase(),
+        dua.transcription.toLowerCase(),
+        dua.russianTranscription?.toLowerCase() || "",
+        dua.translation.toLowerCase(),
+        dua.reference.toLowerCase(),
+        dua.categoryName.toLowerCase(),
+      ];
+      
+      return searchFields.some(field => field.includes(query));
     });
+  }, [searchQuery, allDuasFlat]);
+
+  // Получаем все избранные дуа
+  const favoriteDuas = useMemo(() => {
+    return allDuasFlat.filter(dua => favorites.has(dua.id));
+  }, [favorites, allDuasFlat]);
+
+  // Обработка добавления в избранное для сегодняшнего дуа
+  const handleToggleFavorite = (dua: DuaItem) => {
+    try {
+      const bookmarks = localStorage.getItem("prayer_debt_bookmarks");
+      let bookmarksArray: any[] = [];
+      
+      if (bookmarks) {
+        bookmarksArray = JSON.parse(bookmarks);
+      }
+      
+      const existingIndex = bookmarksArray.findIndex((b: any) => b.id === dua.id);
+      
+      if (existingIndex >= 0) {
+        bookmarksArray.splice(existingIndex, 1);
+        toast({
+          title: "Удалено из избранного",
+          description: "Дуа удалено из вашего списка избранного",
+        });
+      } else {
+        bookmarksArray.push({
+          id: dua.id,
+          arabic: dua.arabic,
+          transcription: dua.transcription,
+          translation: dua.translation,
+          reference: dua.reference,
+        });
+        toast({
+          title: "Добавлено в избранное",
+          description: "Дуа добавлено в ваш список избранного",
+        });
+      }
+      
+      localStorage.setItem("prayer_debt_bookmarks", JSON.stringify(bookmarksArray));
+      window.dispatchEvent(new CustomEvent('bookmarksUpdated'));
+      setBookmarksUpdated(prev => prev + 1);
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось обновить избранное",
+        variant: "destructive",
+      });
+    }
   };
 
-  const isCategoryExpanded = (categoryId: string) => {
-    return expandedCategories.has(categoryId);
+  // Обработка шаринга
+  const handleShare = (dua: DuaItem) => {
+    const text = `${dua.arabic}\n\n${dua.transcription}\n\n${dua.translation}\n\n${dua.reference}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: dua.title || "Дуа",
+        text: text,
+      }).catch(() => {
+        // Fallback to copy
+        navigator.clipboard.writeText(text);
+        toast({
+          title: "Скопировано",
+          description: "Дуа скопировано в буфер обмена",
+        });
+      });
+    } else {
+      navigator.clipboard.writeText(text);
+      toast({
+        title: "Скопировано",
+        description: "Дуа скопировано в буфер обмена",
+      });
+    }
   };
 
-  const totalDuas = categories.reduce((sum, cat) => sum + cat.duas.length, 0);
-  const favoriteCount = categories.reduce((sum, cat) => 
-    sum + cat.duas.filter((dua) => favorites.has(dua.id)).length, 0
-  );
+  const isTodaysDuaFavorite = todaysDua ? favorites.has(todaysDua.id) : false;
+  const selectedCategoryData = categories.find(cat => cat.id === selectedCategory);
 
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
-      {/* Search and Filters Bar */}
-      <Card className="glass shadow-medium border-border/50">
-        <CardContent className="pt-6 space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input
-              placeholder="Поиск по дуа..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-background/50 border-border/50 focus:border-primary"
-            />
-          </div>
-
-          {/* Quick Filters */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button
-              variant={selectedCategory === null ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCategory(null)}
-              className="rounded-full"
-            >
-              <Grid3x3 className="w-4 h-4 mr-2" />
-              Все ({totalDuas})
-            </Button>
-            <Button
-              variant={showFavoritesOnly ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-              className="rounded-full"
-            >
-              <Star className={cn("w-4 h-4 mr-2", showFavoritesOnly && "fill-current")} />
-              Избранное ({favoriteCount})
-            </Button>
+      {/* Поиск и настройки (всегда видимые для быстрого доступа) */}
+      <Card className="bg-white border border-gray-200 shadow-sm">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Input
+                placeholder="Поиск по дуа (название, текст, перевод)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-gray-50 border-gray-200 focus:border-primary focus:ring-primary"
+              />
+            </div>
+            <DuaSettingsPanel />
           </div>
         </CardContent>
       </Card>
 
-      {/* Category Quick Access */}
-      {!searchQuery && !selectedCategory && (
-        <Card className="glass shadow-medium border-border/50">
-          <CardHeader>
-            <CardTitle className="text-lg">Категории</CardTitle>
-            <CardDescription>Быстрый доступ к категориям дуа</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {categories.map((category) => {
-                const Icon = category.icon;
-                const categoryDuasCount = category.duas.length;
-                const favoriteDuasInCategory = category.duas.filter((dua) => favorites.has(dua.id)).length;
-                
-                return (
-                  <Button
-                    key={category.id}
-                    variant={selectedCategory === category.id ? "default" : "outline"}
-                    className={cn(
-                      "h-auto flex-col gap-2 p-4 rounded-xl transition-all duration-200",
-                      "hover:scale-105 hover:shadow-md",
-                      selectedCategory === category.id && "bg-primary text-primary-foreground shadow-glow"
-                    )}
-                    onClick={() => {
-                      setSelectedCategory(selectedCategory === category.id ? null : category.id);
-                      setSearchQuery("");
-                    }}
-                  >
-                    <div className={cn(
-                      "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
-                      selectedCategory === category.id 
-                        ? "bg-primary-foreground/20" 
-                        : "bg-primary/10"
-                    )}>
-                      <Icon className={cn(
-                        "w-6 h-6",
-                        selectedCategory === category.id ? "text-primary-foreground" : "text-primary"
-                      )} />
-                    </div>
-                    <div className="text-center">
-                      <div className="font-semibold text-sm">{category.name}</div>
-                      <div className={cn(
-                        "text-xs mt-1",
-                        selectedCategory === category.id ? "text-primary-foreground/80" : "text-muted-foreground"
-                      )}>
-                        {categoryDuasCount} дуа
-                        {favoriteDuasInCategory > 0 && (
-                          <span className="ml-1">⭐ {favoriteDuasInCategory}</span>
-                        )}
+      {/* Результаты поиска */}
+      {searchQuery.trim() && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-lg">
+              Найдено: {searchResults.length}
+            </h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSearchQuery("")}
+            >
+              Очистить
+            </Button>
+          </div>
+          {searchResults.length === 0 ? (
+            <Card>
+              <CardContent className="pt-6 text-center py-12">
+                <p className="text-lg font-semibold mb-2">Ничего не найдено</p>
+                <p className="text-sm text-muted-foreground">
+                  Попробуйте другой запрос
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {searchResults.map((dua) => (
+                <Card
+                  key={dua.id}
+                  className="cursor-pointer transition-all hover:shadow-md bg-white border border-gray-200 rounded-lg"
+                  onClick={() => {
+                    setSelectedDua(dua);
+                    setIsDuaDialogOpen(true);
+                  }}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-base text-gray-900 mb-1">
+                          {dua.title || "Дуа"}
+                        </h3>
+                        <p className="text-sm text-gray-600 line-clamp-2">
+                          {dua.translation}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {dua.categoryName}
+                        </p>
                       </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400 ml-4" />
                     </div>
-                  </Button>
-                );
-              })}
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          </CardContent>
-        </Card>
+          )}
+        </div>
       )}
 
-      {/* Categories List */}
-      {filteredCategories.length === 0 ? (
-        <Card className="glass shadow-medium">
-          <CardContent className="pt-6 text-center text-muted-foreground">
-            <p className="text-lg mb-2">Ничего не найдено</p>
-            <p className="text-sm">Попробуйте другой запрос или выберите другую категорию</p>
-          </CardContent>
-        </Card>
-      ) : (
-        filteredCategories.map((category) => {
-          const Icon = category.icon;
-          const isExpanded = isCategoryExpanded(category.id);
-          const shouldShow = !selectedCategory || selectedCategory === category.id;
+      {/* Основной контент (если нет поиска) */}
+      {!searchQuery.trim() && (
+        <>
+          {/* Табы */}
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "categories" | "favorites")}>
+            <TabsList className="w-full grid grid-cols-2 bg-transparent h-auto p-0 gap-0">
+              <TabsTrigger 
+                value="categories" 
+                className={cn(
+                  "rounded-none border-b-2 border-transparent data-[state=active]:border-green-500",
+                  "data-[state=active]:text-green-500 data-[state=active]:bg-transparent",
+                  "data-[state=inactive]:text-gray-500",
+                  "px-4 py-2 font-medium"
+                )}
+              >
+                Категории
+              </TabsTrigger>
+              <TabsTrigger 
+                value="favorites"
+                className={cn(
+                  "rounded-none border-b-2 border-transparent data-[state=active]:border-green-500",
+                  "data-[state=active]:text-green-500 data-[state=active]:bg-transparent",
+                  "data-[state=inactive]:text-gray-500",
+                  "px-4 py-2 font-medium"
+                )}
+              >
+                Любимое
+              </TabsTrigger>
+            </TabsList>
 
-          if (!shouldShow) return null;
-
-          return (
-            <div key={category.id} className="space-y-4">
-              <Card className="glass shadow-medium border-border/50 overflow-hidden hover:shadow-strong transition-all duration-300">
-                <div className="h-1 bg-gradient-to-r from-primary/50 to-transparent" />
-                <CardHeader className="cursor-pointer" onClick={() => toggleCategory(category.id)}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                        <Icon className="w-6 h-6 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-xl">{category.name}</CardTitle>
-                        <CardDescription>
-                          {category.duas.length} {category.duas.length === 1 ? "дуа" : "дуа"} 
-                          {category.description && ` • ${category.description}`}
-                        </CardDescription>
-                      </div>
+            <TabsContent value="categories" className="space-y-6 mt-6">
+              {/* Сегодняшний Dua */}
+              {todaysDua && (
+                <Card className="bg-white border border-gray-200 shadow-sm rounded-xl">
+                  <CardContent className="p-5 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <PrayingHands />
+                      <h3 className="font-semibold text-lg text-gray-900">Сегодняшний Dua</h3>
                     </div>
+                    
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-800 leading-relaxed">
+                        I seek refuge in Allah from satan the outcast (then you should desist from doing what you are in doubt... A 'oothu billaahi minash-Shaytaanir-rajeem.
+                      </p>
+                      {todaysDua.transcription && (
+                        <p className="text-sm text-gray-600 italic">
+                          {todaysDua.transcription}
+                        </p>
+                      )}
+                      {todaysDua.translation && (
+                        <p className="text-sm text-gray-500">
+                          {todaysDua.translation}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-6 pt-3 border-t border-gray-200">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleToggleFavorite(todaysDua)}
+                        className={cn(
+                          "flex items-center gap-2 px-0 hover:bg-transparent",
+                          isTodaysDuaFavorite && "text-yellow-500"
+                        )}
+                      >
+                        <Star className={cn("w-4 h-4", isTodaysDuaFavorite && "fill-current")} />
+                        <span className="text-sm">Любимое</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleShare(todaysDua)}
+                        className="flex items-center gap-2 px-0 hover:bg-transparent"
+                      >
+                        <Share2 className="w-4 h-4" />
+                        <span className="text-sm">Поделиться</span>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Список категорий или детальный список внутри категории */}
+              {!selectedCategory ? (
+                <div className="space-y-3">
+                  {categories.map((category) => {
+                    const Icon = category.icon;
+                    
+                    return (
+                      <Card
+                        key={category.id}
+                        className="cursor-pointer transition-all hover:shadow-md bg-white border border-gray-200 rounded-xl"
+                        onClick={() => setSelectedCategory(category.id)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4 flex-1">
+                              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                                <Icon className="w-7 h-7 text-primary" />
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-lg text-gray-900">{category.name}</h3>
+                                {category.description && (
+                                  <p className="text-sm text-gray-500 mt-0.5">{category.description}</p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="secondary" className="bg-gray-100 text-gray-700 font-semibold min-w-[32px] justify-center">
+                                {category.count}
+                              </Badge>
+                              <ChevronRight className="w-5 h-5 text-gray-400" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Заголовок категории с кнопкой назад */}
+                  <div className="flex items-center gap-4 mb-4">
                     <Button
                       variant="ghost"
-                      size="icon"
-                      className="shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleCategory(category.id);
-                      }}
+                      size="sm"
+                      onClick={() => setSelectedCategory(null)}
+                      className="flex items-center gap-2"
                     >
-                      {isExpanded ? (
-                        <ChevronUp className="w-5 h-5" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5" />
-                      )}
+                      <ChevronRight className="w-4 h-4 rotate-180" />
+                      Назад
                     </Button>
+                    <div className="flex-1">
+                      <h2 className="font-bold text-xl">{selectedCategoryData?.name}</h2>
+                      <p className="text-sm text-gray-500">Всего: {selectedCategoryData?.count}</p>
+                    </div>
                   </div>
-                </CardHeader>
-              </Card>
 
-              {/* Duas List */}
-              {(isExpanded || selectedCategory === category.id) && (
-                <div className="space-y-4 animate-in fade-in-50 duration-300">
-                  {category.duas.map((dua) => (
-                    <DuaCard key={dua.id} dua={dua} categoryColor={category.color} />
+                  {/* Детальный список дуа в категории (как на скриншоте) */}
+                  <div className="space-y-2">
+                    {selectedCategoryData?.duas.map((dua, index) => (
+                      <Card
+                        key={dua.id}
+                        className="cursor-pointer transition-all hover:shadow-md bg-white border border-gray-200 rounded-lg"
+                        onClick={() => {
+                          setSelectedDua(dua);
+                          setIsDuaDialogOpen(true);
+                        }}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4 flex-1">
+                              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
+                                {index + 1}
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-base text-gray-900">
+                                  {dua.title || `Дуа ${index + 1}`}
+                                </h3>
+                              </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-gray-400" />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="favorites" className="space-y-4 mt-6">
+              {favoriteDuas.length === 0 ? (
+                <Card>
+                  <CardContent className="pt-6 text-center py-12">
+                    <Star className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                    <p className="text-lg font-semibold mb-2">Нет избранных дуа</p>
+                    <p className="text-sm text-muted-foreground">
+                      Добавьте дуа в избранное, нажав на звездочку
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  {favoriteDuas.map((dua) => (
+                    <DuaCard key={dua.id} dua={dua} categoryColor="category-general" />
                   ))}
                 </div>
               )}
-            </div>
-          );
-        })
+            </TabsContent>
+          </Tabs>
+        </>
       )}
 
-      {/* Info Card */}
-      <Card className="border-accent/30 bg-accent/5">
-        <CardContent className="pt-6">
-          <p className="text-sm text-muted-foreground text-center">
-            <strong className="text-accent">Совет:</strong> Используйте поиск для быстрого нахождения нужного дуа, 
-            или выберите категорию для просмотра всех дуа в ней. Сохраняйте избранные дуа для быстрого доступа.
-          </p>
-        </CardContent>
-      </Card>
+      {/* Модальное окно с детальной карточкой дуа */}
+      <Dialog open={isDuaDialogOpen} onOpenChange={setIsDuaDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          {selectedDua && (
+            <DuaCard dua={selectedDua} categoryColor="category-general" />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -7,7 +7,8 @@ import { ReportsSection } from "@/components/qaza/ReportsSection";
 import { RepaymentPlanSection } from "@/components/qaza/RepaymentPlanSection";
 import { TermsDictionary } from "@/components/qaza/TermsDictionary";
 import { ShareAndFriends } from "@/components/qaza/ShareAndFriends";
-import { GoalsAndHabits } from "@/components/qaza/GoalsAndHabits";
+import { SmartGoalsSection } from "@/components/qaza/SmartGoalsSection";
+import { CompactGoalsCalendar } from "@/components/qaza/CompactGoalsCalendar";
 import { PrayerCalendar } from "@/components/qaza/PrayerCalendar";
 import { RemindersManager } from "@/components/qaza/RemindersManager";
 import { MainHeader } from "@/components/layout/MainHeader";
@@ -22,6 +23,21 @@ const Index = () => {
   const handleNavigateToCalculator = () => {
     setActiveTab("calculator");
   };
+
+  // Слушаем событие навигации к табу
+  useEffect(() => {
+    const handleNavigateToTab = (event: CustomEvent) => {
+      const tab = event.detail?.tab;
+      if (tab && ["plan", "progress", "travel", "reports", "calculator", "goals", "calendar"].includes(tab)) {
+        setActiveTab(tab);
+      }
+    };
+
+    window.addEventListener('navigateToTab', handleNavigateToTab as EventListener);
+    return () => {
+      window.removeEventListener('navigateToTab', handleNavigateToTab as EventListener);
+    };
+  }, []);
 
   // Auto-scroll to active tab
   useEffect(() => {
@@ -116,13 +132,20 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-hero pb-20 sm:pb-0">
+    <div className="min-h-screen bg-mosque pb-20 sm:pb-0">
       <MainHeader />
       <WelcomeDialog onNavigateToCalculator={handleNavigateToCalculator} />
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-4 sm:py-6 max-w-5xl pb-24 sm:pb-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              {/* Main Content */}
+              <main className="container mx-auto px-4 py-4 sm:py-6 max-w-5xl pb-24 sm:pb-6">
+                {/* Компактный календарь целей на главном экране */}
+                {activeTab === "plan" && (
+                  <div className="mb-6">
+                    <CompactGoalsCalendar />
+                  </div>
+                )}
+
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Enhanced Tabs Container */}
           <div className="relative mb-6 overflow-visible">
             {/* Background with gradient glow effect */}
@@ -371,10 +394,11 @@ const Index = () => {
             <TravelPrayersSection />
           </TabsContent>
 
-          <TabsContent value="reports" className="space-y-6">
-            <ReportsSection />
-            <ShareAndFriends />
-          </TabsContent>
+                  <TabsContent value="reports" className="space-y-6">
+                    <ReportsSection />
+                    <BadgesSection />
+                    <ShareAndFriends />
+                  </TabsContent>
 
           <TabsContent value="calculator" className="space-y-6">
             <CalculatorSection />
@@ -382,7 +406,7 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="goals">
-            <GoalsAndHabits />
+            <SmartGoalsSection />
           </TabsContent>
 
           <TabsContent value="calendar" className="space-y-6">

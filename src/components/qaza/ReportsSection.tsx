@@ -6,6 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import { eReplikaAPI } from "@/lib/api";
 import { useUserData } from "@/hooks/useUserData";
 import { calculateProgressStats, formatNumber } from "@/lib/prayer-utils";
+import { WeeklyChart } from "./WeeklyChart";
+import { StreakIndicator } from "./StreakIndicator";
 
 export const ReportsSection = () => {
   const { toast } = useToast();
@@ -265,27 +267,11 @@ export const ReportsSection = () => {
         </CardContent>
       </Card>
 
-      {/* Weekly Progress Chart Placeholder */}
-      <Card className="bg-gradient-card border-border/50">
-        <CardHeader>
-          <CardTitle>Прогресс за последние 7 дней</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-48 flex items-end justify-around gap-2">
-            {[10, 12, 8, 15, 11, 13, 14].map((value, index) => (
-              <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                <div
-                  className="w-full bg-primary rounded-t-lg transition-all duration-500 hover:opacity-80"
-                  style={{ height: `${(value / 15) * 100}%` }}
-                />
-                <span className="text-xs text-muted-foreground">
-                  {["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][index]}
-                </span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Weekly Progress Chart and Streak Indicator */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <WeeklyChart userData={userData} />
+        <StreakIndicator />
+      </div>
 
       {/* Action Buttons */}
       <div className="grid gap-4 md:grid-cols-2">

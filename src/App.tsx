@@ -9,6 +9,7 @@ import Dhikr from "./pages/Dhikr";
 import NotFound from "./pages/NotFound";
 import { initTelegramWebApp } from "./lib/telegram";
 import { ConsentDialog } from "./components/qaza/ConsentDialog";
+import { startAutoSync, setupOnlineListener } from "./lib/offline-sync";
 
 const queryClient = new QueryClient();
 
@@ -16,6 +17,17 @@ const App = () => {
   useEffect(() => {
     // Инициализация Telegram WebApp при загрузке
     initTelegramWebApp();
+    
+    // Инициализация офлайн-синхронизации
+    setupOnlineListener((online) => {
+      console.log("Connection status:", online ? "online" : "offline");
+    });
+    startAutoSync();
+    
+    // Очистка при размонтировании
+    return () => {
+      // stopAutoSync будет вызван автоматически
+    };
   }, []);
 
   return (

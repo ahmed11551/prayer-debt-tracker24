@@ -9,28 +9,33 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://fvxkywczuqinc
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2eGt5d2N6dXFpbmNuamlsZ3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzNDgwNTYsImV4cCI6MjA3NzkyNDA1Nn0.jBvLDl0T2u-slvf4Uu4oZj7yRWMQCKmiln0mXRU0q54";
 const SUPABASE_FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
 
-// Получение токена авторизации из Telegram или env
-function getAuthToken(): string | null {
-  // В Telegram Mini App можно использовать initData для авторизации
-  if (typeof window !== "undefined" && window.Telegram?.WebApp) {
-    return window.Telegram.WebApp.initData;
-  }
-  // Используем test_token_123 по умолчанию для e-Replika API
+// Получение токена авторизации для e-Replika API
+// Согласно документации: https://bot.e-replika.ru/docs#/
+// Используется test_token_123 для тестирования или токен из env
+// ВАЖНО: Все запросы к bot.e-replika.ru/api требуют авторизации через Bearer токен
+function getAuthToken(): string {
+  // Приоритет: env переменная > дефолтный тестовый токен
+  // Для e-Replika API используется Bearer токен в заголовке Authorization
+  // По умолчанию: test_token_123 (согласно документации API)
   return import.meta.env.VITE_API_TOKEN || "test_token_123";
 }
 
 // Получение заголовков для запросов к e-Replika API
+// Согласно документации: https://bot.e-replika.ru/docs#/
+// Авторизация через Bearer токен в заголовке Authorization
+// Используется везде: eReplikaAPI и dhikrAPI (для внутренних эндпоинтов)
 function getAuthHeaders(): HeadersInit {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
   
+  // Всегда используем токен для авторизации
+  // По умолчанию: test_token_123 (для тестирования согласно документации)
+  // Формат: Authorization: Bearer test_token_123
   const token = getAuthToken();
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
+  headers["Authorization"] = `Bearer ${token}`;
   
-  // Добавляем API ключ, если он указан в env
+  // Дополнительный API ключ, если указан в env (опционально)
   const apiKey = import.meta.env.VITE_E_REPLIKA_API_KEY;
   if (apiKey) {
     headers["X-API-Key"] = apiKey;
@@ -255,6 +260,234 @@ export const eReplikaAPI = {
       return [];
     } catch (error) {
       console.error("Error fetching duas:", error);
+      return [];
+    }
+  },
+
+  // Получить список азкаров
+  async getAdhkar(): Promise<Array<{ id: string; title: string; text: string; count: number }>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/adhkar`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.warn("Adhkar endpoint not found");
+          return [];
+        }
+        throw new Error(`Failed to fetch adhkar: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        return data;
+      }
+      if (data.adhkar && Array.isArray(data.adhkar)) {
+        return data.adhkar;
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching adhkar:", error);
+      return [];
+    }
+  },
+
+  // Получить список салаватов
+  async getSalawat(): Promise<Array<{ id: string; arabic: string; transcription: string }>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/salawat`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.warn("Salawat endpoint not found");
+          return [];
+        }
+        throw new Error(`Failed to fetch salawat: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        return data;
+      }
+      if (data.salawat && Array.isArray(data.salawat)) {
+        return data.salawat;
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching salawat:", error);
+      return [];
+    }
+  },
+
+  // Получить список калим
+  async getKalimas(): Promise<Array<{ id: string; arabic: string; transcription: string }>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/kalimas`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.warn("Kalimas endpoint not found");
+          return [];
+        }
+        throw new Error(`Failed to fetch kalimas: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        return data;
+      }
+      if (data.kalimas && Array.isArray(data.kalimas)) {
+        return data.kalimas;
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching kalimas:", error);
+      return [];
+    }
+  },
+
+  // Получить список сур Корана
+  async getSurahs(): Promise<Array<{ number: number; name: string; nameEn: string; ayahsCount?: number }>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/quran/surahs`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.warn("Surahs endpoint not found");
+          return [];
+        }
+        throw new Error(`Failed to fetch surahs: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        return data;
+      }
+      if (data.surahs && Array.isArray(data.surahs)) {
+        return data.surahs;
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching surahs:", error);
+      return [];
+    }
+  },
+
+  // Получить аяты из суры
+  async getAyahs(surahNumber: number, startAyah?: number, endAyah?: number): Promise<Array<{
+    number: number;
+    surah: number;
+    arabic: string;
+    transcription?: string;
+    translation?: string;
+    audioUrl?: string;
+  }>> {
+    try {
+      let url = `${API_BASE_URL}/quran/surah/${surahNumber}/ayahs`;
+      if (startAyah && endAyah) {
+        url += `?start=${startAyah}&end=${endAyah}`;
+      } else if (startAyah) {
+        url += `?start=${startAyah}`;
+      }
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.warn(`Ayahs endpoint not found for surah ${surahNumber}`);
+          return [];
+        }
+        throw new Error(`Failed to fetch ayahs: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        return data;
+      }
+      if (data.ayahs && Array.isArray(data.ayahs)) {
+        return data.ayahs;
+      }
+      return [];
+    } catch (error) {
+      console.error(`Error fetching ayahs for surah ${surahNumber}:`, error);
+      return [];
+    }
+  },
+
+  // Получить конкретный аят
+  async getAyah(surahNumber: number, ayahNumber: number): Promise<{
+    number: number;
+    surah: number;
+    arabic: string;
+    transcription?: string;
+    translation?: string;
+    audioUrl?: string;
+  } | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/quran/surah/${surahNumber}/ayah/${ayahNumber}`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.warn(`Ayah ${surahNumber}:${ayahNumber} not found`);
+          return null;
+        }
+        throw new Error(`Failed to fetch ayah: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(`Error fetching ayah ${surahNumber}:${ayahNumber}:`, error);
+      return null;
+    }
+  },
+
+  // Получить 99 имен Аллаха
+  async getAsmaulHusna(): Promise<Array<{ id: string; arabic: string; transcription: string; translation: string }>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/asmaul-husna`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.warn("Asmaul Husna endpoint not found");
+          return [];
+        }
+        throw new Error(`Failed to fetch asmaul husna: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        return data;
+      }
+      if (data.asmaul_husna && Array.isArray(data.asmaul_husna)) {
+        return data.asmaul_husna;
+      }
+      if (data.names && Array.isArray(data.names)) {
+        return data.names;
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching asmaul husna:", error);
       return [];
     }
   },
@@ -644,4 +877,153 @@ function getDefaultTerms(): Term[] {
     },
   ];
 }
+
+// API для модуля "Умный Тасбих и Трекер Зикров"
+export const dhikrAPI = {
+  // Получение состояния для инициализации интерфейса
+  async bootstrap(): Promise<any> {
+    try {
+      const response = await fetch(`${INTERNAL_API_URL}/v1/bootstrap`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to bootstrap:", error);
+      // Возвращаем дефолтное состояние
+      return {
+        user: null,
+        active_goal: null,
+        daily_azkar: null,
+        recent_items: [],
+      };
+    }
+  },
+
+  // Создание/обновление цели
+  async createGoal(goal: {
+    category: string;
+    item_id?: string | null;
+    goal_type: string;
+    target_count: number;
+    prayer_segment?: string;
+  }): Promise<any> {
+    try {
+      const response = await fetch(`${INTERNAL_API_URL}/v1/goals`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(goal),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to create goal:", error);
+      throw error;
+    }
+  },
+
+  // Начало сессии
+  async startSession(session: {
+    goal_id?: string | null;
+    category?: string;
+    item_id?: string | null;
+    prayer_segment?: string;
+  }): Promise<any> {
+    try {
+      const response = await fetch(`${INTERNAL_API_URL}/v1/sessions/start`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(session),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to start session:", error);
+      throw error;
+    }
+  },
+
+  // Фиксация действия (tap)
+  async tapCounter(data: {
+    session_id: string;
+    delta: number;
+    event_type: string;
+    offline_id?: string;
+    prayer_segment?: string;
+  }): Promise<any> {
+    try {
+      const response = await fetch(`${INTERNAL_API_URL}/v1/counter/tap`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to tap counter:", error);
+      throw error;
+    }
+  },
+
+  // Отметка о заучивании
+  async markLearned(goal_id: string): Promise<any> {
+    try {
+      const response = await fetch(`${INTERNAL_API_URL}/v1/learn/mark`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ goal_id }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to mark learned:", error);
+      throw error;
+    }
+  },
+
+  // Ежедневный отчет
+  async getDailyReport(): Promise<any> {
+    try {
+      const response = await fetch(`${INTERNAL_API_URL}/v1/reports/daily`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to get daily report:", error);
+      return {
+        date: new Date().toISOString().split("T")[0],
+        goals_completed: [],
+        azkar_progress: {},
+        total_dhikr_count: 0,
+      };
+    }
+  },
+};
 

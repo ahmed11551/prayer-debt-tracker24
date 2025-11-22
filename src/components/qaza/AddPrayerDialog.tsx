@@ -102,6 +102,16 @@ export const AddPrayerDialog = ({ open, onOpenChange, onUpdate }: AddPrayerDialo
         }
       }
 
+      // Обновляем streak для намазов
+      try {
+        const { updateStreakForCategory } = await import("@/hooks/useStreaks");
+        // Динамически вызываем функцию обновления streak
+        const { updateStreak } = await import("@/lib/badges-utils");
+        updateStreak("prayer", new Date());
+      } catch (error) {
+        console.warn("Failed to update streak:", error);
+      }
+
       toast({
         title: "Прогресс сохранён",
         description: `Добавлено ${total} намазов к вашему прогрессу`,

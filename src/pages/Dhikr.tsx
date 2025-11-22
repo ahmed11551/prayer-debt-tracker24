@@ -6,11 +6,12 @@ import { DuaSection } from "@/components/dhikr/DuaSection";
 import { AdhkarSection } from "@/components/dhikr/AdhkarSection";
 import { SalawatSection } from "@/components/dhikr/SalawatSection";
 import { KalimaSection } from "@/components/dhikr/KalimaSection";
+import { SmartTasbih } from "@/components/dhikr/SmartTasbih";
 import { cn } from "@/lib/utils";
 
 const Dhikr = () => {
   return (
-    <div className="min-h-screen bg-gradient-hero pb-20">
+    <div className="min-h-screen bg-mosque pb-20">
       <MainHeader />
 
       <main className="container mx-auto px-4 py-6 max-w-5xl">
@@ -149,6 +150,36 @@ const Dhikr = () => {
               >
                 <span className="relative z-10">Калимы</span>
               </TabsTrigger>
+              
+              <TabsTrigger 
+                value="tasbih"
+                className={cn(
+                  "flex-shrink-0 flex items-center justify-center",
+                  "min-w-[85px] sm:min-w-[100px] px-3 sm:px-5 py-2 sm:py-2.5",
+                  "text-center rounded-xl",
+                  "transition-all duration-300 ease-out",
+                  "whitespace-nowrap",
+                  "text-xs sm:text-sm font-semibold",
+                  "snap-start",
+                  "overflow-visible",
+                  // Inactive state
+                  "text-foreground/90 bg-transparent",
+                  "hover:text-foreground hover:bg-primary/8",
+                  "active:scale-[0.98]",
+                  // Active state
+                  "data-[state=active]:bg-gradient-to-r",
+                  "data-[state=active]:from-primary",
+                  "data-[state=active]:to-primary/90",
+                  "data-[state=active]:text-white",
+                  "data-[state=active]:shadow-lg",
+                  "data-[state=active]:shadow-primary/30",
+                  "data-[state=active]:scale-[1.01]",
+                  "data-[state=active]:font-bold",
+                  "data-[state=active]:z-10"
+                )}
+              >
+                <span className="relative z-10">Тасбих</span>
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -166,6 +197,10 @@ const Dhikr = () => {
 
           <TabsContent value="kalima" className="mt-0">
             <KalimaSection />
+          </TabsContent>
+
+          <TabsContent value="tasbih" className="mt-0">
+            <SmartTasbih />
           </TabsContent>
         </Tabs>
       </main>

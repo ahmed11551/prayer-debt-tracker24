@@ -11,6 +11,7 @@ import { SmartGoalsSection } from "@/components/qaza/SmartGoalsSection";
 import { CompactGoalsCalendar } from "@/components/qaza/CompactGoalsCalendar";
 import { PrayerCalendar } from "@/components/qaza/PrayerCalendar";
 import { RemindersManager } from "@/components/qaza/RemindersManager";
+import { BadgesSection } from "@/components/qaza/BadgesSection";
 import { MainHeader } from "@/components/layout/MainHeader";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { WelcomeDialog } from "@/components/qaza/WelcomeDialog";

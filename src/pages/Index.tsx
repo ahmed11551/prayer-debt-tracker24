@@ -37,39 +37,83 @@ const Index = () => {
           const tabWidth = activeTabElement.offsetWidth;
           const containerWidth = container.offsetWidth;
           const scrollLeft = container.scrollLeft;
+          const scrollWidth = container.scrollWidth;
           
           // Calculate if tab is fully visible
           const tabRight = tabLeft + tabWidth;
           const visibleLeft = scrollLeft;
           const visibleRight = scrollLeft + containerWidth;
           
+          // Padding for better visibility
+          const padding = 16;
+          
           let scrollTo = scrollLeft;
           
-          // If tab is cut off on the left, scroll to show it fully
-          if (tabLeft < visibleLeft) {
-            scrollTo = tabLeft - 8; // 8px padding
+          // Check if tab is fully visible (with padding)
+          const isFullyVisible = tabLeft >= visibleLeft + padding && tabRight <= visibleRight - padding;
+          
+          if (!isFullyVisible) {
+            // If tab is cut off on the left, scroll to show it fully with padding
+            if (tabLeft < visibleLeft + padding) {
+              scrollTo = Math.max(0, tabLeft - padding);
+            }
+            // If tab is cut off on the right, scroll to show it fully with padding
+            else if (tabRight > visibleRight - padding) {
+              scrollTo = Math.min(
+                scrollWidth - containerWidth,
+                tabRight - containerWidth + padding
+              );
+            }
+            
+            // Only scroll if needed and if it makes sense
+            if (Math.abs(scrollTo - scrollLeft) > 1) {
+              container.scrollTo({
+                left: scrollTo,
+                behavior: "smooth",
+              });
+            }
           }
-          // If tab is cut off on the right, scroll to show it fully
-          else if (tabRight > visibleRight) {
-            scrollTo = tabRight - containerWidth + 8; // 8px padding
-          }
-          // Otherwise, center the tab
-          else {
-            const tabCenter = tabLeft + tabWidth / 2;
-            const containerCenter = scrollLeft + containerWidth / 2;
-            scrollTo = scrollLeft + (tabCenter - containerCenter);
-          }
-
-          container.scrollTo({
-            left: Math.max(0, scrollTo),
-            behavior: "smooth",
-          });
+          // If tab is already fully visible, don't scroll (preserve current position)
         }
       }
-    }, 50);
+    }, 150); // Delay for better reliability
 
     return () => clearTimeout(timeoutId);
   }, [activeTab]);
+
+  // Ensure scroll starts at 0 on mount and after render
+  useEffect(() => {
+    const resetScroll = () => {
+      if (tabsListRef.current) {
+        // Reset scroll to start
+        tabsListRef.current.scrollLeft = 0;
+      }
+    };
+    
+    // Reset immediately
+    resetScroll();
+    
+    // Also reset after a short delay to ensure DOM is ready
+    const timeoutId = setTimeout(resetScroll, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, []);
+  
+  // Also reset scroll when window resizes
+  useEffect(() => {
+    const handleResize = () => {
+      if (tabsListRef.current) {
+        // Only reset if we're at the start or if content fits
+        const container = tabsListRef.current;
+        if (container.scrollWidth <= container.offsetWidth) {
+          container.scrollLeft = 0;
+        }
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-hero pb-20 sm:pb-0">
@@ -93,10 +137,15 @@ const Index = () => {
                 "bg-white/95 backdrop-blur-md",
                 "rounded-2xl border border-border/60",
                 "shadow-lg shadow-primary/5",
-                "scroll-smooth snap-x snap-mandatory",
+                "scroll-smooth snap-x snap-proximity",
                 "min-h-[48px] sm:min-h-[52px]",
                 "tabs-scroll-container"
               )}
+              style={{ 
+                WebkitOverflowScrolling: 'touch',
+                touchAction: 'pan-x',
+                overscrollBehaviorX: 'auto'
+              }}
             >
               <TabsTrigger 
                 value="plan"

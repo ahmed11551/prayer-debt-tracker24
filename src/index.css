@@ -291,33 +291,47 @@ All colors MUST be HSL.
 
   /* Prevent text clipping in tabs */
   [role="tablist"] {
-    overflow-x: auto;
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch !important;
     scrollbar-width: thin;
-    scrollbar-color: hsl(var(--primary) / 0.4) transparent;
+    scrollbar-color: hsl(var(--primary) / 0.5) hsl(var(--primary) / 0.1);
     scroll-behavior: smooth;
-    overscroll-behavior-x: contain;
+    overscroll-behavior-x: auto !important;
+    overscroll-behavior-y: none;
+    /* Show scrollbar on hover and when scrolling */
+    scrollbar-gutter: stable;
+    /* Enable scrolling in both directions */
+    direction: ltr;
+    /* Ensure scroll works */
+    touch-action: pan-x !important;
+    will-change: scroll-position;
   }
 
   [role="tablist"]::-webkit-scrollbar {
-    height: 6px;
+    height: 8px;
   }
 
   [role="tablist"]::-webkit-scrollbar-track {
     background: hsl(var(--primary) / 0.1);
-    border-radius: 3px;
-    margin: 0 4px;
+    border-radius: 4px;
+    margin: 0 8px;
   }
 
   [role="tablist"]::-webkit-scrollbar-thumb {
-    background: hsl(var(--primary) / 0.4);
-    border-radius: 3px;
-    transition: background 0.2s ease;
+    background: hsl(var(--primary) / 0.5);
+    border-radius: 4px;
+    transition: background 0.2s ease, height 0.2s ease;
+    border: 1px solid hsl(var(--primary) / 0.2);
   }
 
   [role="tablist"]::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--primary) / 0.6);
+    background: hsl(var(--primary) / 0.7);
+    height: 10px;
+  }
+
+  [role="tablist"]::-webkit-scrollbar-thumb:active {
+    background: hsl(var(--primary) / 0.8);
   }
 
   [role="tab"] {
@@ -339,8 +353,13 @@ All colors MUST be HSL.
 
   /* Smooth scrolling for tabs container */
   .tabs-scroll-container {
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
+    scroll-behavior: smooth !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-x: auto !important;
+    overscroll-behavior-y: none !important;
+    touch-action: pan-x !important;
+    direction: ltr !important;
+    /* Ensure scroll position can go to 0 */
+    scroll-snap-type: x proximity;
   }
 }

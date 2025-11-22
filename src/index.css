@@ -295,30 +295,52 @@ All colors MUST be HSL.
     overflow-y: visible;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
-    scrollbar-color: hsl(var(--primary) / 0.3) transparent;
+    scrollbar-color: hsl(var(--primary) / 0.4) transparent;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
   }
 
   [role="tablist"]::-webkit-scrollbar {
-    height: 4px;
+    height: 6px;
   }
 
   [role="tablist"]::-webkit-scrollbar-track {
-    background: transparent;
+    background: hsl(var(--primary) / 0.1);
+    border-radius: 3px;
+    margin: 0 4px;
   }
 
   [role="tablist"]::-webkit-scrollbar-thumb {
-    background: hsl(var(--primary) / 0.3);
-    border-radius: 2px;
+    background: hsl(var(--primary) / 0.4);
+    border-radius: 3px;
+    transition: background 0.2s ease;
   }
 
   [role="tablist"]::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--primary) / 0.5);
+    background: hsl(var(--primary) / 0.6);
   }
 
   [role="tab"] {
     overflow: visible !important;
-    text-overflow: clip;
-    white-space: nowrap;
-    flex-shrink: 0;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    min-width: fit-content !important;
+    width: auto !important;
+  }
+
+  [role="tab"] span {
+    display: inline-block !important;
+    width: auto !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+  }
+
+  /* Smooth scrolling for tabs container */
+  .tabs-scroll-container {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
   }
 }

@@ -22,53 +22,53 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero pb-20">
+    <div className="min-h-screen bg-gradient-hero pb-20 sm:pb-0">
       <MainHeader />
       <WelcomeDialog onNavigateToCalculator={handleNavigateToCalculator} />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-6 max-w-5xl">
+      <main className="container mx-auto px-4 py-4 sm:py-6 max-w-5xl pb-24 sm:pb-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="flex w-full mb-6 glass shadow-medium h-auto px-2 py-2 gap-2 overflow-x-auto bg-white/80 backdrop-blur-sm rounded-2xl">
+          <TabsList className="flex w-full mb-4 sm:mb-6 glass shadow-medium h-auto px-2 py-2 gap-1.5 sm:gap-2 overflow-x-auto bg-white/80 backdrop-blur-sm rounded-2xl scrollbar-hide">
             <TabsTrigger 
               value="plan" 
-              className="flex-shrink-0 min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
+              className="flex-shrink-0 min-w-[85px] sm:min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
             >
               План
             </TabsTrigger>
             <TabsTrigger 
               value="progress"
-              className="flex-shrink-0 min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
+              className="flex-shrink-0 min-w-[95px] sm:min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
             >
               Прогресс
             </TabsTrigger>
             <TabsTrigger 
               value="travel"
-              className="flex-shrink-0 min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
+              className="flex-shrink-0 min-w-[75px] sm:min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
             >
               Сафар
             </TabsTrigger>
             <TabsTrigger 
               value="reports"
-              className="flex-shrink-0 min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
+              className="flex-shrink-0 min-w-[85px] sm:min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
             >
               Отчёты
             </TabsTrigger>
             <TabsTrigger 
               value="calculator"
-              className="flex-shrink-0 min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
+              className="flex-shrink-0 min-w-[100px] sm:min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
             >
               Калькулятор
             </TabsTrigger>
             <TabsTrigger 
               value="goals"
-              className="flex-shrink-0 min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
+              className="flex-shrink-0 min-w-[70px] sm:min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
             >
               Цели
             </TabsTrigger>
             <TabsTrigger 
               value="calendar"
-              className="flex-shrink-0 min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
+              className="flex-shrink-0 min-w-[90px] sm:min-w-[110px] text-center data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-glow rounded-lg transition-all duration-300 whitespace-nowrap px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground data-[state=active]:font-semibold"
             >
               Календарь
             </TabsTrigger>

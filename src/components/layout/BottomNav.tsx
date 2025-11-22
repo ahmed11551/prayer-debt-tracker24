@@ -18,9 +18,9 @@ export const BottomNav = () => {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border/50 backdrop-blur-xl z-50 safe-area-inset-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border/50 backdrop-blur-xl z-50 safe-area-inset-bottom shadow-lg">
       <div className="container mx-auto px-4 max-w-5xl">
-        <div className="flex justify-around items-center h-16">
+        <div className="flex justify-around items-center h-14 sm:h-16">
           {navItems.map(({ path, icon: Icon, label }) => {
             const isActive = location.pathname === path;
             return (
@@ -28,7 +28,7 @@ export const BottomNav = () => {
                 key={path}
                 to={path}
                 className={cn(
-                  "flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-all duration-300 group relative",
+                  "flex flex-col items-center gap-0.5 sm:gap-1 px-4 sm:px-6 py-1.5 sm:py-2 rounded-xl transition-all duration-300 group relative",
                   isActive
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground"
@@ -38,11 +38,11 @@ export const BottomNav = () => {
                   <div className="absolute inset-0 bg-primary/10 rounded-xl shadow-inner" />
                 )}
                 <Icon className={cn(
-                  "w-6 h-6 transition-transform duration-300 relative z-10",
+                  "w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 relative z-10",
                   isActive ? "scale-110" : "group-hover:scale-105"
                 )} />
                 <span className={cn(
-                  "text-xs font-medium relative z-10",
+                  "text-[10px] sm:text-xs font-medium relative z-10 leading-tight",
                   isActive && "gradient-text"
                 )}>
                   {label}

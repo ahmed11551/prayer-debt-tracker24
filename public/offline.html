@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Офлайн режим - Prayer Tracker</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #4a3728 0%, #3a2a1f 100%);
+      color: #f5e6d3;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+    
+    .icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+    
+    h1 {
+      font-size: 28px;
+      margin-bottom: 16px;
+      color: #d4af37;
+    }
+    
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      opacity: 0.9;
+    }
+    
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #d4af37;
+      color: #3a2a1f;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    
+    .button:hover {
+      opacity: 0.9;
+    }
+    
+    .status {
+      margin-top: 24px;
+      padding: 12px;
+      background: rgba(212, 175, 55, 0.1);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📡</div>
+    <h1>Нет подключения к интернету</h1>
+    <p>
+      Вы находитесь в офлайн режиме. Некоторые функции могут быть недоступны.
+      Ваши данные сохранены локально и будут синхронизированы при восстановлении соединения.
+    </p>
+    <a href="/" class="button" onclick="window.location.reload(); return false;">
+      Обновить страницу
+    </a>
+    <div class="status" id="status">
+      Проверка соединения...
+    </div>
+  </div>
+  
+  <script>
+    // Проверка соединения
+    function checkConnection() {
+      const statusEl = document.getElementById('status');
+      if (navigator.onLine) {
+        statusEl.textContent = '✅ Соединение восстановлено!';
+        statusEl.style.background = 'rgba(34, 197, 94, 0.2)';
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        statusEl.textContent = '❌ Нет подключения к интернету';
+        statusEl.style.background = 'rgba(239, 68, 68, 0.2)';
+      }
+    }
+    
+    // Проверка при загрузке
+    checkConnection();
+    
+    // Слушатели событий сети
+    window.addEventListener('online', checkConnection);
+    window.addEventListener('offline', checkConnection);
+    
+    // Периодическая проверка
+    setInterval(checkConnection, 5000);
+  </script>
+</body>
+</html>
+

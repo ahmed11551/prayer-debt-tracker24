@@ -1,6 +1,7 @@
 // Service Worker для офлайн-работы и кэширования
-const CACHE_NAME = 'prayer-tracker-v2';
-const RUNTIME_CACHE = 'prayer-tracker-runtime-v2';
+const CACHE_NAME = 'prayer-tracker-v3';
+const RUNTIME_CACHE = 'prayer-tracker-runtime-v3';
+const OFFLINE_PAGE = '/offline.html';
 
 // Файлы для кэширования при установке
 const PRECACHE_URLS = [
@@ -8,6 +9,7 @@ const PRECACHE_URLS = [
   '/index.html',
   '/manifest.json',
   '/logo.svg',
+  '/offline.html',
   '/dhikr',
   '/goals',
   '/reports',
@@ -73,26 +75,29 @@ self.addEventListener('fetch', (event) => {
         
         return response;
       })
-      .catch(() => {
+      .catch(async () => {
         // Если сеть недоступна, пытаемся получить из кэша
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
+        const cachedResponse = await caches.match(event.request);
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        
+        // Если это навигационный запрос, возвращаем офлайн-страницу или index.html
+        if (event.request.mode === 'navigate') {
+          const offlinePage = await caches.match(OFFLINE_PAGE);
+          if (offlinePage) {
+            return offlinePage;
           }
-          
-          // Если это навигационный запрос, возвращаем index.html
-          if (event.request.mode === 'navigate') {
-            return caches.match('/index.html');
-          }
-          
-          // Иначе возвращаем пустой ответ
-          return new Response('Offline', {
-            status: 503,
-            statusText: 'Service Unavailable',
-            headers: new Headers({
-              'Content-Type': 'text/plain',
-            }),
-          });
+          return caches.match('/index.html');
+        }
+        
+        // Иначе возвращаем пустой ответ
+        return new Response('Offline', {
+          status: 503,
+          statusText: 'Service Unavailable',
+          headers: new Headers({
+            'Content-Type': 'text/plain',
+          }),
         });
       })
   );

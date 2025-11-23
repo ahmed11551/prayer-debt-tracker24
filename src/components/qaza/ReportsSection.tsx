@@ -106,38 +106,25 @@ export const ReportsSection = () => {
 
   // Показываем загрузку
   if (userDataLoading) {
-    return (
-      <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
-          <CardContent className="pt-6">
-            <div className="text-center py-8 space-y-4">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
-              <p className="text-muted-foreground">
-                Загрузка данных...
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <LoadingCard message="Загрузка данных..." />;
   }
 
   // Показываем сообщение, если нет данных или данные невалидны
   if (!userData || !isValidUserData) {
     return (
-      <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
-          <CardContent className="pt-6">
-            <div className="text-center py-8 space-y-4">
-              <p className="text-muted-foreground">
-                {!userData 
-                  ? "Для отображения отчётов необходимо сначала рассчитать долг намазов"
-                  : "Данные неполные. Пожалуйста, выполните расчет заново."}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <EmptyState
+        title={!userData ? "Нет данных" : "Неполные данные"}
+        message={
+          !userData 
+            ? "Для отображения отчётов необходимо сначала рассчитать долг намазов"
+            : "Данные неполные. Пожалуйста, выполните расчет заново."
+        }
+        actionLabel="Перейти к калькулятору"
+        onAction={() => {
+          const calculatorTab = document.querySelector('[value="calculator"]') as HTMLElement;
+          if (calculatorTab) calculatorTab.click();
+        }}
+      />
     );
   }
 

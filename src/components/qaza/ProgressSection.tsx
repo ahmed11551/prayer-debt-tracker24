@@ -7,6 +7,8 @@ import { PrayerProgressCard } from "./PrayerProgressCard";
 import { AddPrayerDialog } from "./AddPrayerDialog";
 import { useUserData } from "@/hooks/useUserData";
 import { getPrayersArray, calculateProgressStats, formatNumber } from "@/lib/prayer-utils";
+import { LoadingCard } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const ProgressSection = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -23,30 +25,23 @@ export const ProgressSection = () => {
   // Мемоизация статистики
   const stats = useMemo(() => calculateProgressStats(userData), [userData]);
 
-  // Если данных нет, показываем сообщение
+  // Показываем загрузку
+  if (loading) {
+    return <LoadingCard message="Загрузка данных..." />;
+  }
+
+  // Если данных нет, показываем empty state
   if (!userData) {
     return (
-      <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
-          <CardContent className="pt-6">
-            <div className="text-center py-8 space-y-4">
-              <p className="text-foreground/90 font-medium">
-                Для отображения прогресса необходимо сначала рассчитать долг намазов
-              </p>
-              <Button
-                onClick={() => {
-                  // Переключение на вкладку калькулятора
-                  const calculatorTab = document.querySelector('[value="calculator"]') as HTMLElement;
-                  if (calculatorTab) calculatorTab.click();
-                }}
-                className="bg-primary"
-              >
-                Перейти к расчёту
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <EmptyState
+        title="Нет данных"
+        message="Для отображения прогресса необходимо сначала рассчитать долг намазов"
+        actionLabel="Перейти к расчёту"
+        onAction={() => {
+          const calculatorTab = document.querySelector('[value="calculator"]') as HTMLElement;
+          if (calculatorTab) calculatorTab.click();
+        }}
+      />
     );
   }
 

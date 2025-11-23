@@ -2,6 +2,20 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
+// Регистрация Service Worker для офлайн-работы
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((registration) => {
+        console.log('✅ Service Worker registered:', registration.scope);
+      })
+      .catch((registrationError) => {
+        console.log('❌ Service Worker registration failed:', registrationError);
+      });
+  });
+}
+
 // Импортируем утилиты для тестирования API (только в dev режиме)
 if (import.meta.env.DEV) {
   import("./lib/api-test");

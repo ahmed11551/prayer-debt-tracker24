@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { SafeInput } from "@/components/ui/safe-input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
@@ -354,13 +355,17 @@ export const CalculatorSection = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="bulughAge">Возраст булюга (лет)</Label>
-                <Input
+                <SafeInput
                   id="bulughAge"
                   type="number"
                   value={bulughAge}
-                  onChange={(e) => setBulughAge(parseInt(e.target.value) || 15)}
+                  onChange={(val) => {
+                    const num = typeof val === 'number' ? val : parseInt(String(val)) || 15;
+                    setBulughAge(Math.max(12, Math.min(18, num)));
+                  }}
                   min={12}
                   max={18}
+                  validate="number"
                   className="bg-background"
                 />
               </div>
@@ -398,36 +403,49 @@ export const CalculatorSection = () => {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="haidDays">Дней хайда в месяц</Label>
-                  <Input
+                  <SafeInput
                     id="haidDays"
                     type="number"
                     value={haidDays}
-                    onChange={(e) => setHaidDays(parseInt(e.target.value) || 7)}
+                    onChange={(val) => {
+                      const num = typeof val === 'number' ? val : parseInt(String(val)) || 7;
+                      setHaidDays(Math.max(1, Math.min(15, num)));
+                    }}
                     min={1}
                     max={15}
+                    validate="number"
                     className="bg-background"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="childbirthCount">Количество родов</Label>
-                  <Input
+                  <SafeInput
                     id="childbirthCount"
                     type="number"
                     value={childbirthCount}
-                    onChange={(e) => setChildbirthCount(parseInt(e.target.value) || 0)}
+                    onChange={(val) => {
+                      const num = typeof val === 'number' ? val : parseInt(String(val)) || 0;
+                      setChildbirthCount(Math.max(0, num));
+                    }}
                     min={0}
+                    max={20}
+                    validate="number"
                     className="bg-background"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="nifasDays">Дней нифаса за роды</Label>
-                  <Input
+                  <SafeInput
                     id="nifasDays"
                     type="number"
                     value={nifasDays}
-                    onChange={(e) => setNifasDays(parseInt(e.target.value) || 40)}
+                    onChange={(val) => {
+                      const num = typeof val === 'number' ? val : parseInt(String(val)) || 40;
+                      setNifasDays(Math.max(1, Math.min(40, num)));
+                    }}
                     min={1}
                     max={40}
+                    validate="number"
                     className="bg-background"
                   />
                 </div>
@@ -457,12 +475,17 @@ export const CalculatorSection = () => {
                   <span className="whitespace-nowrap">Добавить периоды</span>
                 </Button>
               </div>
-              <Input
+              <SafeInput
                 id="travelDays"
                 type="number"
                 value={travelPeriods.length > 0 ? travelPeriods.reduce((sum, p) => sum + p.days_count, 0) : travelDays}
-                onChange={(e) => setTravelDays(parseInt(e.target.value) || 0)}
+                onChange={(val) => {
+                  const num = typeof val === 'number' ? val : parseInt(String(val)) || 0;
+                  setTravelDays(Math.max(0, num));
+                }}
                 min={0}
+                max={3650}
+                validate="number"
                 placeholder="Введите приблизительное количество дней"
                 className="bg-background"
                 disabled={travelPeriods.length > 0}

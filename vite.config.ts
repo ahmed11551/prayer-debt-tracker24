@@ -23,8 +23,16 @@ export default defineConfig({
         assetFileNames: "assets/[name]-[hash][extname]",
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
+        // Code splitting для оптимизации производительности
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
+          'utils-vendor': ['date-fns', '@tanstack/react-query'],
+        },
       },
     },
+    // Увеличиваем лимит предупреждений о размере чанков
+    chunkSizeWarningLimit: 1000,
   },
   test: {
     globals: true,

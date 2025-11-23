@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { LoadingCard } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 import { 
   Target, 
   Plus, 
@@ -209,13 +211,12 @@ export const SmartGoalsSection = () => {
 
         {/* Список целей категории */}
         {categoryGoals.length === 0 ? (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center py-8 text-muted-foreground">
-                Нет целей в этой категории. Создайте первую цель!
-              </div>
-            </CardContent>
-          </Card>
+          <EmptyState
+            title="Нет целей"
+            message="Нет целей в этой категории. Создайте первую цель!"
+            actionLabel="Создать цель"
+            onAction={() => setCreateDialogOpen(true)}
+          />
         ) : (
           <div className="space-y-3">
             {categoryGoals.map((goal) => (
@@ -352,35 +353,44 @@ export const SmartGoalsSection = () => {
       )}
 
       {/* Категории целей */}
-      <div className="space-y-4">
-        {categories.map((category) => {
-          const categoryGoals = groupedGoals[category] || [];
-          const activeCategoryGoals = categoryGoals.filter(g => g.status === "active" || g.status === "paused");
-          
-          return (
-            <Card
-              key={category}
-              className="cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => setSelectedCategory(category)}
-            >
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="text-4xl">{getCategoryIcon(category)}</div>
-                    <div>
-                      <h3 className="text-lg font-semibold">{getCategoryLabel(category)}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {activeCategoryGoals.length} {activeCategoryGoals.length === 1 ? "активная цель" : "активных целей"}
-                      </p>
+      {activeGoals.length === 0 ? (
+        <EmptyState
+          title="Нет активных целей"
+          message="Создайте первую цель для отслеживания вашего духовного пути"
+          actionLabel="Создать цель"
+          onAction={() => setCreateDialogOpen(true)}
+        />
+      ) : (
+        <div className="space-y-4">
+          {categories.map((category) => {
+            const categoryGoals = groupedGoals[category] || [];
+            const activeCategoryGoals = categoryGoals.filter(g => g.status === "active" || g.status === "paused");
+            
+            return (
+              <Card
+                key={category}
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => setSelectedCategory(category)}
+              >
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="text-4xl">{getCategoryIcon(category)}</div>
+                      <div>
+                        <h3 className="text-lg font-semibold">{getCategoryLabel(category)}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {activeCategoryGoals.length} {activeCategoryGoals.length === 1 ? "активная цель" : "активных целей"}
+                        </p>
+                      </div>
                     </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
                   </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
       {/* Сообщение о лимите */}
       {!canCreate && (

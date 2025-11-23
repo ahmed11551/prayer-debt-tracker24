@@ -13,7 +13,7 @@ All colors MUST be HSL.
     --background: 30 25% 15%; /* Dark brown background (will be overlaid with mosque image) */
     --foreground: 42 50% 95%; /* Light gold text */
 
-    --card: 30 15% 35%; /* Lighter brown card for better visibility */
+    --card: 30 20% 45%; /* Much lighter brown card for better visibility */
     --card-foreground: 42 50% 98%; /* Brighter text for better contrast */
 
     --popover: 30 20% 25%;
@@ -71,7 +71,7 @@ All colors MUST be HSL.
     --gradient-dawn: linear-gradient(135deg, hsl(30 50% 30%) 0%, hsl(42 65% 50%) 50%, hsl(42 75% 60%) 100%);
     --gradient-dusk: linear-gradient(135deg, hsl(30 40% 25%) 0%, hsl(30 50% 30%) 50%, hsl(30 40% 20%) 100%);
     --gradient-gold: linear-gradient(135deg, hsl(42 65% 50%) 0%, hsl(42 75% 65%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(30 15% 35%) 0%, hsl(30 20% 40%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(30 20% 45%) 0%, hsl(30 25% 50%) 100%);
     /* Mosque background - will use CSS background-image with blur */
     --mosque-bg: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwMCIgaGVpZ2h0PSIxMDAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6aHNsYSgzMCwgNDAlLCAyMCUsIDAuOCk7c3RvcC1vcGFjaXR5OjEiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOmhzbGEoMzAsIDI1JSwgMTUlLCAwLjkpO3N0b3Atb3BhY2l0eToxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMDAiIGhlaWdodD0iMTAwMCIgZmlsbD0idXJsKCNncmFkKSIvPjwvc3ZnPg==');
     --gradient-hero: 
@@ -84,7 +84,7 @@ All colors MUST be HSL.
                      radial-gradient(circle at 70% 50%, hsl(30 50% 30% / 0.1) 0%, transparent 50%),
                      /* Base dark brown */
                      linear-gradient(135deg, hsl(30 25% 15%) 0%, hsl(30 20% 12%) 100%);
-    --gradient-glass: linear-gradient(135deg, hsla(30, 15%, 35%, 0.95) 0%, hsla(30, 15%, 35%, 0.85) 100%);
+    --gradient-glass: linear-gradient(135deg, hsla(30, 20%, 45%, 0.98) 0%, hsla(30, 25%, 50%, 0.95) 100%);
 
     /* Enhanced Shadows - Warm Brown & Gold Theme */
     --shadow-soft: 0 2px 12px hsl(30 40% 10% / 0.3);
@@ -229,16 +229,16 @@ All colors MUST be HSL.
     bottom: 0;
     background-image: 
       /* Mosque silhouette pattern (simplified) */
-      radial-gradient(ellipse 80% 50% at 50% 20%, hsl(30 35% 30% / 0.4) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 40% at 30% 15%, hsl(30 40% 35% / 0.3) 0%, transparent 40%),
-      radial-gradient(ellipse 60% 40% at 70% 15%, hsl(30 40% 35% / 0.3) 0%, transparent 40%),
+      radial-gradient(ellipse 80% 50% at 50% 20%, hsl(30 35% 30% / 0.25) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 40% at 30% 15%, hsl(30 40% 35% / 0.2) 0%, transparent 40%),
+      radial-gradient(ellipse 60% 40% at 70% 15%, hsl(30 40% 35% / 0.2) 0%, transparent 40%),
       /* Base warm sepia */
-      linear-gradient(135deg, hsl(30 30% 20% / 0.6) 0%, hsl(30 25% 18% / 0.8) 100%);
+      linear-gradient(135deg, hsl(30 30% 20% / 0.4) 0%, hsl(30 25% 18% / 0.5) 100%);
     background-size: cover;
     background-position: center;
     filter: blur(40px);
     -webkit-filter: blur(40px);
-    opacity: 0.7;
+    opacity: 0.5;
     z-index: 0;
   }
   

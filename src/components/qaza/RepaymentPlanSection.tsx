@@ -175,11 +175,11 @@ export const RepaymentPlanSection = () => {
   // Показываем загрузку, если данные еще не загружены
   if (userDataLoading || loading) {
     return (
-      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
+      <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
         <CardContent className="pt-6">
           <div className="text-center py-8 space-y-4">
             <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
-            <p className="text-muted-foreground">Загрузка плана...</p>
+            <p className="text-foreground/90 font-medium">Загрузка плана...</p>
           </div>
         </CardContent>
       </Card>
@@ -188,10 +188,10 @@ export const RepaymentPlanSection = () => {
 
   if (!plan) {
     return (
-      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
+      <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
         <CardContent className="pt-6">
           <div className="text-center py-8 space-y-4">
-            <p className="text-muted-foreground">
+            <p className="text-foreground/90 font-medium">
               Для отображения плана необходимо сначала рассчитать долг намазов
             </p>
           </div>
@@ -219,13 +219,13 @@ export const RepaymentPlanSection = () => {
       )}
 
       {/* AI Plan Header */}
-      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
-        <CardHeader>
+      <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
+        <CardHeader className="pb-4">
           <div className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-primary" />
-            <CardTitle>План восполнения</CardTitle>
+            <CardTitle className="text-foreground">План восполнения</CardTitle>
           </div>
-          <CardDescription>
+          <CardDescription className="text-foreground/90 text-base">
             Умные рекомендации для эффективного восполнения пропущенных намазов на основе вашего прогресса
           </CardDescription>
         </CardHeader>
@@ -235,18 +235,18 @@ export const RepaymentPlanSection = () => {
             {plan.recommendations.map((rec, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-4 rounded-xl bg-white/10 border-2 border-white/20 shadow-md hover:bg-white/15 transition-colors"
+                className="flex items-center justify-between p-4 rounded-xl bg-primary/15 border-2 border-primary/40 shadow-lg hover:bg-primary/20 transition-all hover:scale-[1.02]"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full bg-primary/30 flex items-center justify-center border border-primary/50">
                     <Calendar className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <div className="font-bold text-foreground text-base">{rec.time}</div>
-                    <div className="text-sm text-foreground/80 font-medium">{rec.action}</div>
+                    <div className="text-sm text-foreground/90 font-medium">{rec.action}</div>
                   </div>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-xl border-2 border-primary/50">
                   <span className="text-white font-bold text-lg">{rec.count}</span>
                 </div>
               </div>
@@ -257,47 +257,47 @@ export const RepaymentPlanSection = () => {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
+        <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
           <CardContent className="pt-6">
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-foreground/80">
-                <TrendingUp className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-foreground/90">
+                <TrendingUp className="w-4 h-4 text-primary" />
                 <span className="text-sm font-semibold">Текущий темп</span>
               </div>
               <div className="text-3xl font-bold text-foreground">
                 {plan.currentPace}
               </div>
-              <p className="text-sm text-foreground/70 font-medium">намазов/день</p>
+              <p className="text-sm text-foreground/80 font-medium">намазов/день</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
+        <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
           <CardContent className="pt-6">
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-foreground/80">
-                <Target className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-foreground/90">
+                <Target className="w-4 h-4 text-primary" />
                 <span className="text-sm font-semibold">Еженедельная цель</span>
               </div>
               <div className="text-3xl font-bold text-foreground">
                 {plan.weeklyGoal}
               </div>
-              <p className="text-sm text-foreground/70 font-medium">намазов/неделя</p>
+              <p className="text-sm text-foreground/80 font-medium">намазов/неделя</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
+        <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
           <CardContent className="pt-6">
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-foreground/80">
-                <Clock className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-foreground/90">
+                <Clock className="w-4 h-4 text-primary" />
                 <span className="text-sm font-semibold">До завершения</span>
               </div>
               <div className="text-2xl font-bold text-foreground">
                 {plan.estimatedCompletion.months} мес. {plan.estimatedCompletion.days} дн.
               </div>
-              <p className="text-sm text-foreground/70 font-medium">при текущем темпе</p>
+              <p className="text-sm text-foreground/80 font-medium">при текущем темпе</p>
             </div>
           </CardContent>
         </Card>
@@ -311,10 +311,10 @@ export const RepaymentPlanSection = () => {
       />
 
       {/* Info Card */}
-      <Card className="border-accent/30 bg-accent/5">
+      <Card className="border-2 border-accent/40 bg-accent/10 shadow-lg backdrop-blur-sm">
         <CardContent className="pt-6">
-          <p className="text-sm text-muted-foreground">
-            <strong className="text-accent">Примечание:</strong> План основан на умной методологии расчета, 
+          <p className="text-sm text-foreground/90">
+            <strong className="text-accent font-bold">Примечание:</strong> План основан на умной методологии расчета, 
             которая анализирует ваш текущий прогресс и оставшееся количество намазов. Рекомендации 
             оптимизированы для равномерного распределения нагрузки. Вы можете изменить цель выше и 
             посмотреть, как это повлияет на время завершения.

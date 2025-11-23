@@ -179,13 +179,13 @@ export const CalculatorSection = () => {
   if (mode === "choice") {
     return (
       <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
+        <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Calculator className="w-5 h-5 text-primary" />
-              <CardTitle>Калькулятор пропущенных намазов</CardTitle>
+              <CardTitle className="text-foreground">Калькулятор пропущенных намазов</CardTitle>
             </div>
-            <CardDescription>
+            <CardDescription className="text-foreground/90 text-base">
               Выберите способ расчета пропущенных намазов
             </CardDescription>
           </CardHeader>
@@ -229,12 +229,12 @@ export const CalculatorSection = () => {
   if (mode === "manual") {
     return (
       <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
+        <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <CheckSquare className="w-5 h-5 text-primary" />
-                <CardTitle>Ручной ввод</CardTitle>
+                <CardTitle className="text-foreground">Ручной ввод</CardTitle>
               </div>
               <Button
                 variant="ghost"
@@ -255,7 +255,7 @@ export const CalculatorSection = () => {
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
       {/* Introduction Card */}
-      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
+      <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

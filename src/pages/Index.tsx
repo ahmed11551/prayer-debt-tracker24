@@ -133,12 +133,15 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-mosque pb-20 sm:pb-0">
-      <MainHeader />
-      <WelcomeDialog onNavigateToCalculator={handleNavigateToCalculator} />
+    <div className="min-h-screen bg-mosque pb-20 sm:pb-0 relative">
+      {/* Enhanced background overlay for better content visibility */}
+      <div className="fixed inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/60 pointer-events-none z-0" />
+      <div className="relative z-10">
+        <MainHeader />
+        <WelcomeDialog onNavigateToCalculator={handleNavigateToCalculator} />
 
-              {/* Main Content */}
-              <main className="container mx-auto px-4 py-6 sm:py-8 max-w-5xl pb-24 sm:pb-6 space-y-6">
+        {/* Main Content */}
+        <main className="container mx-auto px-4 py-6 sm:py-8 max-w-5xl pb-24 sm:pb-6 space-y-6">
                 {/* Компактный календарь целей на главном экране */}
                 {activeTab === "plan" && (
                   <div className="mb-6">
@@ -415,9 +418,10 @@ const Index = () => {
             <RemindersManager />
           </TabsContent>
         </Tabs>
-      </main>
+        </main>
 
-      <BottomNav />
+        <BottomNav />
+      </div>
     </div>
   );
 };

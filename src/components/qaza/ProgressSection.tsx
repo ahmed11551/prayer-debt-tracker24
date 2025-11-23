@@ -27,10 +27,10 @@ export const ProgressSection = () => {
   if (!userData) {
     return (
       <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
+        <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
           <CardContent className="pt-6">
             <div className="text-center py-8 space-y-4">
-              <p className="text-muted-foreground">
+              <p className="text-foreground/90 font-medium">
                 Для отображения прогресса необходимо сначала рассчитать долг намазов
               </p>
               <Button
@@ -54,12 +54,12 @@ export const ProgressSection = () => {
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
       {/* Overall Progress Card */}
-      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
+      <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl">Общий прогресс</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-2xl text-foreground">Общий прогресс</CardTitle>
+              <CardDescription className="text-foreground/90 text-base">
                 Восполнено {formatNumber(stats.totalCompleted)} из {formatNumber(stats.totalMissed)} намазов
               </CardDescription>
             </div>

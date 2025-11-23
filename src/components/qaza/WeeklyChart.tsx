@@ -41,7 +41,11 @@ export const WeeklyChart = ({ userData }: WeeklyChartProps) => {
     return data;
   }, [userData]);
 
-  const maxValue = Math.max(...weeklyData.map(d => d.value), 1);
+  const maxValue = useMemo(() => {
+    if (!weeklyData || weeklyData.length === 0) return 1;
+    const values = weeklyData.map(d => d.value || 0);
+    return Math.max(...values, 1);
+  }, [weeklyData]);
 
   const chartConfig = {
     value: {
@@ -51,7 +55,15 @@ export const WeeklyChart = ({ userData }: WeeklyChartProps) => {
   };
 
   if (!userData) {
-    return null;
+    return (
+      <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
+        <CardContent className="pt-6">
+          <div className="text-center py-8 text-muted-foreground">
+            Нет данных для отображения графика
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

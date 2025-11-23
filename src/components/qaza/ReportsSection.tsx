@@ -269,8 +269,38 @@ export const ReportsSection = () => {
 
       {/* Weekly Progress Chart and Streak Indicator */}
       <div className="grid gap-4 md:grid-cols-2">
-        <WeeklyChart userData={userData} />
-        <StreakIndicator />
+        {(() => {
+          try {
+            return <WeeklyChart userData={userData} />;
+          } catch (error) {
+            console.error("Error rendering WeeklyChart:", error);
+            return (
+              <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
+                <CardContent className="pt-6">
+                  <div className="text-center py-8 text-muted-foreground">
+                    Не удалось загрузить график
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          }
+        })()}
+        {(() => {
+          try {
+            return <StreakIndicator />;
+          } catch (error) {
+            console.error("Error rendering StreakIndicator:", error);
+            return (
+              <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
+                <CardContent className="pt-6">
+                  <div className="text-center py-8 text-muted-foreground">
+                    Не удалось загрузить индикатор
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          }
+        })()}
       </div>
 
       {/* Action Buttons */}

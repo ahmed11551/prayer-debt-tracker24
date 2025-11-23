@@ -28,8 +28,11 @@ export const BottomNav = () => {
               <Link
                 key={path}
                 to={path}
+                aria-label={`Перейти на страницу ${label}`}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "flex flex-col items-center justify-center gap-1 px-4 sm:px-6 py-2 rounded-xl transition-all duration-300 group relative min-w-[80px]",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2",
                   isActive
                     ? "text-accent"
                     : "text-muted-foreground hover:text-foreground"

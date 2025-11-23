@@ -118,3 +118,73 @@ self.addEventListener('message', (event) => {
   }
 });
 
+// Обработка push-уведомлений
+self.addEventListener('push', (event) => {
+  let notificationData = {
+    title: 'Трекер намазов',
+    body: 'Не забудьте выполнить намаз!',
+    icon: '/logo.svg',
+    badge: '/logo.svg',
+    tag: 'prayer-reminder',
+    requireInteraction: false,
+    data: {},
+  };
+
+  // Если данные пришли с сервера, используем их
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      notificationData = { ...notificationData, ...data };
+    } catch (e) {
+      notificationData.body = event.data.text();
+    }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(notificationData.title, {
+      body: notificationData.body,
+      icon: notificationData.icon,
+      badge: notificationData.badge,
+      tag: notificationData.tag,
+      requireInteraction: notificationData.requireInteraction,
+      data: notificationData.data,
+      actions: [
+        {
+          action: 'open',
+          title: 'Открыть приложение',
+        },
+        {
+          action: 'dismiss',
+          title: 'Закрыть',
+        },
+      ],
+    })
+  );
+});
+
+// Обработка кликов по уведомлениям
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'dismiss') {
+    return;
+  }
+
+  // Открытие приложения
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Если приложение уже открыто, фокусируемся на нем
+      for (let i = 0; i < clientList.length; i++) {
+        const client = clientList[i];
+        if (client.url === '/' && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // Иначе открываем новое окно
+      if (clients.openWindow) {
+        return clients.openWindow('/');
+      }
+    })
+  );
+});
+

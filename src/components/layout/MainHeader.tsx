@@ -3,6 +3,8 @@ import { useLocation } from "react-router-dom";
 import { Sparkles, User } from "lucide-react";
 import { TimerDisplay } from "./TimerDisplay";
 import { ProfileDialog } from "@/components/profile/ProfileDialog";
+import { CloudSyncButton } from "@/components/qaza/CloudSyncButton";
+import { ShareProgressButton } from "@/components/qaza/ShareProgressButton";
 
 export const MainHeader = () => {
   const location = useLocation();
@@ -62,21 +64,30 @@ export const MainHeader = () => {
               </div>
             </div>
             <div className="min-w-0 flex-1">
-              <h1 className="text-xl sm:text-2xl font-bold gradient-text truncate">
+              <h1 className="text-xl sm:text-2xl font-bold gradient-text truncate" role="heading" aria-level={1}>
                 {getTitle()}
               </h1>
-              <p className="text-xs sm:text-sm text-muted-foreground truncate">{getDescription()}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate" role="text" aria-label={getDescription()}>
+                {getDescription()}
+              </p>
             </div>
           </div>
           
-          {/* Иконка профиля справа */}
-          <button
-            onClick={() => setProfileOpen(true)}
-            className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-primary/90 backdrop-blur-sm border border-primary/50 flex items-center justify-center text-accent hover:bg-primary transition-colors shadow-sm"
-            aria-label="Профиль"
-          >
-            <User className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
+          {/* Дополнительные действия и профиль справа */}
+          <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2">
+              <CloudSyncButton />
+              <ShareProgressButton />
+            </div>
+            <button
+              onClick={() => setProfileOpen(true)}
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-primary/90 backdrop-blur-sm border border-primary/50 flex items-center justify-center text-accent hover:bg-primary transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              aria-label="Открыть профиль и настройки"
+              aria-expanded={profileOpen}
+            >
+              <User className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          </div>
         </div>
       </div>
       

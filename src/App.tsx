@@ -19,6 +19,8 @@ import { ConsentDialog } from "./components/qaza/ConsentDialog";
 import { startAutoSync, setupOnlineListener } from "./lib/offline-sync";
 import { analytics } from "./lib/analytics";
 import { notificationManager } from "./lib/notifications";
+import { pushNotificationManager } from "./lib/push-notifications";
+import { initSupabase } from "./lib/supabase";
 
 // Настройка React Query с обработкой ошибок
 const queryClient = new QueryClient({
@@ -60,6 +62,30 @@ const App = () => {
           }
         });
       }
+    }
+    
+    // Инициализация push-уведомлений
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      pushNotificationManager.initialize().then((initialized) => {
+        if (initialized) {
+          analytics.trackEvent({
+            action: "push_notifications_initialized",
+            category: "system",
+          });
+        }
+      });
+    }
+    
+    // Инициализация Supabase (если настроен)
+    if (import.meta.env.VITE_SUPABASE_URL) {
+      initSupabase().then((client) => {
+        if (client) {
+          analytics.trackEvent({
+            action: "supabase_initialized",
+            category: "system",
+          });
+        }
+      });
     }
     
     // Инициализация офлайн-синхронизации

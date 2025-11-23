@@ -169,7 +169,7 @@ export const RemindersManager = () => {
   }, [settings, permissionStatus]);
 
   return (
-    <Card className="bg-gradient-card shadow-medium border-border/50">
+    <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
       <CardHeader>
         <div className="flex items-center gap-2">
           <Bell className="w-5 h-5 text-primary" />

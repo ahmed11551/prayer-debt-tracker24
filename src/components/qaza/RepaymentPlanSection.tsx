@@ -175,7 +175,7 @@ export const RepaymentPlanSection = () => {
   // Показываем загрузку, если данные еще не загружены
   if (userDataLoading || loading) {
     return (
-      <Card className="bg-gradient-card shadow-medium border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardContent className="pt-6">
           <div className="text-center py-8 space-y-4">
             <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
@@ -188,7 +188,7 @@ export const RepaymentPlanSection = () => {
 
   if (!plan) {
     return (
-      <Card className="bg-gradient-card shadow-medium border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardContent className="pt-6">
           <div className="text-center py-8 space-y-4">
             <p className="text-muted-foreground">
@@ -219,7 +219,7 @@ export const RepaymentPlanSection = () => {
       )}
 
       {/* AI Plan Header */}
-      <Card className="bg-gradient-card shadow-medium border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-primary" />
@@ -235,18 +235,20 @@ export const RepaymentPlanSection = () => {
             {plan.recommendations.map((rec, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 border border-border/50"
+                className="flex items-center justify-between p-4 rounded-xl bg-white/10 border-2 border-white/20 shadow-md hover:bg-white/15 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-primary" />
+                  </div>
                   <div>
-                    <div className="font-semibold text-foreground">{rec.time}</div>
-                    <div className="text-sm text-muted-foreground">{rec.action}</div>
+                    <div className="font-bold text-foreground text-base">{rec.time}</div>
+                    <div className="text-sm text-foreground/80 font-medium">{rec.action}</div>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-lg px-3 py-1">
-                  {rec.count}
-                </Badge>
+                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-lg">{rec.count}</span>
+                </div>
               </div>
             ))}
           </div>
@@ -255,47 +257,47 @@ export const RepaymentPlanSection = () => {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-gradient-card border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardContent className="pt-6">
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="flex items-center gap-2 text-foreground/80">
                 <TrendingUp className="w-4 h-4" />
-                <span className="text-sm">Текущий темп</span>
+                <span className="text-sm font-semibold">Текущий темп</span>
               </div>
-              <div className="text-3xl font-bold gradient-text">
+              <div className="text-3xl font-bold text-foreground">
                 {plan.currentPace}
               </div>
-              <p className="text-sm text-muted-foreground">намазов/день</p>
+              <p className="text-sm text-foreground/70 font-medium">намазов/день</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-card border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardContent className="pt-6">
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="flex items-center gap-2 text-foreground/80">
                 <Target className="w-4 h-4" />
-                <span className="text-sm">Еженедельная цель</span>
+                <span className="text-sm font-semibold">Еженедельная цель</span>
               </div>
-              <div className="text-3xl font-bold gradient-text">
+              <div className="text-3xl font-bold text-foreground">
                 {plan.weeklyGoal}
               </div>
-              <p className="text-sm text-muted-foreground">намазов/неделя</p>
+              <p className="text-sm text-foreground/70 font-medium">намазов/неделя</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-card border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardContent className="pt-6">
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="flex items-center gap-2 text-foreground/80">
                 <Clock className="w-4 h-4" />
-                <span className="text-sm">До завершения</span>
+                <span className="text-sm font-semibold">До завершения</span>
               </div>
-              <div className="text-2xl font-bold gradient-text">
+              <div className="text-2xl font-bold text-foreground">
                 {plan.estimatedCompletion.months} мес. {plan.estimatedCompletion.days} дн.
               </div>
-              <p className="text-sm text-muted-foreground">при текущем темпе</p>
+              <p className="text-sm text-foreground/70 font-medium">при текущем темпе</p>
             </div>
           </CardContent>
         </Card>
@@ -322,3 +324,4 @@ export const RepaymentPlanSection = () => {
     </div>
   );
 };
+

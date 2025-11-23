@@ -78,7 +78,7 @@ export const InteractivePlanCalculator = ({
 
   if (!snapshot || totalRemaining === 0) {
     return (
-      <Card className="bg-gradient-card border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardContent className="pt-6">
           <div className="text-center py-8 text-muted-foreground">
             <Target className="w-12 h-12 mx-auto mb-4 text-primary/50" />
@@ -93,7 +93,7 @@ export const InteractivePlanCalculator = ({
   return (
     <div className="space-y-6">
       {/* Текущий план */}
-      <Card className="bg-gradient-card border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Clock className="w-5 h-5 text-primary" />
@@ -130,7 +130,7 @@ export const InteractivePlanCalculator = ({
       </Card>
 
       {/* Интерактивный калькулятор */}
-      <Card className="bg-gradient-card border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Calculator className="w-5 h-5 text-primary" />

@@ -138,7 +138,7 @@ const Index = () => {
       <WelcomeDialog onNavigateToCalculator={handleNavigateToCalculator} />
 
               {/* Main Content */}
-              <main className="container mx-auto px-4 py-4 sm:py-6 max-w-5xl pb-24 sm:pb-6">
+              <main className="container mx-auto px-4 py-6 sm:py-8 max-w-5xl pb-24 sm:pb-6 space-y-6">
                 {/* Компактный календарь целей на главном экране */}
                 {activeTab === "plan" && (
                   <div className="mb-6">
@@ -158,11 +158,11 @@ const Index = () => {
                 "relative flex w-full h-auto items-center",
                 "px-3 sm:px-4 py-2.5 gap-2 sm:gap-2.5",
                 "overflow-x-auto overflow-y-visible",
-                "bg-white/95 backdrop-blur-md",
-                "rounded-2xl border border-border/60",
-                "shadow-lg shadow-primary/5",
+                "bg-white/98 backdrop-blur-md",
+                "rounded-2xl border-2 border-border/80",
+                "shadow-xl shadow-primary/10",
                 "scroll-smooth snap-x snap-proximity",
-                "min-h-[48px] sm:min-h-[52px]",
+                "min-h-[52px] sm:min-h-[56px]",
                 "tabs-scroll-container"
               )}
               style={{ 
@@ -183,8 +183,8 @@ const Index = () => {
                   "snap-start",
                   "overflow-visible",
                   // Inactive state
-                  "text-foreground/90 bg-transparent",
-                  "hover:text-foreground hover:bg-primary/8",
+                  "text-gray-700 bg-transparent",
+                  "hover:text-gray-900 hover:bg-gray-100",
                   "active:scale-[0.98]",
                   // Active state
                   "data-[state=active]:bg-gradient-to-r",
@@ -213,8 +213,8 @@ const Index = () => {
                   "snap-start",
                   "overflow-visible",
                   // Inactive state
-                  "text-foreground/90 bg-transparent",
-                  "hover:text-foreground hover:bg-primary/8",
+                  "text-gray-700 bg-transparent",
+                  "hover:text-gray-900 hover:bg-gray-100",
                   "active:scale-[0.98]",
                   // Active state
                   "data-[state=active]:bg-gradient-to-r",
@@ -243,8 +243,8 @@ const Index = () => {
                   "snap-start",
                   "overflow-visible",
                   // Inactive state
-                  "text-foreground/90 bg-transparent",
-                  "hover:text-foreground hover:bg-primary/8",
+                  "text-gray-700 bg-transparent",
+                  "hover:text-gray-900 hover:bg-gray-100",
                   "active:scale-[0.98]",
                   // Active state
                   "data-[state=active]:bg-gradient-to-r",
@@ -273,8 +273,8 @@ const Index = () => {
                   "snap-start",
                   "overflow-visible",
                   // Inactive state
-                  "text-foreground/90 bg-transparent",
-                  "hover:text-foreground hover:bg-primary/8",
+                  "text-gray-700 bg-transparent",
+                  "hover:text-gray-900 hover:bg-gray-100",
                   "active:scale-[0.98]",
                   // Active state
                   "data-[state=active]:bg-gradient-to-r",
@@ -303,8 +303,8 @@ const Index = () => {
                   "snap-start",
                   "overflow-visible",
                   // Inactive state
-                  "text-foreground/90 bg-transparent",
-                  "hover:text-foreground hover:bg-primary/8",
+                  "text-gray-700 bg-transparent",
+                  "hover:text-gray-900 hover:bg-gray-100",
                   "active:scale-[0.98]",
                   // Active state
                   "data-[state=active]:bg-gradient-to-r",
@@ -333,8 +333,8 @@ const Index = () => {
                   "snap-start",
                   "overflow-visible",
                   // Inactive state
-                  "text-foreground/90 bg-transparent",
-                  "hover:text-foreground hover:bg-primary/8",
+                  "text-gray-700 bg-transparent",
+                  "hover:text-gray-900 hover:bg-gray-100",
                   "active:scale-[0.98]",
                   // Active state
                   "data-[state=active]:bg-gradient-to-r",
@@ -363,8 +363,8 @@ const Index = () => {
                   "snap-start",
                   "overflow-visible",
                   // Inactive state
-                  "text-foreground/90 bg-transparent",
-                  "hover:text-foreground hover:bg-primary/8",
+                  "text-gray-700 bg-transparent",
+                  "hover:text-gray-900 hover:bg-gray-100",
                   "active:scale-[0.98]",
                   // Active state
                   "data-[state=active]:bg-gradient-to-r",
@@ -383,34 +383,34 @@ const Index = () => {
             </TabsList>
           </div>
 
-          <TabsContent value="plan">
+          <TabsContent value="plan" className="space-y-6 mt-6">
             <RepaymentPlanSection />
           </TabsContent>
 
-          <TabsContent value="progress">
+          <TabsContent value="progress" className="space-y-6 mt-6">
             <ProgressSection />
           </TabsContent>
 
-          <TabsContent value="travel">
+          <TabsContent value="travel" className="space-y-6 mt-6">
             <TravelPrayersSection />
           </TabsContent>
 
-                  <TabsContent value="reports" className="space-y-6">
+                  <TabsContent value="reports" className="space-y-6 mt-6">
                     <ReportsSection />
                     <BadgesSection />
                     <ShareAndFriends />
                   </TabsContent>
 
-          <TabsContent value="calculator" className="space-y-6">
+          <TabsContent value="calculator" className="space-y-6 mt-6">
             <CalculatorSection />
             <TermsDictionary />
           </TabsContent>
 
-          <TabsContent value="goals">
+          <TabsContent value="goals" className="space-y-6 mt-6">
             <SmartGoalsSection />
           </TabsContent>
 
-          <TabsContent value="calendar" className="space-y-6">
+          <TabsContent value="calendar" className="space-y-6 mt-6">
             <PrayerCalendar />
             <RemindersManager />
           </TabsContent>

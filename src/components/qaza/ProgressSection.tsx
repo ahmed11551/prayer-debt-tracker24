@@ -27,7 +27,7 @@ export const ProgressSection = () => {
   if (!userData) {
     return (
       <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-gradient-card shadow-medium border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardContent className="pt-6">
             <div className="text-center py-8 space-y-4">
               <p className="text-muted-foreground">
@@ -54,7 +54,7 @@ export const ProgressSection = () => {
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
       {/* Overall Progress Card */}
-      <Card className="bg-gradient-card shadow-medium border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>

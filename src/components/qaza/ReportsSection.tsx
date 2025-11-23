@@ -108,7 +108,7 @@ export const ReportsSection = () => {
   if (userDataLoading) {
     return (
       <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-gradient-card shadow-medium border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardContent className="pt-6">
             <div className="text-center py-8 space-y-4">
               <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
@@ -126,7 +126,7 @@ export const ReportsSection = () => {
   if (!userData || !isValidUserData) {
     return (
       <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-gradient-card shadow-medium border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardContent className="pt-6">
             <div className="text-center py-8 space-y-4">
               <p className="text-muted-foreground">
@@ -212,7 +212,7 @@ export const ReportsSection = () => {
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
       {/* Header Card */}
-      <Card className="bg-gradient-card shadow-medium border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Ваш духовный путь</CardTitle>
           <CardDescription>
@@ -224,7 +224,7 @@ export const ReportsSection = () => {
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {statsArray.map((stat) => (
-          <Card key={stat.label} className="bg-gradient-card border-border/50">
+          <Card key={stat.label} className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
             <CardContent className="pt-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-muted-foreground">

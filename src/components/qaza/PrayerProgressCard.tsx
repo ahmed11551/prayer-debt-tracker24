@@ -20,7 +20,7 @@ export const PrayerProgressCard = memo(({
   const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (
-    <Card className="bg-gradient-card hover:shadow-medium transition-shadow duration-300 border-border/50">
+    <Card className="bg-card/95 hover:shadow-lg transition-shadow duration-300 border-border/50">
       <CardContent className="pt-6">
         <div className="space-y-3">
           <div className="flex items-center justify-between">

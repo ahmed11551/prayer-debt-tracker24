@@ -27,7 +27,7 @@ export const StreakIndicator = () => {
 
   return (
     <Card className={cn(
-      "bg-gradient-card border-border/50 shadow-medium transition-all",
+      "bg-card/95 shadow-lg border-border/80 backdrop-blur-sm shadow-medium transition-all",
       isActive && "border-accent/30 shadow-glow-gold"
     )}>
       <CardHeader>

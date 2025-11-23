@@ -121,7 +121,7 @@ export const ShareAndFriends = () => {
   if (userDataLoading) {
     return (
       <div className="space-y-6">
-        <Card className="bg-gradient-card shadow-medium border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardContent className="pt-6">
             <div className="text-center py-8 space-y-4">
               <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
@@ -136,7 +136,7 @@ export const ShareAndFriends = () => {
   return (
     <div className="space-y-6">
       {/* Achievements Card */}
-      <Card className="bg-gradient-card shadow-medium border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -223,7 +223,7 @@ export const ShareAndFriends = () => {
       </Card>
 
       {/* Friends Leaderboard */}
-      <Card className="bg-gradient-card shadow-medium border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

@@ -151,7 +151,7 @@ export const ManualInputSection = () => {
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
       {/* Header */}
-      <Card className="bg-gradient-card shadow-medium border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
             <Calculator className="w-6 h-6 text-primary" />
@@ -178,7 +178,7 @@ export const ManualInputSection = () => {
       )}
 
       {/* Missed Prayers */}
-      <Card className="bg-gradient-card border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Пропущенные обязательные намазы</CardTitle>
           <CardDescription>
@@ -214,7 +214,7 @@ export const ManualInputSection = () => {
       </Card>
 
       {/* Travel Prayers */}
-      <Card className="bg-gradient-card border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Сафар-намазы (путешествия)</CardTitle>
           <CardDescription>

@@ -55,7 +55,7 @@ export const WeeklyChart = ({ userData }: WeeklyChartProps) => {
   }
 
   return (
-    <Card className="bg-gradient-card border-border/50 shadow-medium">
+    <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm shadow-medium">
       <CardHeader>
         <CardTitle className="text-xl">Прогресс за неделю</CardTitle>
         <CardDescription className="text-muted-foreground">

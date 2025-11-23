@@ -179,7 +179,7 @@ export const CalculatorSection = () => {
   if (mode === "choice") {
     return (
       <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-gradient-card shadow-medium border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Calculator className="w-5 h-5 text-primary" />
@@ -229,7 +229,7 @@ export const CalculatorSection = () => {
   if (mode === "manual") {
     return (
       <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-gradient-card shadow-medium border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -255,7 +255,7 @@ export const CalculatorSection = () => {
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
       {/* Introduction Card */}
-      <Card className="bg-gradient-card shadow-medium border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

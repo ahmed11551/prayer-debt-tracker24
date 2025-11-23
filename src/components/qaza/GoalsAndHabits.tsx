@@ -182,7 +182,7 @@ export const GoalsAndHabits = () => {
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-500">
       {/* Create Goal Card */}
-      <Card className="bg-gradient-card shadow-medium border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Target className="w-5 h-5 text-primary" />
@@ -241,7 +241,7 @@ export const GoalsAndHabits = () => {
 
       {/* Active Goals */}
       {activeGoals.length > 0 && (
-        <Card className="bg-gradient-card shadow-medium border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-primary" />
@@ -285,7 +285,7 @@ export const GoalsAndHabits = () => {
 
       {/* Completed Goals */}
       {completedGoals.length > 0 && (
-        <Card className="bg-gradient-card shadow-medium border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Trophy className="w-5 h-5 text-primary" />
@@ -321,7 +321,7 @@ export const GoalsAndHabits = () => {
       )}
 
       {goals.length === 0 && (
-        <Card className="bg-gradient-card border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardContent className="pt-6">
             <div className="text-center py-8 text-muted-foreground">
               Нет активных целей. Создайте первую цель для отслеживания прогресса!

@@ -11,7 +11,7 @@ export const TravelPrayersSection = () => {
   if (loading) {
     return (
       <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-gradient-card shadow-medium border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardContent className="pt-6">
             <div className="text-center py-8 text-muted-foreground">Загрузка...</div>
           </CardContent>
@@ -23,7 +23,7 @@ export const TravelPrayersSection = () => {
   if (!userData) {
     return (
       <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-gradient-card shadow-medium border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardContent className="pt-6">
             <div className="text-center py-8 space-y-4">
               <p className="text-muted-foreground">
@@ -61,7 +61,7 @@ export const TravelPrayersSection = () => {
       </Alert>
 
       {/* Travel Prayers Header */}
-      <Card className="bg-gradient-card shadow-medium border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Plane className="w-5 h-5 text-primary" />
@@ -80,7 +80,7 @@ export const TravelPrayersSection = () => {
           return (
             <Card
               key={prayer.name}
-              className="bg-gradient-card hover:shadow-medium transition-shadow duration-300 border-border/50"
+              className="bg-card/95 hover:shadow-lg transition-shadow duration-300 border-border/50"
             >
               <CardContent className="pt-6">
                 <div className="space-y-4">

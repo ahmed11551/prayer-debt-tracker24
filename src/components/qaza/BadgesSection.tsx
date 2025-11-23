@@ -163,7 +163,7 @@ export const BadgesSection = () => {
       </div>
 
       {/* Общий прогресс */}
-      <Card className="bg-gradient-card shadow-medium border-border/50">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
@@ -183,7 +183,7 @@ export const BadgesSection = () => {
 
       {/* Текущие streaks */}
       {(currentStreaks.prayer > 0 || currentStreaks.zikr > 0 || currentStreaks.quran > 0) && (
-        <Card className="bg-gradient-card shadow-medium border-border/50">
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Flame className="w-5 h-5 text-orange-500" />
@@ -240,7 +240,7 @@ export const BadgesSection = () => {
             <Card
               key={badge.id}
               className={cn(
-                "bg-gradient-card shadow-medium border-border/50 transition-all duration-300",
+                "bg-card/95 shadow-lg border-border/80 backdrop-blur-sm transition-all duration-300",
                 isUnlocked 
                   ? "border-primary/50 shadow-glow" 
                   : "opacity-60"

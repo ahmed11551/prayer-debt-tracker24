@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Share2, TrendingUp, Calendar, Target, Clock, Loader2 } from "lucide-react";
+import { Download, Share2, TrendingUp, Calendar, Target, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { eReplikaAPI } from "@/lib/api";
 import { useUserData } from "@/hooks/useUserData";
@@ -9,6 +9,8 @@ import { calculateProgressStats, formatNumber } from "@/lib/prayer-utils";
 import { WeeklyChart } from "./WeeklyChart";
 import { StreakIndicator } from "./StreakIndicator";
 import { useDebounce } from "@/hooks/useDebounce";
+import { LoadingCard } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const ReportsSection = () => {
   const { toast } = useToast();
@@ -215,19 +217,21 @@ export const ReportsSection = () => {
       </Card>
 
       {/* Stats Grid - Fixed heights for stability */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full">
         {statsArray.map((stat) => (
-          <Card key={stat.label} className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm w-full min-h-[140px] flex flex-col">
-            <CardContent className="pt-6 flex-1 flex flex-col">
-              <div className="space-y-2 flex-1">
+          <Card key={stat.label} className="bg-gradient-to-br from-card/95 to-card/90 shadow-lg border-2 border-primary/20 backdrop-blur-sm w-full min-h-[140px] sm:min-h-[160px] flex flex-col hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
+            <CardContent className="pt-4 sm:pt-6 flex-1 flex flex-col">
+              <div className="space-y-2 sm:space-y-3 flex-1">
                 <div className="flex items-center gap-2 text-muted-foreground min-h-[20px]">
-                  <stat.icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-sm break-words line-clamp-2">{stat.label}</span>
+                  <div className="p-1.5 rounded-lg bg-primary/10">
+                    <stat.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 text-primary" />
+                  </div>
+                  <span className="text-xs sm:text-sm break-words line-clamp-2 font-medium">{stat.label}</span>
                 </div>
-                <div className="text-3xl font-bold gradient-text break-words min-h-[40px] flex items-center">
+                <div className="text-2xl sm:text-3xl font-bold gradient-text break-words min-h-[40px] flex items-center">
                   {stat.value}
                 </div>
-                <p className="text-sm text-muted-foreground break-words line-clamp-2">{stat.description}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground break-words line-clamp-2 leading-relaxed">{stat.description}</p>
               </div>
             </CardContent>
           </Card>
@@ -235,25 +239,25 @@ export const ReportsSection = () => {
       </div>
 
       {/* Progress Summary */}
-      <Card className="bg-gradient-dusk text-white shadow-strong w-full">
-        <CardContent className="pt-6">
-          <div className="space-y-4 w-full">
-            <h3 className="text-xl font-semibold break-words">Прогноз завершения</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center w-full">
-              <div className="space-y-1 min-h-[80px] flex flex-col justify-center">
-                <div className="text-3xl font-bold break-words">{stats.monthsToComplete}</div>
-                <div className="text-sm opacity-90">месяцев</div>
+      <Card className="bg-gradient-dusk text-white shadow-strong w-full border-2 border-primary/30 hover:shadow-glow transition-shadow duration-300">
+        <CardContent className="pt-6 sm:pt-8">
+          <div className="space-y-4 sm:space-y-6 w-full">
+            <h3 className="text-lg sm:text-xl font-bold break-words text-center">Прогноз завершения</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center w-full">
+              <div className="space-y-2 min-h-[90px] flex flex-col justify-center p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                <div className="text-3xl sm:text-4xl font-bold break-words">{stats.monthsToComplete}</div>
+                <div className="text-xs sm:text-sm opacity-90 font-medium">месяцев</div>
               </div>
-              <div className="space-y-1 min-h-[80px] flex flex-col justify-center">
-                <div className="text-3xl font-bold break-words">{stats.daysRemaining}</div>
-                <div className="text-sm opacity-90">дней</div>
+              <div className="space-y-2 min-h-[90px] flex flex-col justify-center p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                <div className="text-3xl sm:text-4xl font-bold break-words">{stats.daysRemaining}</div>
+                <div className="text-xs sm:text-sm opacity-90 font-medium">дней</div>
               </div>
-              <div className="space-y-1 min-h-[80px] flex flex-col justify-center">
-                <div className="text-3xl font-bold break-words">{stats.overallProgress}%</div>
-                <div className="text-sm opacity-90">выполнено</div>
+              <div className="space-y-2 min-h-[90px] flex flex-col justify-center p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                <div className="text-3xl sm:text-4xl font-bold break-words">{stats.overallProgress}%</div>
+                <div className="text-xs sm:text-sm opacity-90 font-medium">выполнено</div>
               </div>
             </div>
-            <p className="text-sm opacity-90 text-center break-words">
+            <p className="text-xs sm:text-sm opacity-90 text-center break-words font-medium">
               При текущем темпе ({stats.dailyPace} намазов/день)
             </p>
           </div>

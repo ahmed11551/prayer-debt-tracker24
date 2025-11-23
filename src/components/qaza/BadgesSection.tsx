@@ -163,20 +163,25 @@ export const BadgesSection = () => {
       </div>
 
       {/* Общий прогресс */}
-      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm w-full">
+      <Card className="bg-gradient-to-br from-card/95 to-card/90 shadow-lg border-2 border-primary/20 backdrop-blur-sm w-full hover:shadow-xl transition-shadow duration-300">
         <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="flex items-center gap-2 text-base sm:text-lg break-words">
-            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg break-words text-foreground">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-primary" />
+            </div>
             <span>Общий прогресс</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 sm:space-y-4 pt-0">
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs sm:text-sm">
-              <span className="break-words">Разблокировано бейджей</span>
-              <span className="font-semibold flex-shrink-0 ml-2">{stats.unlocked} / {stats.total}</span>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center text-xs sm:text-sm">
+              <span className="break-words font-medium text-foreground/90">Разблокировано бейджей</span>
+              <span className="font-bold text-primary flex-shrink-0 ml-2 text-base sm:text-lg">{stats.unlocked} / {stats.total}</span>
             </div>
-            <Progress value={stats.progress} className="h-2 sm:h-3 w-full" />
+            <Progress value={stats.progress} className="h-3 sm:h-4 w-full bg-muted/50" />
+            <div className="text-right">
+              <span className="text-xs sm:text-sm text-muted-foreground font-medium">{Math.round(stats.progress)}%</span>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -216,16 +221,16 @@ export const BadgesSection = () => {
       )}
 
       {/* Фильтры */}
-      <div className="w-full overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div className="w-full overflow-x-auto -mx-3 sm:-mx-4 px-3 sm:px-4 scrollbar-hide">
         <Tabs value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as BadgeCategory | "all")} className="w-full">
-          <TabsList className="w-full sm:w-auto inline-flex h-auto p-1 bg-muted/50 rounded-lg overflow-x-auto scrollbar-hide">
-            <TabsTrigger value="all" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Все</TabsTrigger>
-            <TabsTrigger value="prayer" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Намазы</TabsTrigger>
-            <TabsTrigger value="quran" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Коран</TabsTrigger>
-            <TabsTrigger value="zikr" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Зикры</TabsTrigger>
-            <TabsTrigger value="sadaqa" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Садака</TabsTrigger>
-            <TabsTrigger value="streak" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Серии</TabsTrigger>
-            <TabsTrigger value="completion" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Завершение</TabsTrigger>
+          <TabsList className="w-full sm:w-auto inline-flex h-auto p-1.5 bg-muted/60 backdrop-blur-sm border border-border/40 shadow-sm rounded-xl overflow-x-auto scrollbar-hide scroll-smooth">
+            <TabsTrigger value="all" className="flex-shrink-0 whitespace-nowrap min-h-[44px]">Все</TabsTrigger>
+            <TabsTrigger value="prayer" className="flex-shrink-0 whitespace-nowrap min-h-[44px]">Намазы</TabsTrigger>
+            <TabsTrigger value="quran" className="flex-shrink-0 whitespace-nowrap min-h-[44px]">Коран</TabsTrigger>
+            <TabsTrigger value="zikr" className="flex-shrink-0 whitespace-nowrap min-h-[44px]">Зикры</TabsTrigger>
+            <TabsTrigger value="sadaqa" className="flex-shrink-0 whitespace-nowrap min-h-[44px]">Садака</TabsTrigger>
+            <TabsTrigger value="streak" className="flex-shrink-0 whitespace-nowrap min-h-[44px]">Серии</TabsTrigger>
+            <TabsTrigger value="completion" className="flex-shrink-0 whitespace-nowrap min-h-[44px]">Завершение</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -269,23 +274,23 @@ export const BadgesSection = () => {
                   )}
                 </div>
               </CardHeader>
-              <CardContent className="space-y-2 sm:space-y-3 flex-1 flex flex-col pt-0">
-                <p className="text-xs sm:text-sm text-muted-foreground break-words line-clamp-2 flex-shrink-0">{badge.description}</p>
+              <CardContent className="space-y-3 sm:space-y-4 flex-1 flex flex-col pt-0">
+                <p className="text-xs sm:text-sm text-muted-foreground break-words line-clamp-2 flex-shrink-0 leading-relaxed">{badge.description}</p>
                 
-                <div className="space-y-1 sm:space-y-2 flex-shrink-0">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Прогресс</span>
-                    <span className="font-semibold flex-shrink-0 ml-2">{Math.round(badge.progress)}%</span>
+                <div className="space-y-2 flex-shrink-0 bg-muted/20 rounded-lg p-3 border border-border/30">
+                  <div className="flex justify-between items-center text-xs sm:text-sm">
+                    <span className="text-foreground/80 font-medium">Прогресс</span>
+                    <span className="font-bold text-primary flex-shrink-0 ml-2 text-sm sm:text-base">{Math.round(badge.progress)}%</span>
                   </div>
-                  <Progress value={badge.progress} className="h-1.5 sm:h-2 w-full" />
+                  <Progress value={badge.progress} className="h-2 sm:h-2.5 w-full bg-muted/50" />
                 </div>
 
-                <div className="flex items-center justify-between gap-2 mt-auto pt-2 flex-shrink-0">
-                  <Badge variant="outline" className={cn("text-xs flex-shrink-0", colorClass)}>
+                <div className="flex items-center justify-between gap-2 mt-auto pt-2 flex-shrink-0 border-t border-border/30">
+                  <Badge variant="outline" className={cn("text-xs flex-shrink-0 font-semibold px-2 py-1", colorClass)}>
                     {getBadgeLevelLabel(badge.level)}
                   </Badge>
                   {isUnlocked && badge.unlocked_at && (
-                    <span className="text-xs text-muted-foreground flex-shrink-0 whitespace-nowrap">
+                    <span className="text-xs text-muted-foreground flex-shrink-0 whitespace-nowrap font-medium">
                       {new Date(badge.unlocked_at).toLocaleDateString('ru-RU')}
                     </span>
                   )}

@@ -292,6 +292,39 @@ All colors MUST be HSL.
     }
   }
 
+  /* Scrollbar hide utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Enhanced tab styles */
+  [role="tablist"] {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.3) transparent;
+  }
+
+  [role="tablist"]::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  [role="tablist"]::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  [role="tablist"]::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.3);
+    border-radius: 2px;
+  }
+
+  [role="tablist"]::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
+
   /* Hide scrollbar but keep functionality */
   .scrollbar-hide {
     -ms-overflow-style: none;  /* IE and Edge */

@@ -12,7 +12,8 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-auto items-center justify-center rounded-lg bg-muted/50 p-1 text-muted-foreground",
+      "inline-flex h-auto items-center justify-center rounded-xl bg-muted/60 backdrop-blur-sm p-1.5 text-muted-foreground border border-border/40 shadow-sm",
+      "overflow-x-auto scrollbar-hide scroll-smooth",
       className,
     )}
     {...props}
@@ -27,7 +28,14 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-xl px-4 py-2 text-sm font-medium text-foreground/70 transition-all ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow data-[state=active]:font-semibold disabled:pointer-events-none disabled:opacity-50",
+      "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium",
+      "text-foreground/70 transition-all duration-200",
+      "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "hover:text-foreground hover:bg-muted/50",
+      "data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:font-semibold",
+      "data-[state=active]:border data-[state=active]:border-primary/30",
+      "disabled:pointer-events-none disabled:opacity-50",
+      "min-h-[44px] flex-shrink-0",
       className,
     )}
     {...props}

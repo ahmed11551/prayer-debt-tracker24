@@ -8,6 +8,7 @@ import { useUserData } from "@/hooks/useUserData";
 import { calculateProgressStats, formatNumber } from "@/lib/prayer-utils";
 import { WeeklyChart } from "./WeeklyChart";
 import { StreakIndicator } from "./StreakIndicator";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export const ReportsSection = () => {
   const { toast } = useToast();
@@ -58,7 +59,7 @@ export const ReportsSection = () => {
     }
   }, [userData, isValidUserData]);
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadPDFInternal = async () => {
     if (!userData) {
       toast({
         title: "Ошибка",
@@ -67,6 +68,8 @@ export const ReportsSection = () => {
       });
       return;
     }
+
+    if (loading) return; // Защита от повторного клика
 
     setLoading(true);
     try {
@@ -97,12 +100,15 @@ export const ReportsSection = () => {
     }
   };
 
-  const handleShare = () => {
+  // Защита от двойного клика
+  const handleDownloadPDF = useDebounce(handleDownloadPDFInternal, 1000);
+
+  const handleShare = useDebounce(() => {
     toast({
       title: "Поделиться прогрессом",
       description: "Используйте функцию 'Поделиться' в разделе достижений",
     });
-  };
+  }, 300);
 
   // Показываем загрузку
   if (userDataLoading) {
@@ -197,31 +203,31 @@ export const ReportsSection = () => {
   }, [stats]);
 
   return (
-    <div className="space-y-6 animate-in fade-in-50 duration-500">
+    <div className="space-y-6 animate-in fade-in-50 duration-500 w-full">
       {/* Header Card */}
-      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm w-full">
         <CardHeader>
-          <CardTitle className="text-2xl">Ваш духовный путь</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl break-words">Ваш духовный путь</CardTitle>
+          <CardDescription className="break-words">
             Детальная статистика восполнения пропущенных намазов
           </CardDescription>
         </CardHeader>
       </Card>
 
-      {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* Stats Grid - Fixed heights for stability */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full">
         {statsArray.map((stat) => (
-          <Card key={stat.label} className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
-            <CardContent className="pt-6">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <stat.icon className="w-4 h-4" />
-                  <span className="text-sm">{stat.label}</span>
+          <Card key={stat.label} className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm w-full min-h-[140px] flex flex-col">
+            <CardContent className="pt-6 flex-1 flex flex-col">
+              <div className="space-y-2 flex-1">
+                <div className="flex items-center gap-2 text-muted-foreground min-h-[20px]">
+                  <stat.icon className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-sm break-words line-clamp-2">{stat.label}</span>
                 </div>
-                <div className="text-3xl font-bold gradient-text">
+                <div className="text-3xl font-bold gradient-text break-words min-h-[40px] flex items-center">
                   {stat.value}
                 </div>
-                <p className="text-sm text-muted-foreground">{stat.description}</p>
+                <p className="text-sm text-muted-foreground break-words line-clamp-2">{stat.description}</p>
               </div>
             </CardContent>
           </Card>
@@ -229,25 +235,25 @@ export const ReportsSection = () => {
       </div>
 
       {/* Progress Summary */}
-      <Card className="bg-gradient-dusk text-white shadow-strong">
+      <Card className="bg-gradient-dusk text-white shadow-strong w-full">
         <CardContent className="pt-6">
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Прогноз завершения</h3>
-            <div className="grid md:grid-cols-3 gap-4 text-center">
-              <div className="space-y-1">
-                <div className="text-3xl font-bold">{stats.monthsToComplete}</div>
+          <div className="space-y-4 w-full">
+            <h3 className="text-xl font-semibold break-words">Прогноз завершения</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center w-full">
+              <div className="space-y-1 min-h-[80px] flex flex-col justify-center">
+                <div className="text-3xl font-bold break-words">{stats.monthsToComplete}</div>
                 <div className="text-sm opacity-90">месяцев</div>
               </div>
-              <div className="space-y-1">
-                <div className="text-3xl font-bold">{stats.daysRemaining}</div>
+              <div className="space-y-1 min-h-[80px] flex flex-col justify-center">
+                <div className="text-3xl font-bold break-words">{stats.daysRemaining}</div>
                 <div className="text-sm opacity-90">дней</div>
               </div>
-              <div className="space-y-1">
-                <div className="text-3xl font-bold">{stats.overallProgress}%</div>
+              <div className="space-y-1 min-h-[80px] flex flex-col justify-center">
+                <div className="text-3xl font-bold break-words">{stats.overallProgress}%</div>
                 <div className="text-sm opacity-90">выполнено</div>
               </div>
             </div>
-            <p className="text-sm opacity-90 text-center">
+            <p className="text-sm opacity-90 text-center break-words">
               При текущем темпе ({stats.dailyPace} намазов/день)
             </p>
           </div>
@@ -255,14 +261,14 @@ export const ReportsSection = () => {
       </Card>
 
       {/* Weekly Progress Chart and Streak Indicator */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 w-full">
         {(() => {
           try {
-            return <WeeklyChart userData={userData} />;
+            return <div className="w-full min-w-0"><WeeklyChart userData={userData} /></div>;
           } catch (error) {
             console.error("Error rendering WeeklyChart:", error);
             return (
-              <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
+              <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md w-full min-h-[300px]">
                 <CardContent className="pt-6">
                   <div className="text-center py-8 text-muted-foreground">
                     Не удалось загрузить график
@@ -274,11 +280,11 @@ export const ReportsSection = () => {
         })()}
         {(() => {
           try {
-            return <StreakIndicator />;
+            return <div className="w-full min-w-0"><StreakIndicator /></div>;
           } catch (error) {
             console.error("Error rendering StreakIndicator:", error);
             return (
-              <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
+              <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md w-full min-h-[300px]">
                 <CardContent className="pt-6">
                   <div className="text-center py-8 text-muted-foreground">
                     Не удалось загрузить индикатор
@@ -291,49 +297,51 @@ export const ReportsSection = () => {
       </div>
 
       {/* Action Buttons */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 w-full">
         <Button
           onClick={handleDownloadPDF}
           disabled={loading}
           size="lg"
-          className="bg-primary hover:opacity-90 transition-opacity shadow-glow"
+          className="bg-primary hover:opacity-90 transition-opacity shadow-glow w-full min-h-[44px]"
+          aria-label="Скачать PDF отчёт"
         >
-          <Download className="w-5 h-5 mr-2" />
-          {loading ? "Формирование..." : "Скачать PDF отчёт"}
+          <Download className="w-5 h-5 mr-2" aria-hidden="true" />
+          <span className="break-words">{loading ? "Формирование..." : "Скачать PDF отчёт"}</span>
         </Button>
         <Button
           onClick={handleShare}
           size="lg"
           variant="outline"
-          className="border-primary hover:bg-primary/10"
+          className="border-primary hover:bg-primary/10 w-full min-h-[44px]"
+          aria-label="Поделиться прогрессом"
         >
-          <Share2 className="w-5 h-5 mr-2" />
-          Поделиться прогрессом
+          <Share2 className="w-5 h-5 mr-2" aria-hidden="true" />
+          <span className="break-words">Поделиться прогрессом</span>
         </Button>
       </div>
 
       {/* Achievements Card */}
-      <Card className="border-accent/30 bg-accent/5">
+      <Card className="border-accent/30 bg-accent/5 w-full">
         <CardHeader>
-          <CardTitle className="text-accent">🏆 Достижения</CardTitle>
+          <CardTitle className="text-accent break-words">🏆 Достижения</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 rounded-lg bg-card">
-              <div className="text-3xl mb-2">✨</div>
-              <div className="text-sm font-semibold">Первые 100</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+            <div className="text-center p-4 rounded-lg bg-card min-h-[120px] flex flex-col justify-center">
+              <div className="text-3xl mb-2" aria-hidden="true">✨</div>
+              <div className="text-sm font-semibold break-words line-clamp-2">Первые 100</div>
             </div>
-            <div className="text-center p-4 rounded-lg bg-card">
-              <div className="text-3xl mb-2">🔥</div>
-              <div className="text-sm font-semibold">7 дней подряд</div>
+            <div className="text-center p-4 rounded-lg bg-card min-h-[120px] flex flex-col justify-center">
+              <div className="text-3xl mb-2" aria-hidden="true">🔥</div>
+              <div className="text-sm font-semibold break-words line-clamp-2">7 дней подряд</div>
             </div>
-            <div className="text-center p-4 rounded-lg bg-card opacity-50">
-              <div className="text-3xl mb-2">🌟</div>
-              <div className="text-sm font-semibold">1000 намазов</div>
+            <div className="text-center p-4 rounded-lg bg-card opacity-50 min-h-[120px] flex flex-col justify-center">
+              <div className="text-3xl mb-2" aria-hidden="true">🌟</div>
+              <div className="text-sm font-semibold break-words line-clamp-2">1000 намазов</div>
             </div>
-            <div className="text-center p-4 rounded-lg bg-card opacity-50">
-              <div className="text-3xl mb-2">🎯</div>
-              <div className="text-sm font-semibold">50% пути</div>
+            <div className="text-center p-4 rounded-lg bg-card opacity-50 min-h-[120px] flex flex-col justify-center">
+              <div className="text-3xl mb-2" aria-hidden="true">🎯</div>
+              <div className="text-sm font-semibold break-words line-clamp-2">50% пути</div>
             </div>
           </div>
         </CardContent>

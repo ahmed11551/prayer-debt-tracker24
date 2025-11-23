@@ -40,7 +40,8 @@ export const CalculatorSection = () => {
   const [travelPeriods, setTravelPeriods] = useState<TravelPeriod[]>([]);
   const [travelPeriodsDialogOpen, setTravelPeriodsDialogOpen] = useState(false);
 
-  const handleCalculate = async () => {
+  const handleCalculateInternal = async () => {
+    if (loading) return; // Защита от повторного клика
     setErrors([]);
     setLoading(true);
 
@@ -175,6 +176,9 @@ export const CalculatorSection = () => {
       setLoading(false);
     }
   };
+
+  // Защита от двойного клика
+  const handleCalculate = useDebounce(handleCalculateInternal, 1000);
 
   // Экран выбора режима
   if (mode === "choice") {

@@ -56,7 +56,8 @@ export const ManualInputSection = () => {
     }
   };
 
-  const handleSave = async () => {
+  const handleSaveInternal = async () => {
+    if (loading) return; // Защита от повторного клика
     setErrors([]);
     setLoading(true);
 

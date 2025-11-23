@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Dhikr from "./pages/Dhikr";
+import Goals from "./pages/Goals";
+import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 import { initTelegramWebApp } from "./lib/telegram";
 import { ConsentDialog } from "./components/qaza/ConsentDialog";
@@ -40,6 +42,8 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dhikr" element={<Dhikr />} />
+            <Route path="/goals" element={<Goals />} />
+            <Route path="/reports" element={<Reports />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

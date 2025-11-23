@@ -164,8 +164,33 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    /* Улучшенная мобильная адаптация */
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
   body {
     @apply bg-background text-foreground;
+    /* Улучшенная читаемость на мобильных */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Минимальные размеры для touch targets (44x44px согласно WCAG) */
+  button, a, input[type="button"], input[type="submit"], [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Улучшенная типографика для мобильных */
+  @media (max-width: 640px) {
+    body {
+      font-size: 16px; /* Предотвращает автоматическое масштабирование на iOS */
+      line-height: 1.6;
+    }
   }
 
   /* Hide scrollbar but keep functionality */

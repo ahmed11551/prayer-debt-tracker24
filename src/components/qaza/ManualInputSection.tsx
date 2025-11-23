@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { prayerDebtAPI, localStorageAPI } from "@/lib/api";
 import { getTelegramUserId } from "@/lib/telegram";
 import { logCalculation } from "@/lib/audit-log";
+import { validatePositiveInteger } from "@/lib/validation";
 import type { MissedPrayers, TravelPrayers } from "@/types/prayer-debt";
 
 export const ManualInputSection = () => {
@@ -35,18 +36,24 @@ export const ManualInputSection = () => {
     isha_safar: 0,
   });
 
-  const handlePrayerChange = (prayer: keyof MissedPrayers, value: number) => {
-    setMissedPrayers((prev) => ({
-      ...prev,
-      [prayer]: Math.max(0, value),
-    }));
+  const handlePrayerChange = (prayer: keyof MissedPrayers, value: string | number) => {
+    const validation = validatePositiveInteger(value);
+    if (validation.valid && validation.value !== undefined) {
+      setMissedPrayers((prev) => ({
+        ...prev,
+        [prayer]: validation.value!,
+      }));
+    }
   };
 
-  const handleTravelPrayerChange = (prayer: keyof TravelPrayers, value: number) => {
-    setTravelPrayers((prev) => ({
-      ...prev,
-      [prayer]: Math.max(0, value),
-    }));
+  const handleTravelPrayerChange = (prayer: keyof TravelPrayers, value: string | number) => {
+    const validation = validatePositiveInteger(value);
+    if (validation.valid && validation.value !== undefined) {
+      setTravelPrayers((prev) => ({
+        ...prev,
+        [prayer]: validation.value!,
+      }));
+    }
   };
 
   const handleSave = async () => {
@@ -203,8 +210,19 @@ export const ManualInputSection = () => {
                 id={key}
                 type="number"
                 min={0}
+                max={999999}
                 value={missedPrayers[key]}
-                onChange={(e) => handlePrayerChange(key, parseInt(e.target.value) || 0)}
+                onChange={(e) => handlePrayerChange(key, e.target.value)}
+                onBlur={(e) => {
+                  const validation = validatePositiveInteger(e.target.value);
+                  if (!validation.valid && validation.error) {
+                    toast({
+                      title: "Ошибка ввода",
+                      description: validation.error,
+                      variant: "destructive",
+                    });
+                  }
+                }}
                 className="bg-background"
                 placeholder="0"
               />
@@ -236,8 +254,19 @@ export const ManualInputSection = () => {
                 id={key}
                 type="number"
                 min={0}
+                max={999999}
                 value={travelPrayers[key]}
-                onChange={(e) => handleTravelPrayerChange(key, parseInt(e.target.value) || 0)}
+                onChange={(e) => handleTravelPrayerChange(key, e.target.value)}
+                onBlur={(e) => {
+                  const validation = validatePositiveInteger(e.target.value);
+                  if (!validation.valid && validation.error) {
+                    toast({
+                      title: "Ошибка ввода",
+                      description: validation.error,
+                      variant: "destructive",
+                    });
+                  }
+                }}
                 className="bg-background"
                 placeholder="0"
               />

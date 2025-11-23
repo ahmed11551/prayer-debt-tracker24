@@ -40,6 +40,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { getTelegramUser } from "@/lib/telegram";
+import { DataBackupDialog } from "@/components/qaza/DataBackupDialog";
 
 interface ProfileDialogProps {
   open: boolean;
@@ -309,6 +310,20 @@ export const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
                     <SelectItem value="ar">العربية</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <Separator />
+
+              {/* Резервное копирование */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-muted-foreground" />
+                  <div>
+                    <Label className="text-base">Резервная копия</Label>
+                    <p className="text-sm text-muted-foreground">Экспорт и импорт данных</p>
+                  </div>
+                </div>
+                <DataBackupDialog />
               </div>
             </CardContent>
           </Card>

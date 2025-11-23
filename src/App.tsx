@@ -21,6 +21,7 @@ import { analytics } from "./lib/analytics";
 import { notificationManager } from "./lib/notifications";
 import { pushNotificationManager } from "./lib/push-notifications";
 import { initSupabase } from "./lib/supabase";
+import { performanceMonitor } from "./lib/performance";
 
 // Настройка React Query с обработкой ошибок
 const queryClient = new QueryClient({
@@ -38,6 +39,9 @@ const queryClient = new QueryClient({
 
 const App = () => {
   useEffect(() => {
+    // Инициализация мониторинга производительности
+    performanceMonitor.init();
+    
     // Инициализация Telegram WebApp при загрузке
     initTelegramWebApp();
     

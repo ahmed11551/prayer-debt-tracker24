@@ -1,19 +1,27 @@
 // Service Worker для офлайн-работы и кэширования
-const CACHE_NAME = 'prayer-tracker-v3';
-const RUNTIME_CACHE = 'prayer-tracker-runtime-v3';
+const CACHE_NAME = 'prayer-tracker-v4';
+const RUNTIME_CACHE = 'prayer-tracker-runtime-v4';
 const OFFLINE_PAGE = '/offline.html';
+const CACHE_VERSION = 'v4';
 
-// Файлы для кэширования при установке
+// Файлы для кэширования при установке (критически важные ресурсы)
 const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/logo.svg',
   '/offline.html',
-  '/dhikr',
-  '/goals',
-  '/reports',
 ];
+
+// Стратегия кэширования: Network First с fallback на Cache
+const CACHE_STRATEGIES = {
+  // Статические ресурсы - Cache First
+  static: ['/logo.svg', '/manifest.json'],
+  // API запросы - Network Only
+  api: ['/api/', 'bot.e-replika.ru', 'supabase.co'],
+  // Страницы - Network First
+  pages: ['/', '/dhikr', '/goals', '/reports'],
+};
 
 // Установка Service Worker
 self.addEventListener('install', (event) => {

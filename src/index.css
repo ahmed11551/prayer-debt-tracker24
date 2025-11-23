@@ -270,6 +270,64 @@ All colors MUST be HSL.
     overflow-wrap: break-word;
   }
 
+  /* Performance optimizations */
+  * {
+    /* Оптимизация рендеринга */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Will-change для анимируемых элементов */
+  .animate-in,
+  .hover\:scale-105:hover,
+  .hover\:scale-\[1\.02\]:hover {
+    will-change: transform;
+  }
+
+  /* Оптимизация скролла */
+  .overflow-x-auto,
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* Оптимизация изображений */
+  img {
+    content-visibility: auto;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  /* Skeleton loader для состояний загрузки */
+  @keyframes skeleton-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .skeleton {
+    animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted) / 0.5) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    border-radius: 0.5rem;
+  }
+
+  /* Оптимизация переходов */
+  .transition-all,
+  .transition-colors,
+  .transition-opacity {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
   /* Mobile-first container fixes */
   @media (max-width: 640px) {
     .container {

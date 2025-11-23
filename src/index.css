@@ -270,6 +270,28 @@ All colors MUST be HSL.
     overflow-wrap: break-word;
   }
 
+  /* Mobile-first container fixes */
+  @media (max-width: 640px) {
+    .container {
+      width: 100%;
+      max-width: 100%;
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+    
+    /* Prevent horizontal scroll */
+    body, html {
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+    
+    /* Fix for cards on mobile */
+    .card {
+      min-width: 0;
+      width: 100%;
+    }
+  }
+
   /* Hide scrollbar but keep functionality */
   .scrollbar-hide {
     -ms-overflow-style: none;  /* IE and Edge */

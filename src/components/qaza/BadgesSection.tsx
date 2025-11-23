@@ -148,50 +148,50 @@ export const BadgesSection = () => {
   }, [badges]);
 
   return (
-    <div className="space-y-6 animate-in fade-in-50 duration-500">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in-50 duration-500 w-full max-w-full overflow-hidden">
       {/* Заголовок и статистика */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground">Достижения</h2>
-          <p className="text-sm text-muted-foreground mt-1">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 w-full">
+        <div className="flex-1 min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground break-words">Достижения</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 break-words">
             {stats.unlocked} из {stats.total} бейджей разблокировано
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Trophy className="w-8 h-8 text-yellow-500" />
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500" />
         </div>
       </div>
 
       {/* Общий прогресс */}
-      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
-            Общий прогресс
+      <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm w-full">
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg break-words">
+            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+            <span>Общий прогресс</span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 sm:space-y-4 pt-0">
           <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Разблокировано бейджей</span>
-              <span className="font-semibold">{stats.unlocked} / {stats.total}</span>
+            <div className="flex justify-between text-xs sm:text-sm">
+              <span className="break-words">Разблокировано бейджей</span>
+              <span className="font-semibold flex-shrink-0 ml-2">{stats.unlocked} / {stats.total}</span>
             </div>
-            <Progress value={stats.progress} className="h-3" />
+            <Progress value={stats.progress} className="h-2 sm:h-3 w-full" />
           </div>
         </CardContent>
       </Card>
 
       {/* Текущие streaks */}
       {(currentStreaks.prayer > 0 || currentStreaks.zikr > 0 || currentStreaks.quran > 0) && (
-        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Flame className="w-5 h-5 text-orange-500" />
-              Активные серии
+        <Card className="bg-card/95 shadow-lg border-border/80 backdrop-blur-sm w-full">
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg break-words">
+              <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 flex-shrink-0" />
+              <span>Активные серии</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-4">
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4">
               {currentStreaks.prayer > 0 && (
                 <div className="text-center">
                   <div className="text-2xl font-bold text-orange-500">{currentStreaks.prayer}</div>
@@ -216,22 +216,22 @@ export const BadgesSection = () => {
       )}
 
       {/* Фильтры */}
-      <div className="flex items-center gap-4">
-        <Tabs value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as BadgeCategory | "all")}>
-          <TabsList>
-            <TabsTrigger value="all">Все</TabsTrigger>
-            <TabsTrigger value="prayer">Намазы</TabsTrigger>
-            <TabsTrigger value="quran">Коран</TabsTrigger>
-            <TabsTrigger value="zikr">Зикры</TabsTrigger>
-            <TabsTrigger value="sadaqa">Садака</TabsTrigger>
-            <TabsTrigger value="streak">Серии</TabsTrigger>
-            <TabsTrigger value="completion">Завершение</TabsTrigger>
+      <div className="w-full overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+        <Tabs value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as BadgeCategory | "all")} className="w-full">
+          <TabsList className="w-full sm:w-auto inline-flex h-auto p-1 bg-muted/50 rounded-lg overflow-x-auto scrollbar-hide">
+            <TabsTrigger value="all" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Все</TabsTrigger>
+            <TabsTrigger value="prayer" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Намазы</TabsTrigger>
+            <TabsTrigger value="quran" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Коран</TabsTrigger>
+            <TabsTrigger value="zikr" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Зикры</TabsTrigger>
+            <TabsTrigger value="sadaqa" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Садака</TabsTrigger>
+            <TabsTrigger value="streak" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Серии</TabsTrigger>
+            <TabsTrigger value="completion" className="flex-shrink-0 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2">Завершение</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
       {/* Список бейджей */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full">
         {filteredBadges.map((badge) => {
           const isUnlocked = !!badge.unlocked_at;
           const colorClass = getBadgeColor(badge.level);
@@ -240,52 +240,52 @@ export const BadgesSection = () => {
             <Card
               key={badge.id}
               className={cn(
-                "bg-card/95 shadow-lg border-border/80 backdrop-blur-sm transition-all duration-300",
+                "bg-card/95 shadow-lg border-border/80 backdrop-blur-sm transition-all duration-300 w-full min-h-[180px] sm:min-h-[200px] flex flex-col",
                 isUnlocked 
                   ? "border-primary/50 shadow-glow" 
                   : "opacity-60"
               )}
             >
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+              <CardHeader className="pb-2 sm:pb-4 flex-shrink-0">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                     <div className={cn(
-                      "text-4xl p-3 rounded-full border-2",
+                      "text-2xl sm:text-4xl p-2 sm:p-3 rounded-full border-2 flex-shrink-0",
                       colorClass
                     )}>
                       {badge.icon}
                     </div>
-                    <div>
-                      <CardTitle className="text-lg">{badge.name}</CardTitle>
-                      <CardDescription className="text-xs">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-base sm:text-lg break-words line-clamp-2">{badge.name}</CardTitle>
+                      <CardDescription className="text-xs break-words line-clamp-1">
                         {getBadgeCategoryLabel(badge.category)}
                       </CardDescription>
                     </div>
                   </div>
                   {isUnlocked ? (
-                    <CheckCircle2 className="w-6 h-6 text-primary" />
+                    <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
                   ) : (
-                    <Lock className="w-6 h-6 text-muted-foreground" />
+                    <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground flex-shrink-0" />
                   )}
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground">{badge.description}</p>
+              <CardContent className="space-y-2 sm:space-y-3 flex-1 flex flex-col pt-0">
+                <p className="text-xs sm:text-sm text-muted-foreground break-words line-clamp-2 flex-shrink-0">{badge.description}</p>
                 
-                <div className="space-y-2">
+                <div className="space-y-1 sm:space-y-2 flex-shrink-0">
                   <div className="flex justify-between text-xs">
                     <span className="text-muted-foreground">Прогресс</span>
-                    <span className="font-semibold">{Math.round(badge.progress)}%</span>
+                    <span className="font-semibold flex-shrink-0 ml-2">{Math.round(badge.progress)}%</span>
                   </div>
-                  <Progress value={badge.progress} className="h-2" />
+                  <Progress value={badge.progress} className="h-1.5 sm:h-2 w-full" />
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Badge variant="outline" className={cn("text-xs", colorClass)}>
+                <div className="flex items-center justify-between gap-2 mt-auto pt-2 flex-shrink-0">
+                  <Badge variant="outline" className={cn("text-xs flex-shrink-0", colorClass)}>
                     {getBadgeLevelLabel(badge.level)}
                   </Badge>
                   {isUnlocked && badge.unlocked_at && (
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground flex-shrink-0 whitespace-nowrap">
                       {new Date(badge.unlocked_at).toLocaleDateString('ru-RU')}
                     </span>
                   )}

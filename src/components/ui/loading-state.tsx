@@ -34,7 +34,11 @@ interface LoadingCardProps {
 
 export const LoadingCard = ({ message = "Загрузка...", className }: LoadingCardProps) => {
   return (
-    <Card className={cn("bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md", className)}>
+    <Card className={cn(
+      "bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md",
+      "animate-in fade-in-50 duration-500",
+      className
+    )}>
       <CardContent className="pt-6">
         <LoadingState message={message} />
       </CardContent>

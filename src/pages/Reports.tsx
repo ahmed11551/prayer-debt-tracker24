@@ -1,6 +1,7 @@
 import { Component, ReactNode } from "react";
 import { MainHeader } from "@/components/layout/MainHeader";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { SkipToMain } from "@/components/layout/SkipToMain";
 import { ReportsSection } from "@/components/qaza/ReportsSection";
 import { BadgesSection } from "@/components/qaza/BadgesSection";
 import { ShareAndFriends } from "@/components/qaza/ShareAndFriends";
@@ -61,23 +62,33 @@ class ErrorBoundary extends Component<
 const Reports = () => {
   return (
     <div className="min-h-screen bg-mosque pb-20 sm:pb-0 relative w-full overflow-x-hidden">
+      <SkipToMain />
       {/* Enhanced background overlay for better content visibility */}
       <div className="fixed inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/60 pointer-events-none z-0" />
       <div className="relative z-10 w-full max-w-full">
         <MainHeader />
         
-        <main className="container mx-auto px-4 py-6 sm:py-8 max-w-5xl pb-24 sm:pb-6">
-          <div className="space-y-6">
+        <main id="main-content" className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 max-w-7xl pb-24 sm:pb-6" role="main">
+          <div className="space-y-6 lg:space-y-8">
             <ErrorBoundary>
-              <ReportsSection />
+              <section aria-labelledby="reports-heading">
+                <h2 id="reports-heading" className="sr-only">Отчёты и статистика</h2>
+                <ReportsSection />
+              </section>
             </ErrorBoundary>
             
             <ErrorBoundary>
-              <BadgesSection />
+              <section aria-labelledby="badges-heading">
+                <h2 id="badges-heading" className="sr-only">Достижения</h2>
+                <BadgesSection />
+              </section>
             </ErrorBoundary>
             
             <ErrorBoundary>
-              <ShareAndFriends />
+              <section aria-labelledby="share-heading">
+                <h2 id="share-heading" className="sr-only">Поделиться и друзья</h2>
+                <ShareAndFriends />
+              </section>
             </ErrorBoundary>
           </div>
         </main>

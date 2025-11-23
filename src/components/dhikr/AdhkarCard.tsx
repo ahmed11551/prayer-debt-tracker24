@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 
 interface AdhkarCardProps {
   dhikr: {
@@ -21,6 +22,7 @@ interface AdhkarCardProps {
 
 export const AdhkarCard = memo(({ dhikr }: AdhkarCardProps) => {
   const [currentCount, setCurrentCount] = useState(0);
+  const [showResetDialog, setShowResetDialog] = useState(false);
 
   const handleClick = () => {
     if (currentCount < dhikr.count) {
@@ -28,9 +30,15 @@ export const AdhkarCard = memo(({ dhikr }: AdhkarCardProps) => {
     }
   };
 
-  const handleReset = (e: React.MouseEvent) => {
+  const handleResetClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (currentCount === 0) return;
+    setShowResetDialog(true);
+  };
+
+  const handleReset = () => {
     setCurrentCount(0);
+    setShowResetDialog(false);
   };
 
   const progress = (currentCount / dhikr.count) * 100;
@@ -66,8 +74,10 @@ export const AdhkarCard = memo(({ dhikr }: AdhkarCardProps) => {
           <Button
             size="icon"
             variant="ghost"
-            onClick={handleReset}
+            onClick={handleResetClick}
             className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+            disabled={currentCount === 0}
+            aria-label="Сбросить счетчик"
           >
             <RotateCcw className="w-4 h-4" />
           </Button>
@@ -136,6 +146,17 @@ export const AdhkarCard = memo(({ dhikr }: AdhkarCardProps) => {
           </div>
         )}
       </CardContent>
+
+      <ConfirmationDialog
+        open={showResetDialog}
+        onOpenChange={setShowResetDialog}
+        onConfirm={handleReset}
+        title="Сбросить счетчик?"
+        description={`Вы уверены, что хотите сбросить счетчик для "${dhikr.title}"? Текущий прогресс (${currentCount}/${dhikr.count}) будет потерян.`}
+        confirmText="Сбросить"
+        cancelText="Отмена"
+        variant="destructive"
+      />
     </Card>
   );
 });

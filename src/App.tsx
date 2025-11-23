@@ -22,6 +22,7 @@ import { notificationManager } from "./lib/notifications";
 import { pushNotificationManager } from "./lib/push-notifications";
 import { initSupabase } from "./lib/supabase";
 import { performanceMonitor } from "./lib/performance";
+import { initializeDailyTracker } from "./lib/daily-prayer-tracker";
 
 // Настройка React Query с обработкой ошибок
 const queryClient = new QueryClient({
@@ -41,6 +42,9 @@ const App = () => {
   useEffect(() => {
     // Инициализация мониторинга производительности
     performanceMonitor.init();
+    
+    // Инициализация системы ежедневного трекинга намазов
+    initializeDailyTracker();
     
     // Инициализация Telegram WebApp при загрузке
     initTelegramWebApp();

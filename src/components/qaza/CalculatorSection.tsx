@@ -14,6 +14,7 @@ import { calculateBulughDate, calculatePrayerDebt, validateCalculationData } fro
 import { prayerDebtAPI, localStorageAPI } from "@/lib/api";
 import { getTelegramUserId } from "@/lib/telegram";
 import { logCalculation } from "@/lib/audit-log";
+import { useDebounce } from "@/hooks/useDebounce";
 import type { Gender, Madhab, TravelPeriod } from "@/types/prayer-debt";
 import { TravelPeriodsDialog } from "./TravelPeriodsDialog";
 import { ManualInputSection } from "./ManualInputSection";
@@ -183,28 +184,32 @@ export const CalculatorSection = () => {
   // Экран выбора режима
   if (mode === "choice") {
     return (
-      <div className="space-y-6 animate-in fade-in-50 duration-500">
-        <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Calculator className="w-5 h-5 text-primary" />
-              <CardTitle className="text-foreground">Калькулятор пропущенных намазов</CardTitle>
+      <div className="space-y-6 lg:space-y-8 animate-in fade-in-50 duration-500">
+        <Card className="bg-card/98 shadow-xl border-2 border-primary/30 backdrop-blur-md hover:shadow-2xl transition-shadow duration-300">
+          <CardHeader className="pb-4 sm:pb-6">
+            <div className="flex items-center gap-3">
+              <Calculator className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
+              <CardTitle className="text-foreground text-xl sm:text-2xl lg:text-3xl">
+                Калькулятор пропущенных намазов
+              </CardTitle>
             </div>
-            <CardDescription className="text-foreground/90 text-base">
+            <CardDescription className="text-foreground/90 text-base sm:text-lg mt-2">
               Выберите способ расчета пропущенных намазов
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 sm:space-y-6">
             <Button
               onClick={() => setMode("manual")}
               size="lg"
               variant="outline"
-              className="w-full h-auto p-4 sm:p-6 flex items-start gap-3 hover:bg-primary/5 transition-all border-2 hover:border-primary/30"
+              className="w-full h-auto p-4 sm:p-6 lg:p-8 flex items-start gap-4 hover:bg-primary/5 transition-all border-2 hover:border-primary/30 hover:shadow-md"
             >
-              <CheckSquare className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+              <CheckSquare className="w-6 h-6 sm:w-7 sm:h-7 text-primary shrink-0 mt-0.5" />
               <div className="flex-1 text-left min-w-0">
-                <div className="font-semibold text-base sm:text-lg leading-tight">Я знаю количество пропущенных</div>
-                <div className="text-xs sm:text-sm text-muted-foreground mt-1.5 leading-relaxed break-words">
+                <div className="font-semibold text-base sm:text-lg lg:text-xl leading-tight mb-2">
+                  Я знаю количество пропущенных
+                </div>
+                <div className="text-sm sm:text-base text-muted-foreground leading-relaxed break-words">
                   Введите количество пропущенных намазов вручную по каждому виду
                 </div>
               </div>
@@ -214,12 +219,14 @@ export const CalculatorSection = () => {
               onClick={() => setMode("calculator")}
               size="lg"
               variant="outline"
-              className="w-full h-auto p-4 sm:p-6 flex items-start gap-3 hover:bg-primary/5 transition-all border-2 hover:border-primary/30"
+              className="w-full h-auto p-4 sm:p-6 lg:p-8 flex items-start gap-4 hover:bg-primary/5 transition-all border-2 hover:border-primary/30 hover:shadow-md"
             >
-              <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0 mt-0.5" />
+              <HelpCircle className="w-6 h-6 sm:w-7 sm:h-7 text-primary shrink-0 mt-0.5" />
               <div className="flex-1 text-left min-w-0">
-                <div className="font-semibold text-base sm:text-lg leading-tight">Помощь посчитать</div>
-                <div className="text-xs sm:text-sm text-muted-foreground mt-1.5 leading-relaxed break-words">
+                <div className="font-semibold text-base sm:text-lg lg:text-xl leading-tight mb-2">
+                  Помощь посчитать
+                </div>
+                <div className="text-sm sm:text-base text-muted-foreground leading-relaxed break-words">
                   Автоматический расчет на основе даты рождения и других параметров
                 </div>
               </div>

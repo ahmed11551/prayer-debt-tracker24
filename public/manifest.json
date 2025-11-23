@@ -1,0 +1,59 @@
+{
+  "name": "Трекер намазов - Prayer Debt Tracker",
+  "short_name": "Prayer Tracker",
+  "description": "Telegram Mini App для расчета и отслеживания восполнения пропущенных обязательных намазов",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#4a3728",
+  "theme_color": "#d4af37",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "productivity", "religion"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Добавить намаз",
+      "short_name": "Добавить",
+      "description": "Быстро добавить выполненный намаз",
+      "url": "/?action=add",
+      "icons": [{ "src": "/logo.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Отчеты",
+      "short_name": "Отчеты",
+      "description": "Просмотр статистики",
+      "url": "/reports",
+      "icons": [{ "src": "/logo.svg", "sizes": "192x192" }]
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}
+

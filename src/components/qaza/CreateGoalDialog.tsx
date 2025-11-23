@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SafeInput } from "@/components/ui/safe-input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -410,10 +411,12 @@ export const CreateGoalDialog = ({
                     </SelectContent>
                   </Select>
                   {knowledgeType === "book" && (
-                    <Input
+                    <SafeInput
                       placeholder="Название книги"
                       value={bookName}
-                      onChange={(e) => setBookName(e.target.value)}
+                      onChange={setBookName}
+                      validate="text"
+                      maxLength={200}
                     />
                   )}
                 </div>
@@ -424,10 +427,12 @@ export const CreateGoalDialog = ({
           {/* Название */}
           <div className="space-y-2">
             <Label htmlFor="title">Название цели *</Label>
-            <Input
+            <SafeInput
               id="title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={setTitle}
+              validate="text"
+              maxLength={100}
               placeholder={
                 category === "prayer" ? "Например: Читать тахаджуд каждый день" :
                 category === "quran" ? "Например: Прочитать суру Аль-Фатиха" :
@@ -441,10 +446,12 @@ export const CreateGoalDialog = ({
           {/* Описание */}
           <div className="space-y-2">
             <Label htmlFor="description">Описание (необязательно)</Label>
-            <Input
+            <SafeInput
               id="description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={setDescription}
+              validate="text"
+              maxLength={500}
               placeholder="Дополнительная информация о цели"
             />
           </div>
@@ -534,12 +541,14 @@ export const CreateGoalDialog = ({
               {period === "custom" && (
                 <div className="space-y-2">
                   <Label htmlFor="customDays">Количество дней</Label>
-                  <Input
+                  <SafeInput
                     id="customDays"
                     type="number"
                     min={1}
+                    max={3650}
                     value={customDays}
-                    onChange={(e) => setCustomDays(parseInt(e.target.value) || 30)}
+                    onChange={(val) => setCustomDays(typeof val === 'number' ? val : parseInt(String(val)) || 30)}
+                    validate="number"
                   />
                 </div>
               )}
@@ -579,12 +588,14 @@ export const CreateGoalDialog = ({
             <Label htmlFor="targetValue">
               Целевое значение ({metric === "count" ? "количество" : "дней"}) *
             </Label>
-            <Input
+            <SafeInput
               id="targetValue"
               type="number"
               min={1}
+              max={999999}
               value={targetValue}
-              onChange={(e) => setTargetValue(parseInt(e.target.value) || 0)}
+              onChange={(val) => setTargetValue(typeof val === 'number' ? val : parseInt(String(val)) || 1)}
+              validate="number"
             />
           </div>
 

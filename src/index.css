@@ -180,9 +180,11 @@ All colors MUST be HSL.
   }
 
   /* Минимальные размеры для touch targets (44x44px согласно WCAG) */
-  button, a, input[type="button"], input[type="submit"], [role="button"] {
+  button, a, input[type="button"], input[type="submit"], [role="button"], 
+  [role="tab"], [role="menuitem"], label[for] {
     min-height: 44px;
     min-width: 44px;
+    touch-action: manipulation; /* Улучшает отзывчивость на мобильных */
   }
 
   /* Улучшенная типографика для мобильных */
@@ -190,6 +192,45 @@ All colors MUST be HSL.
     body {
       font-size: 16px; /* Предотвращает автоматическое масштабирование на iOS */
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Улучшенные размеры для мобильных */
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+    
+    /* Улучшенные отступы для мобильных */
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    
+    /* Улучшенная читаемость карточек на мобильных */
+    .card {
+      border-radius: 1rem;
+      padding: 1rem;
+    }
+  }
+
+  /* Улучшенная контрастность для доступности */
+  ::placeholder {
+    color: hsl(var(--muted-foreground) / 0.7);
+    opacity: 1;
+  }
+
+  /* Улучшенные focus states для доступности */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Предотвращение выделения текста при двойном тапе на мобильных */
+  @media (max-width: 640px) {
+    button, a, [role="button"] {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
   }
 

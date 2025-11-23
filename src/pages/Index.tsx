@@ -1,27 +1,21 @@
-import { useState, useEffect, useRef, lazy, Suspense } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LoadingCard } from "@/components/ui/loading-state";
+import { CalculatorSection } from "@/components/qaza/CalculatorSection";
+import { ProgressSection } from "@/components/qaza/ProgressSection";
+import { TravelPrayersSection } from "@/components/qaza/TravelPrayersSection";
+import { ReportsSection } from "@/components/qaza/ReportsSection";
+import { RepaymentPlanSection } from "@/components/qaza/RepaymentPlanSection";
+import { TermsDictionary } from "@/components/qaza/TermsDictionary";
+import { ShareAndFriends } from "@/components/qaza/ShareAndFriends";
+import { SmartGoalsSection } from "@/components/qaza/SmartGoalsSection";
+import { CompactGoalsCalendar } from "@/components/qaza/CompactGoalsCalendar";
+import { PrayerCalendar } from "@/components/qaza/PrayerCalendar";
+import { RemindersManager } from "@/components/qaza/RemindersManager";
+import { BadgesSection } from "@/components/qaza/BadgesSection";
 import { MainHeader } from "@/components/layout/MainHeader";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { SkipToMain } from "@/components/layout/SkipToMain";
 import { WelcomeDialog } from "@/components/qaza/WelcomeDialog";
 import { cn } from "@/lib/utils";
-
-// Lazy loading для тяжелых компонентов
-const CalculatorSection = lazy(() => import("@/components/qaza/CalculatorSection").then(m => ({ default: m.CalculatorSection })));
-const ProgressSection = lazy(() => import("@/components/qaza/ProgressSection").then(m => ({ default: m.ProgressSection })));
-const TravelPrayersSection = lazy(() => import("@/components/qaza/TravelPrayersSection").then(m => ({ default: m.TravelPrayersSection })));
-const ReportsSection = lazy(() => import("@/components/qaza/ReportsSection").then(m => ({ default: m.ReportsSection })));
-const RepaymentPlanSection = lazy(() => import("@/components/qaza/RepaymentPlanSection").then(m => ({ default: m.RepaymentPlanSection })));
-const TermsDictionary = lazy(() => import("@/components/qaza/TermsDictionary").then(m => ({ default: m.TermsDictionary })));
-const ShareAndFriends = lazy(() => import("@/components/qaza/ShareAndFriends").then(m => ({ default: m.ShareAndFriends })));
-const SmartGoalsSection = lazy(() => import("@/components/qaza/SmartGoalsSection").then(m => ({ default: m.SmartGoalsSection })));
-const CompactGoalsCalendar = lazy(() => import("@/components/qaza/CompactGoalsCalendar").then(m => ({ default: m.CompactGoalsCalendar })));
-const PrayerCalendar = lazy(() => import("@/components/qaza/PrayerCalendar").then(m => ({ default: m.PrayerCalendar })));
-const RemindersManager = lazy(() => import("@/components/qaza/RemindersManager").then(m => ({ default: m.RemindersManager })));
-const BadgesSection = lazy(() => import("@/components/qaza/BadgesSection").then(m => ({ default: m.BadgesSection })));
-const DailyPrayerTracker = lazy(() => import("@/components/qaza/DailyPrayerTracker").then(m => ({ default: m.DailyPrayerTracker })));
-const QadaDebtSection = lazy(() => import("@/components/qaza/QadaDebtSection").then(m => ({ default: m.QadaDebtSection })));
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("plan");
@@ -140,7 +134,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-mosque pb-20 sm:pb-0 relative">
-      <SkipToMain />
       {/* Enhanced background overlay for better content visibility */}
       <div className="fixed inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/60 pointer-events-none z-0" />
       <div className="relative z-10">
@@ -148,7 +141,7 @@ const Index = () => {
         <WelcomeDialog onNavigateToCalculator={handleNavigateToCalculator} />
 
         {/* Main Content */}
-        <main id="main-content" className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 max-w-7xl pb-24 sm:pb-6 space-y-6 lg:space-y-8" role="main">
+        <main className="container mx-auto px-4 py-6 sm:py-8 max-w-5xl pb-24 sm:pb-6 space-y-6">
                 {/* Компактный календарь целей на главном экране */}
                 {activeTab === "plan" && (
                   <div className="mb-6">
@@ -436,72 +429,35 @@ const Index = () => {
           </div>
 
           <TabsContent value="plan" className="space-y-6 mt-6">
-            <Suspense fallback={<LoadingCard message="Загрузка плана..." />}>
-              <section aria-labelledby="plan-heading">
-                <h2 id="plan-heading" className="sr-only">План восполнения намазов</h2>
-                <RepaymentPlanSection />
-              </section>
-            </Suspense>
+            <RepaymentPlanSection />
           </TabsContent>
 
           <TabsContent value="progress" className="space-y-6 mt-6">
-            <Suspense fallback={<LoadingCard message="Загрузка прогресса..." />}>
-              <section aria-labelledby="progress-heading">
-                <h2 id="progress-heading" className="sr-only">Прогресс восполнения</h2>
-                <DailyPrayerTracker />
-                <QadaDebtSection />
-                <ProgressSection />
-              </section>
-            </Suspense>
+            <ProgressSection />
           </TabsContent>
 
           <TabsContent value="travel" className="space-y-6 mt-6">
-            <Suspense fallback={<LoadingCard message="Загрузка намазов в пути..." />}>
-              <section aria-labelledby="travel-heading">
-                <h2 id="travel-heading" className="sr-only">Намазы в путешествии</h2>
-                <TravelPrayersSection />
-              </section>
-            </Suspense>
+            <TravelPrayersSection />
           </TabsContent>
 
-          <TabsContent value="reports" className="space-y-6 mt-6">
-            <Suspense fallback={<LoadingCard message="Загрузка отчётов..." />}>
-              <section aria-labelledby="reports-heading">
-                <h2 id="reports-heading" className="sr-only">Отчёты и статистика</h2>
-                <ReportsSection />
-                <BadgesSection />
-                <ShareAndFriends />
-              </section>
-            </Suspense>
-          </TabsContent>
+                  <TabsContent value="reports" className="space-y-6 mt-6">
+                    <ReportsSection />
+                    <BadgesSection />
+                    <ShareAndFriends />
+                  </TabsContent>
 
           <TabsContent value="calculator" className="space-y-6 mt-6">
-            <Suspense fallback={<LoadingCard message="Загрузка калькулятора..." />}>
-              <section aria-labelledby="calculator-heading">
-                <h2 id="calculator-heading" className="sr-only">Калькулятор долга намазов</h2>
-                <CalculatorSection />
-                <TermsDictionary />
-              </section>
-            </Suspense>
+            <CalculatorSection />
+            <TermsDictionary />
           </TabsContent>
 
           <TabsContent value="goals" className="space-y-6 mt-6">
-            <Suspense fallback={<LoadingCard message="Загрузка целей..." />}>
-              <section aria-labelledby="goals-heading">
-                <h2 id="goals-heading" className="sr-only">Цели и привычки</h2>
-                <SmartGoalsSection />
-              </section>
-            </Suspense>
+            <SmartGoalsSection />
           </TabsContent>
 
           <TabsContent value="calendar" className="space-y-6 mt-6">
-            <Suspense fallback={<LoadingCard message="Загрузка календаря..." />}>
-              <section aria-labelledby="calendar-heading">
-                <h2 id="calendar-heading" className="sr-only">Календарь намазов</h2>
-                <PrayerCalendar />
-                <RemindersManager />
-              </section>
-            </Suspense>
+            <PrayerCalendar />
+            <RemindersManager />
           </TabsContent>
         </Tabs>
         </main>

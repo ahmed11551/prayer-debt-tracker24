@@ -152,20 +152,19 @@ const Index = () => {
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Enhanced Tabs Container */}
           <div className="relative mb-6 overflow-visible">
-            {/* Background with gradient glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 rounded-2xl blur-xl opacity-50 -z-10" />
-            
             <TabsList 
               ref={tabsListRef}
               className={cn(
                 "relative flex w-full h-auto items-center",
-                "px-3 sm:px-4 py-2.5 gap-2 sm:gap-2.5",
+                "px-2 sm:px-3 py-2 gap-1.5 sm:gap-2",
                 "overflow-x-auto overflow-y-visible",
-                "bg-white/98 backdrop-blur-md",
-                "rounded-2xl border-2 border-border/80",
-                "shadow-xl shadow-primary/10",
-                "scroll-smooth snap-x snap-proximity",
-                "min-h-[52px] sm:min-h-[56px]",
+                // Темно-коричневый фон как в отчетах
+                "bg-[hsl(30_40%_20%)] backdrop-blur-md",
+                // Золотисто-коричневая рамка
+                "rounded-2xl border-2 border-[hsl(42_65%_50%)]/60",
+                "shadow-xl shadow-[hsl(30_40%_10%)/0.4]",
+                "scroll-smooth snap-x snap-mandatory",
+                "min-h-[48px] sm:min-h-[52px]",
                 "tabs-scroll-container"
               )}
               style={{ 
@@ -177,88 +176,107 @@ const Index = () => {
               <TabsTrigger 
                 value="plan"
                 className={cn(
-                  "flex-shrink-0 flex items-center justify-center",
-                  "w-auto min-w-fit px-5 sm:px-6 py-2.5 sm:py-3",
+                  "flex-shrink-0 flex flex-col items-center justify-center relative",
+                  "min-w-[70px] sm:min-w-[80px] px-3 sm:px-5 py-2 sm:py-2.5",
                   "text-center rounded-xl",
                   "transition-all duration-300 ease-out",
                   "whitespace-nowrap",
                   "text-xs sm:text-sm font-semibold",
                   "snap-start",
                   "overflow-visible",
-                  // Inactive state
-                  "text-gray-700 bg-transparent",
-                  "hover:text-gray-900 hover:bg-gray-100",
+                  // Inactive state - desaturated blue-grey как в отчетах
+                  "text-[hsl(210_20%_60%)] bg-transparent",
+                  "hover:text-[hsl(210_25%_70%)]",
+                  "hover:shadow-sm",
                   "active:scale-[0.98]",
-                  // Active state
-                  "data-[state=active]:bg-gradient-to-r",
-                  "data-[state=active]:from-primary",
-                  "data-[state=active]:to-primary/90",
-                  "data-[state=active]:text-white",
-                  "data-[state=active]:shadow-lg",
-                  "data-[state=active]:shadow-primary/30",
-                  "data-[state=active]:scale-[1.01]",
+                  // Active state - золотисто-коричневая линия под текстом
+                  "data-[state=active]:text-[hsl(42_50%_95%)]",
+                  "data-[state=active]:bg-transparent",
+                  "data-[state=active]:pb-1",
                   "data-[state=active]:font-bold",
-                  "data-[state=active]:z-10"
+                  "data-[state=active]:z-10",
+                  // Линия под активным табом
+                  "data-[state=active]:after:content-['']",
+                  "data-[state=active]:after:absolute",
+                  "data-[state=active]:after:bottom-0",
+                  "data-[state=active]:after:left-1/2",
+                  "data-[state=active]:after:-translate-x-1/2",
+                  "data-[state=active]:after:w-[calc(100%-1rem)]",
+                  "data-[state=active]:after:h-[2px]",
+                  "data-[state=active]:after:bg-[hsl(42_65%_50%)]",
+                  "data-[state=active]:after:rounded-full"
                 )}
               >
-                <span className="relative z-10 whitespace-nowrap">План</span>
+                <span className="relative z-10">План</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="progress"
                 className={cn(
-                  "flex-shrink-0 flex items-center justify-center",
-                  "w-auto min-w-fit px-5 sm:px-6 py-2.5 sm:py-3",
+                  "flex-shrink-0 flex flex-col items-center justify-center relative",
+                  "min-w-[85px] sm:min-w-[100px] px-3 sm:px-5 py-2 sm:py-2.5",
                   "text-center rounded-xl",
                   "transition-all duration-300 ease-out",
                   "whitespace-nowrap",
                   "text-xs sm:text-sm font-semibold",
                   "snap-start",
                   "overflow-visible",
-                  // Inactive state
-                  "text-gray-700 bg-transparent",
-                  "hover:text-gray-900 hover:bg-gray-100",
+                  // Inactive state - desaturated blue-grey
+                  "text-[hsl(210_20%_60%)] bg-transparent",
+                  "hover:text-[hsl(210_25%_70%)]",
+                  "hover:shadow-sm",
                   "active:scale-[0.98]",
                   // Active state
-                  "data-[state=active]:bg-gradient-to-r",
-                  "data-[state=active]:from-primary",
-                  "data-[state=active]:to-primary/90",
-                  "data-[state=active]:text-white",
-                  "data-[state=active]:shadow-lg",
-                  "data-[state=active]:shadow-primary/30",
-                  "data-[state=active]:scale-[1.01]",
+                  "data-[state=active]:text-[hsl(42_50%_95%)]",
+                  "data-[state=active]:bg-transparent",
+                  "data-[state=active]:pb-1",
                   "data-[state=active]:font-bold",
-                  "data-[state=active]:z-10"
+                  "data-[state=active]:z-10",
+                  "data-[state=active]:after:content-['']",
+                  "data-[state=active]:after:absolute",
+                  "data-[state=active]:after:bottom-0",
+                  "data-[state=active]:after:left-1/2",
+                  "data-[state=active]:after:-translate-x-1/2",
+                  "data-[state=active]:after:w-[calc(100%-1rem)]",
+                  "data-[state=active]:after:h-[2px]",
+                  "data-[state=active]:after:bg-[hsl(42_65%_50%)]",
+                  "data-[state=active]:after:rounded-full"
                 )}
               >
-                <span className="relative z-10 whitespace-nowrap">Прогресс</span>
+                <span className="relative z-10">Прогресс</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="travel"
                 className={cn(
-                  "flex-shrink-0 flex items-center justify-center",
-                  "w-auto min-w-fit px-5 sm:px-6 py-2.5 sm:py-3",
+                  "flex-shrink-0 flex flex-col items-center justify-center relative",
+                  "min-w-[75px] sm:min-w-[90px] px-3 sm:px-5 py-2 sm:py-2.5",
                   "text-center rounded-xl",
                   "transition-all duration-300 ease-out",
                   "whitespace-nowrap",
                   "text-xs sm:text-sm font-semibold",
                   "snap-start",
                   "overflow-visible",
-                  // Inactive state
-                  "text-gray-700 bg-transparent",
-                  "hover:text-gray-900 hover:bg-gray-100",
+                  // Inactive state - desaturated blue-grey
+                  "text-[hsl(210_20%_60%)] bg-transparent",
+                  "hover:text-[hsl(210_25%_70%)]",
+                  "hover:shadow-sm",
                   "active:scale-[0.98]",
                   // Active state
-                  "data-[state=active]:bg-gradient-to-r",
-                  "data-[state=active]:from-primary",
-                  "data-[state=active]:to-primary/90",
-                  "data-[state=active]:text-white",
-                  "data-[state=active]:shadow-lg",
-                  "data-[state=active]:shadow-primary/30",
-                  "data-[state=active]:scale-[1.01]",
+                  "data-[state=active]:text-[hsl(42_50%_95%)]",
+                  "data-[state=active]:bg-transparent",
+                  "data-[state=active]:pb-1",
                   "data-[state=active]:font-bold",
-                  "data-[state=active]:z-10"
+                  "data-[state=active]:z-10",
+                  "data-[state=active]:after:content-['']",
+                  "data-[state=active]:after:absolute",
+                  "data-[state=active]:after:bottom-0",
+                  "data-[state=active]:after:left-1/2",
+                  "data-[state=active]:after:-translate-x-1/2",
+                  "data-[state=active]:after:w-[calc(100%-1rem)]",
+                  "data-[state=active]:after:h-[2px]",
+                  "data-[state=active]:after:bg-[hsl(42_65%_50%)]",
+                  "data-[state=active]:after:rounded-full"
                 )}
               >
                 <span className="relative z-10 whitespace-nowrap">Сафар</span>
@@ -267,121 +285,145 @@ const Index = () => {
               <TabsTrigger 
                 value="reports"
                 className={cn(
-                  "flex-shrink-0 flex items-center justify-center",
-                  "w-auto min-w-fit px-5 sm:px-6 py-2.5 sm:py-3",
+                  "flex-shrink-0 flex flex-col items-center justify-center relative",
+                  "min-w-[85px] sm:min-w-[100px] px-3 sm:px-5 py-2 sm:py-2.5",
                   "text-center rounded-xl",
                   "transition-all duration-300 ease-out",
                   "whitespace-nowrap",
                   "text-xs sm:text-sm font-semibold",
                   "snap-start",
                   "overflow-visible",
-                  // Inactive state
-                  "text-gray-700 bg-transparent",
-                  "hover:text-gray-900 hover:bg-gray-100",
+                  // Inactive state - desaturated blue-grey
+                  "text-[hsl(210_20%_60%)] bg-transparent",
+                  "hover:text-[hsl(210_25%_70%)]",
+                  "hover:shadow-sm",
                   "active:scale-[0.98]",
                   // Active state
-                  "data-[state=active]:bg-gradient-to-r",
-                  "data-[state=active]:from-primary",
-                  "data-[state=active]:to-primary/90",
-                  "data-[state=active]:text-white",
-                  "data-[state=active]:shadow-lg",
-                  "data-[state=active]:shadow-primary/30",
-                  "data-[state=active]:scale-[1.01]",
+                  "data-[state=active]:text-[hsl(42_50%_95%)]",
+                  "data-[state=active]:bg-transparent",
+                  "data-[state=active]:pb-1",
                   "data-[state=active]:font-bold",
-                  "data-[state=active]:z-10"
+                  "data-[state=active]:z-10",
+                  "data-[state=active]:after:content-['']",
+                  "data-[state=active]:after:absolute",
+                  "data-[state=active]:after:bottom-0",
+                  "data-[state=active]:after:left-1/2",
+                  "data-[state=active]:after:-translate-x-1/2",
+                  "data-[state=active]:after:w-[calc(100%-1rem)]",
+                  "data-[state=active]:after:h-[2px]",
+                  "data-[state=active]:after:bg-[hsl(42_65%_50%)]",
+                  "data-[state=active]:after:rounded-full"
                 )}
               >
-                <span className="relative z-10 whitespace-nowrap">Отчёты</span>
+                <span className="relative z-10">Отчёты</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="calculator"
                 className={cn(
-                  "flex-shrink-0 flex items-center justify-center",
-                  "w-auto min-w-fit px-5 sm:px-6 py-2.5 sm:py-3",
+                  "flex-shrink-0 flex flex-col items-center justify-center relative",
+                  "min-w-[100px] sm:min-w-[120px] px-3 sm:px-5 py-2 sm:py-2.5",
                   "text-center rounded-xl",
                   "transition-all duration-300 ease-out",
                   "whitespace-nowrap",
                   "text-xs sm:text-sm font-semibold",
                   "snap-start",
                   "overflow-visible",
-                  // Inactive state
-                  "text-gray-700 bg-transparent",
-                  "hover:text-gray-900 hover:bg-gray-100",
+                  // Inactive state - desaturated blue-grey
+                  "text-[hsl(210_20%_60%)] bg-transparent",
+                  "hover:text-[hsl(210_25%_70%)]",
+                  "hover:shadow-sm",
                   "active:scale-[0.98]",
                   // Active state
-                  "data-[state=active]:bg-gradient-to-r",
-                  "data-[state=active]:from-primary",
-                  "data-[state=active]:to-primary/90",
-                  "data-[state=active]:text-white",
-                  "data-[state=active]:shadow-lg",
-                  "data-[state=active]:shadow-primary/30",
-                  "data-[state=active]:scale-[1.01]",
+                  "data-[state=active]:text-[hsl(42_50%_95%)]",
+                  "data-[state=active]:bg-transparent",
+                  "data-[state=active]:pb-1",
                   "data-[state=active]:font-bold",
-                  "data-[state=active]:z-10"
+                  "data-[state=active]:z-10",
+                  "data-[state=active]:after:content-['']",
+                  "data-[state=active]:after:absolute",
+                  "data-[state=active]:after:bottom-0",
+                  "data-[state=active]:after:left-1/2",
+                  "data-[state=active]:after:-translate-x-1/2",
+                  "data-[state=active]:after:w-[calc(100%-1rem)]",
+                  "data-[state=active]:after:h-[2px]",
+                  "data-[state=active]:after:bg-[hsl(42_65%_50%)]",
+                  "data-[state=active]:after:rounded-full"
                 )}
               >
-                <span className="relative z-10 whitespace-nowrap">Калькулятор</span>
+                <span className="relative z-10">Калькулятор</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="goals"
                 className={cn(
-                  "flex-shrink-0 flex items-center justify-center",
-                  "w-auto min-w-fit px-5 sm:px-6 py-2.5 sm:py-3",
+                  "flex-shrink-0 flex flex-col items-center justify-center relative",
+                  "min-w-[70px] sm:min-w-[80px] px-3 sm:px-5 py-2 sm:py-2.5",
                   "text-center rounded-xl",
                   "transition-all duration-300 ease-out",
                   "whitespace-nowrap",
                   "text-xs sm:text-sm font-semibold",
                   "snap-start",
                   "overflow-visible",
-                  // Inactive state
-                  "text-gray-700 bg-transparent",
-                  "hover:text-gray-900 hover:bg-gray-100",
+                  // Inactive state - desaturated blue-grey
+                  "text-[hsl(210_20%_60%)] bg-transparent",
+                  "hover:text-[hsl(210_25%_70%)]",
+                  "hover:shadow-sm",
                   "active:scale-[0.98]",
                   // Active state
-                  "data-[state=active]:bg-gradient-to-r",
-                  "data-[state=active]:from-primary",
-                  "data-[state=active]:to-primary/90",
-                  "data-[state=active]:text-white",
-                  "data-[state=active]:shadow-lg",
-                  "data-[state=active]:shadow-primary/30",
-                  "data-[state=active]:scale-[1.01]",
+                  "data-[state=active]:text-[hsl(42_50%_95%)]",
+                  "data-[state=active]:bg-transparent",
+                  "data-[state=active]:pb-1",
                   "data-[state=active]:font-bold",
-                  "data-[state=active]:z-10"
+                  "data-[state=active]:z-10",
+                  "data-[state=active]:after:content-['']",
+                  "data-[state=active]:after:absolute",
+                  "data-[state=active]:after:bottom-0",
+                  "data-[state=active]:after:left-1/2",
+                  "data-[state=active]:after:-translate-x-1/2",
+                  "data-[state=active]:after:w-[calc(100%-1rem)]",
+                  "data-[state=active]:after:h-[2px]",
+                  "data-[state=active]:after:bg-[hsl(42_65%_50%)]",
+                  "data-[state=active]:after:rounded-full"
                 )}
               >
-                <span className="relative z-10 whitespace-nowrap">Цели</span>
+                <span className="relative z-10">Цели</span>
               </TabsTrigger>
               
               <TabsTrigger 
                 value="calendar"
                 className={cn(
-                  "flex-shrink-0 flex items-center justify-center",
-                  "w-auto min-w-fit px-5 sm:px-6 py-2.5 sm:py-3",
+                  "flex-shrink-0 flex flex-col items-center justify-center relative",
+                  "min-w-[90px] sm:min-w-[110px] px-3 sm:px-5 py-2 sm:py-2.5",
                   "text-center rounded-xl",
                   "transition-all duration-300 ease-out",
                   "whitespace-nowrap",
                   "text-xs sm:text-sm font-semibold",
                   "snap-start",
                   "overflow-visible",
-                  // Inactive state
-                  "text-gray-700 bg-transparent",
-                  "hover:text-gray-900 hover:bg-gray-100",
+                  // Inactive state - desaturated blue-grey
+                  "text-[hsl(210_20%_60%)] bg-transparent",
+                  "hover:text-[hsl(210_25%_70%)]",
+                  "hover:shadow-sm",
                   "active:scale-[0.98]",
                   // Active state
-                  "data-[state=active]:bg-gradient-to-r",
-                  "data-[state=active]:from-primary",
-                  "data-[state=active]:to-primary/90",
-                  "data-[state=active]:text-white",
-                  "data-[state=active]:shadow-lg",
-                  "data-[state=active]:shadow-primary/30",
-                  "data-[state=active]:scale-[1.01]",
+                  "data-[state=active]:text-[hsl(42_50%_95%)]",
+                  "data-[state=active]:bg-transparent",
+                  "data-[state=active]:pb-1",
                   "data-[state=active]:font-bold",
-                  "data-[state=active]:z-10"
+                  "data-[state=active]:z-10",
+                  "data-[state=active]:after:content-['']",
+                  "data-[state=active]:after:absolute",
+                  "data-[state=active]:after:bottom-0",
+                  "data-[state=active]:after:left-1/2",
+                  "data-[state=active]:after:-translate-x-1/2",
+                  "data-[state=active]:after:w-[calc(100%-1rem)]",
+                  "data-[state=active]:after:h-[2px]",
+                  "data-[state=active]:after:bg-[hsl(42_65%_50%)]",
+                  "data-[state=active]:after:rounded-full"
                 )}
               >
-                <span className="relative z-10 whitespace-nowrap">Календарь</span>
+                <span className="relative z-10">Календарь</span>
               </TabsTrigger>
             </TabsList>
           </div>
